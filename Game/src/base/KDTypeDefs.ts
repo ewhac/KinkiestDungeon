@@ -3906,6 +3906,73 @@ type KDTeaseAttack = {
 	apply: (enemy: entity, player: entity, AIData: any, blocked: boolean, evaded: boolean, damageMod: number) => boolean,
 };
 
+/**
+ * Modifier specification.  You can request a key have certain modifiers to be effective.  The modifier states are:
+ *  * None (i.e. the modifier is not asserted)
+ *  * Any (i.e. the modifier is asserted via any pertinent key)
+ *  * Left (the modifier is asserted by the left-hand key)
+ *  * Right (the modifier is asserted by the right-hand key).
+ *  * Don't Care (the modifier's presence/absence is not relevant/ignored)
+ *
+ * (Limitations in the JS event API prevent you from specifying both left+right modifiers be pressed.)
+ */
+enum KeyModifier {
+	KEYMODDEF_NONE		= 0x00,
+	KEYMODDEF_LEFT		= 0x01,
+	KEYMODDEF_RIGHT		= 0x02,
+	KEYMODDEF_ANY		= 0x03,
+	KEYMODDEF_DONTCARE	= 0x0F,
+};
+
+/**
+ * Key "stroke" specifications.  Though declared as an enum, these are numbers
+ * that may be ORed together.
+ */
+ enum KeyStrokeDefs {
+	KEYSTROKEDEF_DOWN	= 0x01,
+	KEYSTROKEDEF_UP		= 0x02,
+	KEYSTROKEDEF_REPEAT	= 0x04,
+ };
+
+/**
+ * Declares a keystroke we're interested in, the modifiers it must/must not possess, and the function to invoke when seen.  Allows
+ * most common modifier filtering to happen in the main key event processor, simplifying leaf function logic.
+ */
+interface KDKeystrokeDef {
+
+	/**
+	 * Function to invoke when a matching keystroke is received.
+	 *
+	 * @param ev - Event
+	 * @returns - Tri-state, indicates whether event was consumed; handler checking stops when the event is consumed.
+	 *            undefined == event not recognized;
+	 *            false == event recognized but not consumed;
+	 *            true == event recognized and consumed.
+	 */
+	func:		(ev: KDEV_Key) => boolean | undefined;
+
+	/**
+	 * Base keystroke.  This may be a layout-mapped character (e.g. 'a'), or a "key name" (e.g. "Enter", "Backspace", etc.).
+	 */
+	key:		string;
+
+	/*  Use KEYMODDEF_ values here.  `undefined` == NONE  */
+	mod_shift?:	KeyModifier;
+	mod_ctrl?:	KeyModifier;
+	mod_alt?:	KeyModifier;
+	mod_meta?:	KeyModifier;
+
+	/**
+	 * Key "strokes" handled.  Use KeyStrokeDefs values ORed together here.  undefined == KEYSTROKEDEF_DOWN.
+	 */
+	strokes?:	number;
+};
+
+interface KDEV_Key {
+	type:	"keydown" | "keyup";
+	ev:	KeyboardEvent;
+};
+
 declare const zip: any;
 declare const guessLanguage: {
 	detect(text: string): string;
@@ -3913,6 +3980,8 @@ declare const guessLanguage: {
 	code(text: string): [number];
 	name(text: string): string;
 };
+
+declare const Denque: typeof import ('denque');
 
 declare const PIXI: typeof import('pixi.js') & typeof import('pixi.js-legacy') & {
 	// Filters says it's deprecated and should be referenced `PIXI.<filter>` rather than `PIXI.filters.<filter>`

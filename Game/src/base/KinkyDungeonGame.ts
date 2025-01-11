@@ -4915,6 +4915,98 @@ function KinkyDungeonGameKeyUp(lastPress: number): boolean {
 	return false;
 }
 
+let KDKeystrokeCache: KDKeystrokeDef[] = [];
+
+
+function KDProcessEVQ(): void {
+	if (!KDEVQ_Keys.size()) {
+		return;
+	}
+
+	let kev: KDEV_Key;
+	while (kev = KDEVQ_Keys.shift()) {
+		let ev_key = kev.ev.key;
+		if (ev_key.length == 1) {
+			ev_key = ev_key.toLowerCase();
+		}
+		for (const kd of KDKeystrokeCache) {
+			if (ev_key !== kd.key) {
+				continue;
+			}
+
+			const mod_shift = kd.mod_shift ?? KeyModifier.KEYMODDEF_NONE;
+			const mod_ctrl  = kd.mod_ctrl ?? KeyModifier.KEYMODDEF_NONE;
+			const mod_alt   = kd.mod_alt ?? KeyModifier.KEYMODDEF_NONE;
+			const mod_meta  = kd.mod_meta ?? KeyModifier.KEYMODDEF_NONE;
+			const strokes   = kd.strokes ?? KeyStrokeDefs.KEYSTROKEDEF_DOWN;
+
+			if (!strokes) {
+				console.log (`ERR: invalid strokes in KeyModifier: ${JSON.stringify (kd)}`);
+				continue;
+			}
+
+			if (kev.type === "keyup"  &&  !(strokes & KeyStrokeDefs.KEYSTROKEDEF_UP)) {
+				continue;
+			}
+
+			if (kev.type === "keydown") {
+				if (    !(strokes & (KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT))
+				    ||  (kev.ev.repeat  &&  !(strokes & KeyStrokeDefs.KEYSTROKEDEF_REPEAT))
+			    	    ||  (!kev.ev.repeat  &&  !(strokes & KeyStrokeDefs.KEYSTROKEDEF_DOWN)))
+				{
+					continue;
+				}
+			}
+
+			/**
+			 * @returns - true if event matches desired mod key state.
+			 */
+			function modcheck (mod_sought: number, ev_modstate: boolean, ev_location: number) {
+				if (mod_sought != KeyModifier.KEYMODDEF_DONTCARE) {
+					if (ev_modstate) {
+						if (mod_sought == KeyModifier.KEYMODDEF_NONE) {
+							return false;
+						}
+						if (    (mod_sought == KeyModifier.KEYMODDEF_LEFT   &&  ev_location != KeyboardEvent.DOM_KEY_LOCATION_LEFT)
+						    ||  (mod_sought == KeyModifier.KEYMODDEF_RIGHT  &&  ev_location != KeyboardEvent.DOM_KEY_LOCATION_RIGHT))
+						{
+							return false;
+						}
+					} else {
+						if (    mod_sought == KeyModifier.KEYMODDEF_ANY
+						    ||  mod_sought == KeyModifier.KEYMODDEF_LEFT
+						    ||  mod_sought == KeyModifier.KEYMODDEF_RIGHT)
+						{
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+
+			if (!modcheck (mod_shift, kev.ev.shiftKey, kev.ev.location)) {
+				continue;
+			}
+			if (!modcheck (mod_ctrl, kev.ev.ctrlKey, kev.ev.location)) {
+				continue;
+			}
+			if (!modcheck (mod_alt, kev.ev.altKey, kev.ev.location)) {
+				continue;
+			}
+			if (!modcheck (mod_meta, kev.ev.metaKey, kev.ev.location)) {
+				continue;
+			}
+
+			/*  Passed all the filters, so do the thing.  */
+			const ret = kd.func (kev);
+			if (ret === true) {
+				/*  Event was consumed.  */
+				break;
+			}
+		}
+	}
+}
+
 function KinkyDungeonSendTextMessage(priority: number, text: string, color: string, time?: number, noPush?: boolean, noDupe?: boolean, entity?: entity, filter: string = "Self"): boolean {
 	if (entity && KinkyDungeonVisionGet(entity.x, entity.y) < 1) return false;
 	if (text) {

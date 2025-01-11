@@ -169,6 +169,8 @@ let KinkyDungeonKeySwitchLoadout = ['[', ']', '\\'];
 let KinkyDungeonKeyLogFilter = ['{', '}', ':', '"'];
 let KinkyDungeonKeyMap = ['+', '<', '>'];
 
+let KDEVQ_Keys = new Denque<KDEV_Key>();
+
 let KDLoadingTextKeys: Record<string, string> = {};
 
 let kdSpecialModePerks = [
@@ -1522,6 +1524,7 @@ function KinkyDungeonRun() {
 
 	KDLastButtonsCache = KDButtonsCache;
 	KDButtonsCache = {};
+	KDKeystrokeCache = [];
 	KDUpdateVibeSounds();
 	KDUpdateMusic();
 
@@ -3457,6 +3460,15 @@ function DrawButtonKDEx (
 		priority: (options?.zIndex || 0),
 		hotkeyPress: options?.hotkeyPress,
 	};
+	if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
+		for (const kd of options.keyDefs as KDKeystrokeDef[]) {
+			if (kd.key.length == 1) {
+				// Single char; make sure it's lower-case.
+				kd.key = kd.key.toLowerCase();
+			}
+			KDKeystrokeCache.push (kd);
+		}
+	}
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -5919,11 +5931,21 @@ let KinkyDungeonGameKey: any = {
 
 	addKeyListener : function () {
 		window.addEventListener('keydown', KinkyDungeonGameKey.keyDownEvent);
+		window.addEventListener('keydown', KinkyDungeonGameKey.ewhacKeyDown);
 		window.addEventListener('keyup', KinkyDungeonGameKey.keyUpEvent);
+		window.addEventListener('keyup', KinkyDungeonGameKey.ewhacKeyUp);
 	},
 	removeKeyListener : function () {
 		window.removeEventListener('keydown', KinkyDungeonGameKey.keyDownEvent);
+		window.removeEventListener('keydown', KinkyDungeonGameKey.ewhacKeyDown);
 		window.removeEventListener('keyup', KinkyDungeonGameKey.keyUpEvent);
+		window.removeEventListener('keyup', KinkyDungeonGameKey.ewhacKeyUp);
+	},
+	ewhacKeyDown: function (ev: KeyboardEvent): void {
+		KDEVQ_Keys.push ({ type: "keydown", ev });
+	},
+	ewhacKeyUp: function (ev: KeyboardEvent): void {
+		KDEVQ_Keys.push ({ type: "keyup", ev });
 	},
 	keyDownEvent : {
 		handleEvent : function (event: KeyboardEvent) {

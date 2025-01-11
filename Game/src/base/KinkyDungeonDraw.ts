@@ -2242,6 +2242,7 @@ function KinkyDungeonDrawGame() {
 	if (KinkyDungeonDrawState == "Game")
 		KinkyDungeonListenKeyMove();
 
+	KDProcessEVQ();
 	KDProcessInputs();
 
 	if (KDDrewEnemyTooltipThisFrame) {
