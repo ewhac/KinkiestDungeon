@@ -3310,10 +3310,12 @@ type ButtonOptions = {
 	centerText?:  boolean;
 	/// tint
 	tint?:        string;
-	/// hotkey
-	hotkey?:      string;
-	/// hotkey
+	/// Text naming the hotkey for this button
+	hotkeyLabel?: string;
+	/// hotkey press that triggers this button
 	hotkeyPress?: string;
+	/// Hotkey definitions for this button
+	keyDefs?:     KDKeystrokeDef[],
 	/// filters
 	filters?:     any[];
 	font?:        string;
@@ -3339,16 +3341,6 @@ type ButtonOptions = {
  * @param [Stretch] - Stretch the image to fit
  * @param [zIndex] - Stretch the image to fit
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha]
- * @param [options.zIndex] - zIndex
- * @param [options.scaleImage] - zIndex
- * @param [options.centered] - centered
- * @param [options.centerText] - centered
- * @param [options.tint] - tint
- * @param [options.hotkey] - hotkey
- * @param [options.hotkeyPress] - hotkey
- * @param [options.filters] - filters
  */
 function DrawButtonVis (
 	Left:          number,
@@ -3392,17 +3384,6 @@ function DrawButtonVis (
  * @param [Stretch] - Stretch the image to fit
  * @param [zIndex] - Stretch the image to fit
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha]
- * @param [options.zIndex] - zIndex
- * @param [options.unique] - This button is not differentiated by position
- * @param [options.scaleImage] - zIndex
- * @param [options.centered] - centered
- * @param [options.centerText] - centered
- * @param [options.tint] - tint
- * @param [options.hotkey] - hotkey
- * @param [options.hotkeyPress] - hotkey
- * @param [options.filters] - filters
  */
 function DrawButtonVisTo (
 	Container:     PIXIContainer,
@@ -3492,9 +3473,9 @@ function DrawButtonVisTo (
 			FontSize, undefined, zIndex + 0.009, undefined, undefined,
 			options?.unique, KDButtonFont);
 
-	if (options?.hotkey) {
+	if (options?.hotkeyLabel) {
 		let size = (FontSize*0.6) || 14;
-		DrawTextFitKDTo(Container || kdcanvas, options?.hotkey, Left + Width - 4,
+		DrawTextFitKDTo(Container || kdcanvas, options.hotkeyLabel, Left + Width - 4,
 			Top + (size / 2) + 2, Width*0.7,
 			'#ffffff',
 			(options && options.noTextBG) ? "none" : undefined,
@@ -3515,9 +3496,6 @@ function DrawButtonVisTo (
  * @param [Disabled] - Disables the hovering options if set to true
  * @param [TextColor] - Color of the text
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha]
- * @param [options.zIndex] - zIndex
  */
 function DrawCheckboxVis (
 	Left:        number,
@@ -3553,12 +3531,6 @@ function DrawCheckboxVis (
  * @param [Disabled] - Disables the hovering options if set to true
  * @param [TextColor] - Color of the text
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha]
- * @param [options.zIndex] - zIndex
- * @param [options.maxWidth] - Max width
- * @param [options.fontSize] - fontSize
- * @param [options.scaleImage] - zIndex
  */
 function DrawCheckboxKDEx (
 	name:         string,
@@ -3597,9 +3569,6 @@ function DrawCheckboxKDEx (
  * @param [ArrowWidth] - How much of the button the previous/next sections cover. By default, half each.
  * @param [NoBorder] - Disables the hovering options if set to true
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha]
- * @param [options.font]
  */
 function DrawBackNextButtonVis (
 	Left:         number,

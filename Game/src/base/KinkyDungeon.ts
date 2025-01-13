@@ -3417,16 +3417,6 @@ function DrawButtonKD (
  * @param [FontSize] - Font size
  * @param [ShiftText] - Shift text to make room for the button
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha] - Dont show text backgrounds
- * @param [options.zIndex] - zIndex
- * @param [options.scaleImage] - zIndex
- * @param [options.centered] - centered
- * @param [options.centerText] - centered
- * @param [options.tint] - tint
- * @param [options.hotkey] - hotkey
- * @param [options.hotkeyPress] - hotkey
- * @param [options.filters] - filters
  * @returns - Whether or not the mouse is in the button
  */
 function DrawButtonKDEx (
@@ -3446,7 +3436,7 @@ function DrawButtonKDEx (
 	FillColor?:	string,
 	FontSize?:	number,
 	ShiftText?:	boolean,
-	options?:	any,
+	options?:	ButtonOptions
 ): boolean
 {
 	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
@@ -3461,7 +3451,7 @@ function DrawButtonKDEx (
 		hotkeyPress: options?.hotkeyPress,
 	};
 	if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
-		for (const kd of options.keyDefs as KDKeystrokeDef[]) {
+		for (const kd of options.keyDefs) {
 			if (kd.key.length == 1) {
 				// Single char; make sure it's lower-case.
 				kd.key = kd.key.toLowerCase();
@@ -3493,15 +3483,6 @@ function DrawButtonKDEx (
  * @param [FontSize] - Font size
  * @param [ShiftText] - Shift text to make room for the button
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha] - Dont show text backgrounds
- * @param [options.zIndex] - zIndex
- * @param [options.scaleImage] - zIndex
- * @param [options.centered] - centered
- * @param [options.centerText] - centered
- * @param [options.tint] - tint
- * @param [options.hotkey] - hotkey
- * @param [options.hotkeyPress] - hotkey
  * @returns - Whether or not the mouse is in the button
  */
 function DrawButtonKDExScroll (
@@ -3522,7 +3503,7 @@ function DrawButtonKDExScroll (
 	FillColor?:	string,
 	FontSize?:	number,
 	ShiftText?:	boolean,
-	options?:	any,
+	options?:	ButtonOptions
 ): boolean
 {
 	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
@@ -3560,12 +3541,6 @@ function DrawButtonKDExScroll (
  * @param [FontSize] - Font size
  * @param [ShiftText] - Shift text to make room for the button
  * @param [options] - Additional options
- * @param [options.noTextBG] - Dont show text backgrounds
- * @param [options.alpha] - Dont show text backgrounds
- * @param [options.zIndex] - zIndex
- * @param [options.hotkey] - hotkey
- * @param [options.hotkeyPress] - hotkey
- * @param [options.unique] - This button is unique, so X and Y are not differentiators
  * @returns - Whether or not the mouse is in the button
  */
 function DrawButtonKDExTo (
@@ -3586,7 +3561,7 @@ function DrawButtonKDExTo (
 	FillColor?:	string,
 	FontSize?:	number,
 	ShiftText?:	boolean,
-	options?:	any,
+	options?:	ButtonOptions
 ): boolean
 {
 	DrawButtonVisTo(Container, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
@@ -3808,10 +3783,10 @@ function KDFunctionShopScroll(amount: number): boolean {
 
 function KDProcessButtonScroll(amount: number, padV: number = 0): boolean {
 	let buttons = [];
-	for (let button of Object.entries(KDButtonsCache)) {
-		if (button[1].enabled && button[1].scrollfunc) {
-			if (MouseInKD(button[0], 0, padV)) {
-				buttons.push(button[1]);
+	for (let [k, v] of Object.entries(KDButtonsCache)) {
+		if (v.enabled && v.scrollfunc) {
+			if (MouseInKD(k, 0, padV)) {
+				buttons.push(v);
 			}
 		}
 	}
@@ -3828,10 +3803,10 @@ function KDProcessButtonScroll(amount: number, padV: number = 0): boolean {
 function KDProcessButtons() {
 	//KDFocusControls = "";
 	let buttons = [];
-	for (let button of Object.entries(KDButtonsCache)) {
-		if (button[1].enabled && button[1].func) {
-			if (MouseInKD(button[0])) {
-				buttons.push(button[1]);
+	for (let [k, v] of Object.entries(KDButtonsCache)) {
+		if (v.enabled && v.func) {
+			if (MouseInKD(k)) {
+				buttons.push(v);
 			}
 		}
 	}
