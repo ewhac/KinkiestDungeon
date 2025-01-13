@@ -19,7 +19,7 @@ KDCollectionTabDraw.Release = (value, buttonSpacing, III, x, y) => {
 	"", "#ffffff", KinkyDungeonRootDirectory + "UI/Buttons/Release.png",
 	undefined, undefined, Object.keys(KDCollectionReleaseSelection).length == 0,
 	(Object.keys(KDCollectionReleaseSelection).length == 0) ? "#ff5555" : KDButtonColor, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyUpcast[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyUpcast[0]),
 		hotkeyPress: KinkyDungeonKeyUpcast[0],
 	})) {
 		tooltip = true;
@@ -54,7 +54,7 @@ KDCollectionTabDraw.Release = (value, buttonSpacing, III, x, y) => {
 	"", "#ffffff", KinkyDungeonRootDirectory + "UI/Buttons/Ransom.png",
 	undefined, undefined, Object.keys(KDCollectionReleaseSelection).length == 0,
 	(ransomValue == 0 || Object.keys(KDCollectionReleaseSelection).length == 0) ? "#ff5555" : KDButtonColor, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyUpcast[1]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyUpcast[1]),
 		hotkeyPress: KinkyDungeonKeyUpcast[1],
 	})) {
 		tooltip = true;
@@ -121,7 +121,7 @@ KDCollectionTabDraw.Release = (value, buttonSpacing, III, x, y) => {
 		+ "UI/Buttons/" + (KDCollectionReleaseSelection[value.id] ? "Unmark" : "Mark") + ".png",
 	undefined, undefined, false,
 	KDButtonColor, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
 		hotkeyPress: KinkyDungeonKeyEnter[0],
 	})) {
 		tooltip = true;

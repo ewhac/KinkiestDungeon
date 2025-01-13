@@ -1819,7 +1819,7 @@ function KinkyDungeonDrawMagic() {
 			return true;
 		}, true, canvasOffsetX_ui + xOffset + 100 + 50, canvasOffsetY_ui + 483*KinkyDungeonBookScale, 250, 50, TextGet("KinkyDungeonBookLastPage"), "White", "", "", false, true, KDButtonColor,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKey[1]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[1]),
 			hotkeyPress: KinkyDungeonKey[1],
 		});
 	}
@@ -1838,7 +1838,7 @@ function KinkyDungeonDrawMagic() {
 			return true;
 		}, true, canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale - 375, canvasOffsetY_ui + 483*KinkyDungeonBookScale, 250, 50, TextGet("KinkyDungeonBookNextPage"), "White", "", "", false, true, KDButtonColor,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKey[3]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[3]),
 			hotkeyPress: KinkyDungeonKey[3],
 		});
 	}

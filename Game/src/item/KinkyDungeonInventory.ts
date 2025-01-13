@@ -1594,7 +1594,7 @@ function KDDrawInventoryContainer (
 			true,
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + canvasOffsetY_ui, 90, 44, "", KinkyDungeonInventoryOffset > 0 ? "white" : "#888888", KinkyDungeonRootDirectory + "Up.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkey: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
+				hotkeyLabel: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
 					KDInventoryDrawContainerHotkeys[prefix].up() : KinkyDungeonKey[4]),
 				hotkeyPress: KDInventoryDrawContainerHotkeys[prefix] ?
 					KDInventoryDrawContainerHotkeys[prefix].up() : KinkyDungeonKey[4],
@@ -1612,7 +1612,7 @@ function KDDrawInventoryContainer (
 			true,
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + 480*KinkyDungeonBookScale + canvasOffsetY_ui - 4, 90, 44, "", ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + 24 < filteredInventory.length) ? "white" : "#888888", KinkyDungeonRootDirectory + "Down.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkey: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
+				hotkeyLabel: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
 					KDInventoryDrawContainerHotkeys[prefix].down() : KinkyDungeonKey[6]),
 				hotkeyPress: KDInventoryDrawContainerHotkeys[prefix] ?
 					KDInventoryDrawContainerHotkeys[prefix].down() : KinkyDungeonKey[6],
@@ -1675,7 +1675,7 @@ function KDDrawInventoryContainer (
 				KDTextGray1, 20, undefined, {
 					centered: true,
 					scaleImage: false,
-					hotkey: KDHotkeyToText(KinkyDungeonKey[0]),
+					hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[0]),
 					hotkeyPress: KinkyDungeonKey[0],
 					keyDefs: [{
 						key: KinkyDungeonKey[0],
@@ -1694,7 +1694,7 @@ function KDDrawInventoryContainer (
 				KDTextGray1, 20, undefined, {
 					centered: true,
 					scaleImage: false,
-					hotkey: KDHotkeyToText(KinkyDungeonKey[2]),
+					hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[2]),
 					hotkeyPress: KinkyDungeonKey[2],
 					keyDefs: [{
 						key: KinkyDungeonKey[2],
@@ -1834,7 +1834,7 @@ function KinkyDungeonDrawInventory() {
 						!KDInventoryAction[action].valid(KinkyDungeonPlayerEntity, filteredInventory[KinkyDungeonCurrentPageInventory].item),
 						true, KDInventoryAction[action].valid(KinkyDungeonPlayerEntity, filteredInventory[KinkyDungeonCurrentPageInventory].item) ? KDButtonColor : "rgba(255, 50, 50, 0.5)",
 						undefined, undefined, {centered: true,
-							hotkey: KDInventoryAction[action].hotkey ? KDInventoryAction[action].hotkey() : undefined,
+							hotkeyLabel: KDInventoryAction[action].hotkey ? KDInventoryAction[action].hotkey() : undefined,
 							hotkeyPress: KDInventoryAction[action].hotkeyPress ? KDInventoryAction[action].hotkeyPress() : undefined,
 
 						},
@@ -1887,7 +1887,7 @@ function KinkyDungeonDrawInventory() {
 						KDInventoryAction[KDGameData.InventoryAction] && KDInventoryAction[KDGameData.InventoryAction].valid(KinkyDungeonPlayerEntity, filteredInventory[KinkyDungeonCurrentPageInventory].item)
 						? "#ffffff" : "#888888",
 						"", "", undefined, undefined, undefined, undefined, undefined, {
-							hotkey: KDInventoryAction[KDGameData.InventoryAction].hotkey ? KDInventoryAction[KDGameData.InventoryAction].hotkey() : undefined,
+							hotkeyLabel: KDInventoryAction[KDGameData.InventoryAction].hotkey ? KDInventoryAction[KDGameData.InventoryAction].hotkey() : undefined,
 							hotkeyPress: KDInventoryAction[KDGameData.InventoryAction].hotkeyPress ? KDInventoryAction[KDGameData.InventoryAction].hotkeyPress() : undefined,
 						});
 				}
@@ -1906,7 +1906,7 @@ function KinkyDungeonDrawInventory() {
 			return true;
 		}, true, canvasOffsetX_ui + xOffset + 100 + 50, canvasOffsetY_ui + 483*KinkyDungeonBookScale, 250, 50, TextGet("KinkyDungeonBookLastPage"), "White", "", "", undefined, true, KDButtonColor,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKey[1]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[1]),
 			hotkeyPress: KinkyDungeonKey[1],
 		});
 	}
@@ -1919,7 +1919,7 @@ function KinkyDungeonDrawInventory() {
 			return true;
 		}, true, canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale - 375, canvasOffsetY_ui + 483*KinkyDungeonBookScale, 250, 50, TextGet("KinkyDungeonBookNextPage"), "White", "", "", undefined, true, KDButtonColor,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKey[3]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[3]),
 			hotkeyPress: KinkyDungeonKey[3],
 		});
 	}
@@ -2225,7 +2225,7 @@ function KinkyDungeonDrawQuickInv() {
 			}, true, 630, QL_y + 70 * i, 120, 60, i + "", "#dddddd", "",
 			undefined, false, KDGameData.CurrentLoadout != i || KDQuickLoadoutSave, KDButtonColor,
 			undefined, undefined, {
-				hotkey: KDHotkeyToText(KinkyDungeonKeySwitchLoadout[i]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySwitchLoadout[i]),
 			});
 			if (MouseIn(630, QL_y + 70 * i, 120, 60)) {
 				for (let ii = 0; ii < 20 && ii < (KDGameData.QuickLoadouts ? (KDGameData.QuickLoadouts[i+""] ? KDGameData.QuickLoadouts[i+""].length : 0) : 0); ii++) {
@@ -3354,7 +3354,7 @@ function KDDrawHotbarBottom(selected: KDFilteredInventoryItem, spells: boolean, 
 		return true;
 	}, true, hotBarX + 713, HotbarStart, 72, 72, `${KDSpellPage + 1}`, "#ffffff",
 	KinkyDungeonRootDirectory + "UI/Cycle.png", undefined, undefined, true, undefined, 28, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeySpellPage[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySpellPage[0]),
 		hotkeyPress: KinkyDungeonKeySpellPage[0],
 		scaleImage: true,
 		centered: true,
@@ -3469,7 +3469,7 @@ function KDDrawHotbarBottom(selected: KDFilteredInventoryItem, spells: boolean, 
 				buttonDim.x, buttonDim.y, buttonDim.w, buttonDim.h, "", "rgba(0, 0, 0, 0)",
 				KinkyDungeonRootDirectory + "Spells/" + spell.name + ".png", "", false, true,
 				undefined, undefined, undefined, {
-					hotkey: KDHotkeyToText(KinkyDungeonKeySpell[i]),
+					hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySpell[i]),
 					scaleImage: true,
 				});
 			if (KinkyDungeoCheckComponentsPartial(spell, KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, true).length > 0) {
@@ -3533,7 +3533,7 @@ function KDDrawHotbarBottom(selected: KDFilteredInventoryItem, spells: boolean, 
 					buttonDim.x, buttonDim.y, buttonDim.w, buttonDim.h, "", "rgba(0, 0, 0, 0)",
 					KDGetItemPreview({name: item, type: consumable ? Consumable : (arm ? LooseRestraint : Weapon)}).preview, "", false, true,
 					undefined, undefined, undefined, {
-						hotkey: KDHotkeyToText(KinkyDungeonKeySpell[i]),
+						hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySpell[i]),
 						scaleImage: true,
 					});
 
@@ -3586,7 +3586,7 @@ function KDDrawHotbarBottom(selected: KDFilteredInventoryItem, spells: boolean, 
 				buttonDim.x, buttonDim.y, buttonDim.w, buttonDim.h, "", "rgba(0, 0, 0, 0)",
 				"", "", false, true,
 				undefined, undefined, undefined, {
-					hotkey: KDHotkeyToText(KinkyDungeonKeySpell[i]),
+					hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySpell[i]),
 					scaleImage: true,
 				});
 		}

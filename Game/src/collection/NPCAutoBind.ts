@@ -19,7 +19,7 @@ KDCollectionTabDraw.AutoBind = (value, buttonSpacing, III, x, y) => {
 	"", "#ffffff", KinkyDungeonRootDirectory + "UI/AutoBindCopy.png",
 	undefined, undefined, entity != undefined,
 	(!KDGetNPCRestraints(value.id) || Object.values(KDGetNPCRestraints(value.id)).length == 0) ? "#ff5555" : KDButtonColor, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyUpcast[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyUpcast[0]),
 		hotkeyPress: KinkyDungeonKeyUpcast[0],
 	})) {
 		DrawTextFitKD(TextGet("KDAutoBindCopy"), x + 220, y + 750, 500, "#ffffff",
@@ -83,7 +83,7 @@ KDCollectionTabDraw.AutoBind = (value, buttonSpacing, III, x, y) => {
 	"", "#ffffff", KinkyDungeonRootDirectory + "UI/AutoBindPaste.png",
 	undefined, undefined, entity != undefined,
 	(!KDAutoBindRestraints || KDNPCUnavailable(value.id, value.status)) ? "#ff5555" : KDButtonColor, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
 		hotkeyPress: KinkyDungeonKeyEnter[0],
 	})) {
 		let missingAll = KDAutoBindRestraints ? Object.values(KDAutoBindRestraints).length > 0 : false;
@@ -121,7 +121,7 @@ KDCollectionTabDraw.AutoBind = (value, buttonSpacing, III, x, y) => {
 	"", "#ffffff", KinkyDungeonRootDirectory + "UI/RestrainFree.png",
 	undefined, undefined, false, (!KDIsNPCPersistent(value.id) || KDGetPersistentNPC(value.id).collect) ?
 	KDButtonColor : "#ff5555", undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeyUpcast[1]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyUpcast[1]),
 		hotkeyPress: KinkyDungeonKeyUpcast[1],
 	})) {
 		DrawTextFitKD(TextGet("KDFreePrisoner"), x + 220, y + 750, 500, "#ffffff",

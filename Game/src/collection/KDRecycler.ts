@@ -251,7 +251,7 @@ function KDDrawRecyclerBlueprints(cats: KDBlueprintCategory[], x: number, y: num
 			{
 				scaleImage: true,
 				centered: true,
-				hotkey: hotkey ? KDHotkeyToText(hotkey) : undefined,
+				hotkeyLabel: hotkey ? KDHotkeyToText(hotkey) : undefined,
 				hotkeyPress: hotkey,
 			}
 		);
@@ -327,7 +327,7 @@ function KDDrawRecyclerBlueprints(cats: KDBlueprintCategory[], x: number, y: num
 				{
 					scaleImage: true,
 					centered: true,
-					hotkey: hotkey ? KDHotkeyToText(hotkey) : undefined,
+					hotkeyLabel: hotkey ? KDHotkeyToText(hotkey) : undefined,
 					hotkeyPress: hotkey,
 				}
 			);
@@ -380,7 +380,7 @@ function KDDrawRecyclerBlueprints(cats: KDBlueprintCategory[], x: number, y: num
 			{
 				scaleImage: true,
 				centered: true,
-				hotkey: hotkey ? KDHotkeyToText(hotkey) : undefined,
+				hotkeyLabel: hotkey ? KDHotkeyToText(hotkey) : undefined,
 				hotkeyPress: hotkey,
 			}
 		);

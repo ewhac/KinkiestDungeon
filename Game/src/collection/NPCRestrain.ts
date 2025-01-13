@@ -1273,7 +1273,7 @@ function KDDrawGenericNPCRestrainingUI(cats: RestraintGenericType[], x: number, 
 			{
 				scaleImage: true,
 				centered: true,
-				hotkey: hotkey ? KDHotkeyToText(hotkey) : undefined,
+				hotkeyLabel: hotkey ? KDHotkeyToText(hotkey) : undefined,
 				hotkeyPress: hotkey,
 			}
 		)) {
@@ -1387,7 +1387,7 @@ function KDDrawGenericNPCRestrainingUI(cats: RestraintGenericType[], x: number, 
 				{
 					scaleImage: true,
 					centered: true,
-					hotkey: hotkey ? KDHotkeyToText(hotkey) : undefined,
+					hotkeyLabel: hotkey ? KDHotkeyToText(hotkey) : undefined,
 					hotkeyPress: hotkey,
 				}
 			) || (!highlightedItem && KDSelectedGenericBindItem == item.restraint)) {

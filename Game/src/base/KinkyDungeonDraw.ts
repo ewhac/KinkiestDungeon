@@ -2455,7 +2455,7 @@ function KinkyDungeonDrawMessages(NoLog?: boolean, shiftx: number = 0, noBG: boo
 			return true;
 		}, true, KDMsgWidthMin + KDMsgX + shiftx + 70, 4, 52, 52, "", "#ffffff",
 		KinkyDungeonRootDirectory + (KinkyDungeonMessageToggle ? "UI/LogUp.png" : "UI/LogDown.png"), undefined, undefined, !KinkyDungeonMessageToggle, undefined, undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKeyToggle[0]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyToggle[0]),
 			hotkeyPress: KinkyDungeonKeyToggle[0],
 			scaleImage: true,
 		});
@@ -2481,7 +2481,7 @@ function KinkyDungeonDrawMessages(NoLog?: boolean, shiftx: number = 0, noBG: boo
 					}, true, filterX + spacing * (ii%filterCols), filterY + spacing*Math.floor(ii/filterCols), size, size, "", "#ffffff",
 					KinkyDungeonRootDirectory + "UI/Log/" + filter + ".png", undefined, undefined,
 					!KDGameData.LogFilters[filter], undefined, undefined, undefined, {
-						//hotkey: KDHotkeyToText(KinkyDungeonKeyToggle[0]),
+						//hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyToggle[0]),
 						//hotkeyPress: KinkyDungeonKeyToggle[0],
 						scaleImage: true,
 					})) {

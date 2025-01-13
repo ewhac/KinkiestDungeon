@@ -1620,7 +1620,7 @@ function KinkyDungeonRun() {
 		}, true, 975, 850, 350, 64, TextGet("KinkyDungeonLoadBack"), "#ffffff", "",
 		undefined, undefined, undefined, undefined,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 			hotkeyPress: KinkyDungeonKeySkip[0],
 		});
 
@@ -1996,7 +1996,7 @@ function KinkyDungeonRun() {
 			TextGet("KinkyDungeonLoadBack"),
 			"#ffffff", "", undefined, undefined, undefined, undefined,
 			undefined, undefined, {
-				hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 				hotkeyPress: KinkyDungeonKeySkip[0],
 			}
 		);
@@ -2691,7 +2691,7 @@ function KinkyDungeonRun() {
 		}, true, 1075, 900, 350, 64, TextGet("KinkyDungeonLoadBack"), "#ffffff", "",
 		undefined, undefined, undefined, undefined,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 			hotkeyPress: KinkyDungeonKeySkip[0],
 		});
 
@@ -2746,7 +2746,7 @@ function KinkyDungeonRun() {
 			return true;
 		}, true, 1275, 920, 350, 64, TextGet("KinkyDungeonLoadBack"), "#ffffff", "", undefined, undefined, undefined, undefined,
 		undefined, undefined, {
-			hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 			hotkeyPress: KinkyDungeonKeySkip[0],
 		});
 
@@ -3207,7 +3207,7 @@ function KinkyDungeonRun() {
 				return true;
 			}, true, 975, 880, 550, 64, TextGet("GameReturnToMenuFromOptions"), "#ffffff", "", undefined, undefined, undefined, undefined,
 			undefined, undefined, {
-				hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 				hotkeyPress: KinkyDungeonKeySkip[0],
 			}
 			);
@@ -4881,7 +4881,7 @@ function KDDrawLoadMenu() {
 		return true;
 	}, true, 975, 880, 550, 64, TextGet("GameReturnToMenuFromOptions"), "#ffffff", "",
 	undefined, undefined, undefined, undefined, undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 		hotkeyPress: KinkyDungeonKeySkip[0],
 	});
 	// Play Game with current save data!
@@ -6676,7 +6676,7 @@ function KDDrawGameSetupTabs(_xOffset: number = 0) {
 		return true;
 	}, true, 1075, 900, 350, 64, TextGet("KinkyDungeonLoadBack"), "#ffffff", "", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
-		hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+		hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 		hotkeyPress: KinkyDungeonKeySkip[0],
 	});
 }

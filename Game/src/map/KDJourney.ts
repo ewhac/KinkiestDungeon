@@ -270,7 +270,7 @@ function KDRenderJourneyMap(X: number, Y: number, Width: number = 5, Height: num
 			KDGameData.JourneyTarget = null;
 			return true;
 		}, true, 800, 900, 400, 55, TextGet("KinkyDungeonCancel"), "white", undefined, undefined, undefined, undefined, undefined, undefined, undefined,  {
-			hotkey: KDHotkeyToText(KinkyDungeonKeySkip[0]),
+			hotkeyLabel: KDHotkeyToText(KinkyDungeonKeySkip[0]),
 			hotkeyPress: KinkyDungeonKeySkip[0],
 		});
 
@@ -281,7 +281,7 @@ function KDRenderJourneyMap(X: number, Y: number, Width: number = 5, Height: num
 				KinkyDungeonMove({x: 0, y: 0}, 1, true);
 				return true;
 			}, true, 1300, 900, 400, 55, TextGet("KDNavMapConfirm"), "white", undefined, undefined, undefined, undefined, undefined, undefined, undefined,  {
-				hotkey: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKeyEnter[0]),
 				hotkeyPress: KinkyDungeonKeyEnter[0],
 			});
 	}
@@ -532,7 +532,7 @@ function KDRenderJourneyMap(X: number, Y: number, Width: number = 5, Height: num
 				return true;
 			}, true, xOffset - 45, 95, 90, 40, "",
 			KDJourneyIndex > 0 ? "white" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkey: KDHotkeyToText(KinkyDungeonKey[0]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[0]),
 				hotkeyPress: KinkyDungeonKey[0],
 			});
 		if (KDJourneyIndex < maxY)
@@ -544,7 +544,7 @@ function KDRenderJourneyMap(X: number, Y: number, Width: number = 5, Height: num
 			}, true, xOffset - 45, 830, 90, 40, "",
 			KDJourneyIndex < maxY ? "white" : "#888888",
 			KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkey: KDHotkeyToText(KinkyDungeonKey[2]),
+				hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[2]),
 				hotkeyPress: KinkyDungeonKey[2],
 			});
 
