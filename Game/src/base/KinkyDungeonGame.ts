@@ -4624,9 +4624,9 @@ function KinkyDungeonGameKeyDown() {
 	}
 	if ((document.activeElement && KDFocusableTextFields.includes(document.activeElement.id))) return true;
 
-	for (let b of Object.entries(KDButtonsCache)) {
-		if (b[1].hotkeyPress == KinkyDungeonKeybindingCurrentKey) {
-			KDClickButton(b[0]);
+	for (let [k, v] of Object.entries(KDButtonsCache)) {
+		if (v.hotkeyPress == KinkyDungeonKeybindingCurrentKey) {
+			KDClickButton(k);
 			return true;
 		}
 	}
@@ -4915,7 +4915,7 @@ function KinkyDungeonGameKeyUp(lastPress: number): boolean {
 	return false;
 }
 
-let KDKeystrokeCache: KDKeystrokeDef[] = [];
+let KDKeystrokeCache: Record<string, KDKeystrokeDef> = {};
 
 
 function KDProcessEVQ(): void {
@@ -4929,7 +4929,7 @@ function KDProcessEVQ(): void {
 		if (ev_key.length == 1) {
 			ev_key = ev_key.toLowerCase();
 		}
-		for (const kd of KDKeystrokeCache) {
+		for (const [_, kd] of Object.entries (KDKeystrokeCache)) {
 			if (ev_key !== kd.key) {
 				continue;
 			}

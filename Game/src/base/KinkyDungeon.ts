@@ -1524,7 +1524,7 @@ function KinkyDungeonRun() {
 
 	KDLastButtonsCache = KDButtonsCache;
 	KDButtonsCache = {};
-	KDKeystrokeCache = [];
+	KDKeystrokeCache = {};
 	KDUpdateVibeSounds();
 	KDUpdateMusic();
 
@@ -3466,7 +3466,7 @@ function DrawButtonKDEx (
 				// Single char; make sure it's lower-case.
 				kd.key = kd.key.toLowerCase();
 			}
-			KDKeystrokeCache.push (kd);
+			KDKeystrokeCache[name + kd.key] = kd;
 		}
 	}
 	return MouseIn(Left,Top,Width,Height);
