@@ -3349,11 +3349,88 @@ function KDCullSpritesList(list: Map<string, any>): void {
 	}
 }
 
-let KDButtonsCache: Record<string, {Left: number, Top: number, Width: number, Height: number, enabled: boolean, func?: (bdata: any) => boolean, priority: number, scrollfunc?: (amount: number) => void, hotkeyPress?: string}> = {
+
+type ButtonCacheEntry = {
+	Left:          number;
+	Top:           number;
+	Width:         number;
+	Height:        number;
+	enabled:       boolean;
+	func?:         (bdata?: any) => boolean | undefined;
+	priority:      number;
+	scrollfunc?:   (amount: number) => void;
+	hotkeyPress?:  string;
 };
 
-let KDLastButtonsCache: Record<string, {Left: number, Top: number, Width: number, Height: number, enabled: boolean, func?: (bdata?: any) => boolean, priority: number}> = {
-};
+let KDButtonsCache: Record<string, ButtonCacheEntry> = {};
+
+let KDLastButtonsCache: Record<string, ButtonCacheEntry> = {};
+
+
+/**
+ * Registers an array of KDKeystrokeDefs for later checking.
+ * @param keyDefs - key definitions to register.
+ * @param [name] - Name of associated button, if any.
+ * @param [commonFunc] - Callback function.  Only assigned if undefined in key definition.
+ */
+function KDRegisterKeyDefs (keyDefs: KDKeystrokeDef[], name?: string, commonFunc?: (a?: any) => boolean | undefined): void
+{
+	if (!name) {
+		name = '-';
+	}
+	for (const kd of keyDefs) {
+		if (kd.key.length == 1) {
+			// Single char; make sure it's lower-case.
+			kd.key = kd.key.toLowerCase();
+		}
+		if (!kd.func) {
+			if (commonFunc) {
+				kd.func = commonFunc;
+			} else {
+				console.log (`ERR: keydef ${name + kd.key} has no func, ignoring: ${JSON.stringify (kd)}`);
+			}
+		}
+		KDKeystrokeCache[name + kd.key] = kd;
+	}
+}
+
+/**
+ * Registers old-style hotkeyPress as a KDKeystrokeDef.  Do nothing if the button is disabled, or has no hotkey or callback function.  (Compatibility hack)
+ *
+ * @param button - Button from which to draw hotkey info.
+ * @param [name] - Name of button, as registered in KDButtonsCache[].
+ */
+function KDRegisterKeyDefsCompat (button: ButtonCacheEntry, name?: string): void
+{
+	if (!button.enabled  ||  !button.hotkeyPress  ||  !button.func) {
+		return;
+	}
+
+	KDRegisterKeyDefs ([{ key:  button.hotkeyPress,
+	                      func: button.func }],
+	                   name || '=');
+}
+
+/**
+ * Register a button in KDButtonsCache[].  Will also register hotkey definitions if present (KDKeystrokeDefs preferred).
+ * @param button - Button to register.
+ * @param name - Button's registered name.
+ * @param [options] - Optional info.
+ */
+function KDRegisterButton (button: ButtonCacheEntry, name: string, options?: ButtonOptions): void
+{
+	if (button.enabled) {
+		if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
+			KDRegisterKeyDefs (options.keyDefs, name, button.func);
+		} else {
+			KDRegisterKeyDefsCompat (button, name);
+			// Keep away from old keystroke processor.
+			button.hotkeyPress = undefined;
+		}
+	}
+	KDButtonsCache[name] = button;
+}
+
 
 /**
  * Draws a button component
@@ -3387,14 +3464,14 @@ function DrawButtonKD (
 ): void
 {
 	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder);
-	KDButtonsCache[name] = {
+	KDRegisterButton ({
 		Left,
 		Top,
 		Width,
 		Height,
 		enabled,
 		priority: 0,
-	};
+	}, name);
 }
 
 
@@ -3440,7 +3517,7 @@ function DrawButtonKDEx (
 ): boolean
 {
 	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDButtonsCache[name] = {
+	KDRegisterButton ({
 		Left,
 		Top,
 		Width,
@@ -3449,16 +3526,12 @@ function DrawButtonKDEx (
 		func,
 		priority: (options?.zIndex || 0),
 		hotkeyPress: options?.hotkeyPress,
-	};
-	if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
-		for (const kd of options.keyDefs) {
-			if (kd.key.length == 1) {
-				// Single char; make sure it's lower-case.
-				kd.key = kd.key.toLowerCase();
-			}
-			KDKeystrokeCache[name + kd.key] = kd;
-		}
-	}
+	}, name, options);
+	//if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
+	//	KDRegisterKeyDefs (options.keyDefs, name, func);
+	//} else {
+	//	KDRegisterKeyDefsCompat (KDButtonsCache[name], name);
+	//}
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -3467,7 +3540,8 @@ function DrawButtonKDEx (
 /**
  * Draws a button component
  * @param name - Name of the button element
- * @param func - Whether or not you can click on it
+ * @param scrollfunc - Invoked on mouse wheel event
+ * @param func - Invoked when clicked.
  * @param enabled - Whether or not you can click on it
  * @param Left - Position of the component from the left of the canvas
  * @param Top - Position of the component from the top of the canvas
@@ -3507,7 +3581,7 @@ function DrawButtonKDExScroll (
 ): boolean
 {
 	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDButtonsCache[name] = {
+	KDRegisterButton ({
 		Left,
 		Top,
 		Width,
@@ -3517,7 +3591,7 @@ function DrawButtonKDExScroll (
 		priority: (options?.zIndex || 0),
 		scrollfunc: scrollfunc,
 		hotkeyPress: options?.hotkeyPress,
-	};
+	}, name, options);
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -3565,7 +3639,7 @@ function DrawButtonKDExTo (
 ): boolean
 {
 	DrawButtonVisTo(Container, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDButtonsCache[name] = {
+	KDRegisterButton ({
 		Left,
 		Top,
 		Width,
@@ -3574,15 +3648,18 @@ function DrawButtonKDExTo (
 		func,
 		priority: (options?.zIndex || 0),
 		hotkeyPress: options?.hotkeyPress,
-	};
+	}, name, options);
 	return MouseIn(Left,Top,Width,Height);
 }
 
 function KDMouseWheel (event: WheelEvent): void {
-	if (!KDProcessButtonScroll(event.deltaY)) {
-		// If we fail we dilate the buttons vertically
-		if (KDProcessButtonScroll(event.deltaY, 15)) return;
-	} else return;
+	if (KDProcessButtonScroll(event.deltaY)) {
+		return;
+	} else	// If we fail we dilate the buttons vertically and try again
+	  if (KDProcessButtonScroll(event.deltaY, 15)) {
+		return;
+	}
+
 	if (KDFunctionOptionsScroll(event.deltaY)) return;
 	if (KDFunctionCollectionScroll(event.deltaY)) return;
 	if (KDFunctionFacilitiesScroll(event.deltaY)) return;

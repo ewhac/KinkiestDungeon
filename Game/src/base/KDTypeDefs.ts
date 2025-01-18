@@ -3939,6 +3939,11 @@ enum KeyModifier {
  * most common modifier filtering to happen in the main key event processor, simplifying leaf function logic.
  */
 interface KDKeystrokeDef {
+	/**
+	 * Base keystroke.  This may be a lower-case layout-mapped character (e.g. 'a'), or a "key name"
+	 * (e.g. "Enter", "Backspace", etc.).
+	 */
+	key:		string;
 
 	/**
 	 * Function to invoke when a matching keystroke is received.
@@ -3949,12 +3954,7 @@ interface KDKeystrokeDef {
 	 *            false == event recognized but not consumed;
 	 *            true == event recognized and consumed.
 	 */
-	func:		(ev: KDEV_Key) => boolean | undefined;
-
-	/**
-	 * Base keystroke.  This may be a layout-mapped character (e.g. 'a'), or a "key name" (e.g. "Enter", "Backspace", etc.).
-	 */
-	key:		string;
+	func?:		(ev: KDEV_Key) => boolean | undefined;
 
 	/*  Use KEYMODDEF_ values here.  `undefined` == NONE  */
 	mod_shift?:	KeyModifier;

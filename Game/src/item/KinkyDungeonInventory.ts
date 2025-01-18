@@ -1400,26 +1400,33 @@ function KDDrawInventoryContainer (
 		let yy = 0;
 		let xx = -1;
 
-		if (filteredInventory.length  &&  KDDrawInventoryContainer.scrolldelta) {
-			if (KDDrawInventoryContainer.scrolldelta > 0) {
-				if ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + KDDrawInventoryContainer.scrolldelta < filteredInventory.length + 2) {
+		/*  Apply inventory page-up/down.  */
+		if (filteredInventory.length  &&  KDDrawInventoryContainer.scroll_inv) {
+			if (KDDrawInventoryContainer.scroll_inv > 0) {
+				if ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + KDDrawInventoryContainer.scroll_inv < filteredInventory.length + 2) {
 					if (prefix) {
-						KinkyDungeonContainerOffset += KDDrawInventoryContainer.scrolldelta;
+						KinkyDungeonContainerOffset += KDDrawInventoryContainer.scroll_inv;
 					} else {
-						KinkyDungeonInventoryOffset += KDDrawInventoryContainer.scrolldelta;
+						KinkyDungeonInventoryOffset += KDDrawInventoryContainer.scroll_inv;
 					}
 				}
 			} else {
 				if ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) > 0) {
 					if (prefix) {
-						KinkyDungeonContainerOffset = Math.max(0, KinkyDungeonContainerOffset + KDDrawInventoryContainer.scrolldelta);
+						KinkyDungeonContainerOffset = Math.max(0, KinkyDungeonContainerOffset + KDDrawInventoryContainer.scroll_inv);
 					} else {
-						KinkyDungeonInventoryOffset = Math.max(0, KinkyDungeonInventoryOffset + KDDrawInventoryContainer.scrolldelta);
+						KinkyDungeonInventoryOffset = Math.max(0, KinkyDungeonInventoryOffset + KDDrawInventoryContainer.scroll_inv);
 					}
 				}
 			}
 		}
-		KDDrawInventoryContainer.scrolldelta = 0;
+		KDDrawInventoryContainer.scroll_inv = 0;
+
+		/*  Apply filter list page-up/down.  */
+		if (KDDrawInventoryContainer.scroll_filter) {
+			KDFilterIndex[CurrentFilter] = KDDrawInventoryContainer.scroll_filter;
+		}
+		KDDrawInventoryContainer.scroll_filter = 0;
 
 		if (!KDRenderAlternateInventory(selected, xOffset, yOffset, prefix)) {
 			KDResetAlternateInventoryRender();
@@ -1583,11 +1590,11 @@ function KDDrawInventoryContainer (
 
 
 			let f_pgup = function (_arg: any): boolean {
-				KDDrawInventoryContainer.scrolldelta = -numRows * 3;
+				KDDrawInventoryContainer.scroll_inv = -numRows * 3;
 				return true;
 			}
 			let f_pgdn = function (_arg: any): boolean {
-				KDDrawInventoryContainer.scrolldelta = numRows * 3;
+				KDDrawInventoryContainer.scroll_inv = numRows * 3;
 				return true;
 			}
 			DrawButtonKDEx(prefix + "invScrollUp", f_pgup,
@@ -1601,11 +1608,9 @@ function KDDrawInventoryContainer (
 				keyDefs: [{
 					key: KinkyDungeonKey[4],
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-					func: f_pgup,
 				}, {
 					key: "PageUp",
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-					func: f_pgup,
 				}] as KDKeystrokeDef[],
 			});
 			DrawButtonKDEx(prefix + "invScrollDown", f_pgdn,
@@ -1619,11 +1624,9 @@ function KDDrawInventoryContainer (
 				keyDefs: [{
 					key: KinkyDungeonKey[6],
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-					func: f_pgdn,
 				}, {
 					key: "PageDown",
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-					func: f_pgdn,
 				}] as KDKeystrokeDef[],
 			});
 		}
@@ -1658,12 +1661,14 @@ function KDDrawInventoryContainer (
 			};
 			const f_pgup_invchoice = function (arg: any): boolean {
 				const amount = typeof arg === "number" ?  arg :  -1;
-				KDFilterIndex[CurrentFilter] = scroll (amount);
+				//KDFilterIndex[CurrentFilter] = scroll (amount);
+				KDDrawInventoryContainer.scroll_filter = scroll (amount);
 				return true;
 			}
 			const f_pgdn_invchoice = function (arg: any): boolean {
 				const amount = typeof arg === "number" ?  arg :  1;
-				KDFilterIndex[CurrentFilter] = scroll (amount);
+				//KDFilterIndex[CurrentFilter] = scroll (amount);
+				KDDrawInventoryContainer.scroll_filter = scroll (amount);
 				return true;
 			}
 			if (index > 0 && i == index) {
@@ -1680,7 +1685,6 @@ function KDDrawInventoryContainer (
 					keyDefs: [{
 						key: KinkyDungeonKey[0],
 						strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-						func: f_pgup_invchoice,
 					}],
 				});
 			} else if (filters.length > KDMaxFilters && i == KDMaxFilters + index - 1 &&
@@ -1699,7 +1703,6 @@ function KDDrawInventoryContainer (
 					keyDefs: [{
 						key: KinkyDungeonKey[2],
 						strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-						func: f_pgup_invchoice,
 					}],
 				});
 			} else if (i - index < KDMaxFilters && i - index >= 0) {
@@ -1734,8 +1737,10 @@ function KDDrawInventoryContainer (
 }
 
 namespace KDDrawInventoryContainer {
-	export let scrolldelta: number = 0;
+	export let scroll_inv: number = 0;
+	export let scroll_filter: number = 0;
 };
+
 
 function KDDrawInventoryFilters(xOffset, yOffset = 0, filters = [], addFilters = []) {
 
