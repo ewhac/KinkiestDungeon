@@ -3380,8 +3380,8 @@ function KDRegisterKeyDefs (keyDefs: KDKeystrokeDef[], name?: string, commonFunc
 	}
 	for (const kd of keyDefs) {
 		if (kd.key.length == 1) {
-			// Single char; make sure it's lower-case.
-			kd.key = kd.key.toLowerCase();
+			// Single char; make sure it's upper-case.
+			kd.key = kd.key.toUpperCase();
 		}
 		if (!kd.func) {
 			if (commonFunc) {

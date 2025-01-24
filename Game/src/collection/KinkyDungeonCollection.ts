@@ -944,34 +944,52 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 	let II = 0;
 	let selectedIndex = 0;
 
+	if (KDDrawCollectionInventory.scroll_amt) {
+		KDCollectionIndex = Math.max(
+			0,
+			Math.min (KDCollectionIndex + KDDrawCollectionInventory.scroll_amt,
+			          Math.floor (KDGameData.CollectionSorted.length / KDCollectionColumns) * KDCollectionColumns));
+		KDDrawCollectionInventory.scroll_amt = 0;
+	}
 
 	if (KDCollectionIndex + KDCollectionRows * KDCollectionColumns < KDGameData.CollectionSorted.length) {
 		DrawButtonKDEx("collDOWN", (_b) => {
-			KDCollectionIndex = Math.max(
-				0,
-				Math.min(
-					KDCollectionIndex + KDCollectionColumns,
-					Math.floor(KDGameData.CollectionSorted.length / KDCollectionColumns) * KDCollectionColumns));
+			KDDrawCollectionInventory.scroll_amt = KDCollectionColumns;
 			return true;
 		},true,
 		1700, 870, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Down.png",
-		"", false, false, KDButtonColor, undefined, undefined, {centered: true}
-		);
+		"", false, false, KDButtonColor, undefined,
+		undefined,
+		{
+			centered: true,
+			keyDefs: [{
+				key: "PageDown",
+				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
+				func: (_) => {
+					KDDrawCollectionInventory.scroll_amt = (KDCollectionRows - 1) * KDCollectionColumns;
+					return true;
+				}
+			}]
+		});
 	}
 	if (KDCollectionIndex > 0) {
 		DrawButtonKDEx("collUP", (_b) => {
-			KDCollectionIndex = Math.max(
-				0,
-				Math.min(
-					KDCollectionIndex - KDCollectionColumns,
-					Math.floor(KDGameData.CollectionSorted.length / KDCollectionColumns) * KDCollectionColumns));
+			KDDrawCollectionInventory.scroll_amt = -KDCollectionColumns;
 			return true;
 		},true,
 		1700, 100, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Up.png",
 		"", false, false, KDButtonColor, undefined,
-		undefined, {centered: true}
-		);
-
+		undefined, {
+			centered: true,
+			keyDefs: [{
+				key: "PageUp",
+				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
+				func: (_) => {
+					KDDrawCollectionInventory.scroll_amt = -(KDCollectionRows - 1) * KDCollectionColumns;
+					return true;
+				}
+			}]
+		});
 	}
 
 	KDDraw(kdcanvas, kdpixisprites, "collScrollBar",
@@ -1223,6 +1241,11 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 
 	KDDrawnCollectionInventory = rendered;
 }
+
+namespace KDDrawCollectionInventory {
+	export let scroll_amt: number = 0;
+};
+
 
 /**
  * @param value

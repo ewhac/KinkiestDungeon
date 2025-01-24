@@ -3915,6 +3915,8 @@ type KDTeaseAttack = {
  *  * Don't Care (the modifier's presence/absence is not relevant/ignored)
  *
  * (Limitations in the JS event API prevent you from specifying both left+right modifiers be pressed.)
+ *
+ * FIXME: These aren't used.
  */
 enum KeyModifier {
 	KEYMODDEF_NONE		= 0x00,
@@ -3940,7 +3942,7 @@ enum KeyModifier {
  */
 interface KDKeystrokeDef {
 	/**
-	 * Base keystroke.  This may be a lower-case layout-mapped character (e.g. 'a'), or a "key name"
+	 * Base keystroke.  This may be a upper-case layout-mapped character (e.g. 'a'), or a "key name"
 	 * (e.g. "Enter", "Backspace", etc.).
 	 */
 	key:		string;
@@ -3949,18 +3951,12 @@ interface KDKeystrokeDef {
 	 * Function to invoke when a matching keystroke is received.
 	 *
 	 * @param ev - Event
-	 * @returns - Tri-state, indicates whether event was consumed; handler checking stops when the event is consumed.
-	 *            undefined == event not recognized;
-	 *            false == event recognized but not consumed;
-	 *            true == event recognized and consumed.
+	 * @returns Tri-state, indicates whether event was consumed; handler checking stops when the event is consumed.
+	 *          undefined == event not recognized;
+	 *          false == event recognized but not consumed;
+	 *          true == event recognized and consumed.
 	 */
 	func?:		(ev: KDEV_Key) => boolean | undefined;
-
-	/*  Use KEYMODDEF_ values here.  `undefined` == NONE  */
-	mod_shift?:	KeyModifier;
-	mod_ctrl?:	KeyModifier;
-	mod_alt?:	KeyModifier;
-	mod_meta?:	KeyModifier;
 
 	/**
 	 * Key "strokes" handled.  Use KeyStrokeDefs values ORed together here.  undefined == KEYSTROKEDEF_DOWN.
