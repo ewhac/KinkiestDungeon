@@ -1354,8 +1354,8 @@ function KDDrawInventoryContainer (
 	CurrentFilter:      string,
 	itemcallback?:      (item: KDFilteredInventoryItem, x: number, y: number, w: number, h: number, different: boolean) => void,
 	colorcallback?:     (item: KDFilteredInventoryItem) => string,
-	prefix: string = "",
-	nosearch?: boolean,
+	prefix:             string = "",
+	nosearch?:          boolean,
 ): {selected: KDFilteredInventoryItem, tooltipitem: KDFilteredInventoryItem}
 {
 	if (prefix) {
@@ -1638,6 +1638,24 @@ function KDDrawInventoryContainer (
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
 				}] as KDKeystrokeDef[],
 			});
+
+			/*  Set up handlers for Home and End keys (inventory only).  */
+			if (!prefix) {
+				KDRegisterKeyDefs ([{
+						       key: "Home",
+						       func: (_) => {
+							       KinkyDungeonInventoryOffset = 0;
+							       return true;
+						       }
+						   }, {
+						       key: "End",
+						       func: (_) => {
+							       KinkyDungeonInventoryOffset = filteredInventory.length - numRows * 3;
+							       return true;
+						       }
+						   }],
+						   "invHomeEnd");
+			}
 		}
 	}
 	if (KDFilterFilters[CurrentFilter] && !KDAlternateInventoryRender()) {
