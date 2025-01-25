@@ -1400,33 +1400,27 @@ function KDDrawInventoryContainer (
 		let yy = 0;
 		let xx = -1;
 
-		/*  Apply inventory page-up/down.  */
-		if (filteredInventory.length  &&  KDDrawInventoryContainer.scroll_inv) {
-			if (KDDrawInventoryContainer.scroll_inv > 0) {
-				if ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + KDDrawInventoryContainer.scroll_inv < filteredInventory.length + 2) {
-					if (prefix) {
-						KinkyDungeonContainerOffset += KDDrawInventoryContainer.scroll_inv;
-					} else {
-						KinkyDungeonInventoryOffset += KDDrawInventoryContainer.scroll_inv;
-					}
-				}
-			} else {
-				if ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) > 0) {
-					if (prefix) {
-						KinkyDungeonContainerOffset = Math.max(0, KinkyDungeonContainerOffset + KDDrawInventoryContainer.scroll_inv);
-					} else {
-						KinkyDungeonInventoryOffset = Math.max(0, KinkyDungeonInventoryOffset + KDDrawInventoryContainer.scroll_inv);
-					}
-				}
+		/*  Apply inventory/container page-up/down.  */
+		if (KDDrawInventoryContainer.inv_len > 0  &&  KDDrawInventoryContainer.inv_scroll) {
+			const new_off = KinkyDungeonInventoryOffset + KDDrawInventoryContainer.inv_scroll;
+			if (new_off < KDDrawInventoryContainer.inv_len + 2) {
+				KinkyDungeonInventoryOffset = Math.max (0, new_off);
 			}
+			KDDrawInventoryContainer.inv_scroll = 0;
 		}
-		KDDrawInventoryContainer.scroll_inv = 0;
+		if (KDDrawInventoryContainer.container_len > 0  &&  KDDrawInventoryContainer.container_scroll) {
+			const new_off = KinkyDungeonContainerOffset + KDDrawInventoryContainer.container_scroll;
+			if (new_off < KDDrawInventoryContainer.container_len + 2) {
+				KinkyDungeonContainerOffset = Math.max (0, new_off);
+			}
+			KDDrawInventoryContainer.container_scroll = 0;
+		}
 
 		/*  Apply filter list page-up/down.  */
-		if (KDDrawInventoryContainer.scroll_filter) {
-			KDFilterIndex[CurrentFilter] = KDDrawInventoryContainer.scroll_filter;
+		if (KDDrawInventoryContainer.filter_scroll) {
+			KDFilterIndex[CurrentFilter] = KDDrawInventoryContainer.filter_scroll;
+			KDDrawInventoryContainer.filter_scroll = 0;
 		}
-		KDDrawInventoryContainer.scroll_filter = 0;
 
 		if (!KDRenderAlternateInventory(selected, xOffset, yOffset, prefix)) {
 			KDResetAlternateInventoryRender();
@@ -1589,24 +1583,41 @@ function KDDrawInventoryContainer (
 			}
 
 
-			let f_pgup = function (_arg: any): boolean {
-				KDDrawInventoryContainer.scroll_inv = -numRows * 3;
+			const f_pgup = function (_arg: any): boolean {
+				const inc = -numRows * 3;
+				const len = filteredInventory.length;
+				if (prefix) {
+					KDDrawInventoryContainer.container_scroll = inc;
+					KDDrawInventoryContainer.container_len = len;
+				} else {
+					KDDrawInventoryContainer.inv_scroll = inc;
+					KDDrawInventoryContainer.inv_len = len;
+				}
 				return true;
 			}
-			let f_pgdn = function (_arg: any): boolean {
-				KDDrawInventoryContainer.scroll_inv = numRows * 3;
+			const f_pgdn = function (_arg: any): boolean {
+				const inc = numRows * 3;
+				const len = filteredInventory.length;
+				if (prefix) {
+					KDDrawInventoryContainer.container_scroll = inc;
+					KDDrawInventoryContainer.container_len = len;
+				} else {
+					KDDrawInventoryContainer.inv_scroll = inc;
+					KDDrawInventoryContainer.inv_len = len;
+				}
 				return true;
 			}
+
+			const hotkey_up = KDInventoryDrawContainerHotkeys[prefix] ?  KDInventoryDrawContainerHotkeys[prefix].up()   : KinkyDungeonKey[4];
+			const hotkey_dn = KDInventoryDrawContainerHotkeys[prefix] ?  KDInventoryDrawContainerHotkeys[prefix].down() : KinkyDungeonKey[6];
 			DrawButtonKDEx(prefix + "invScrollUp", f_pgup,
 			true,
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + canvasOffsetY_ui, 90, 44, "", KinkyDungeonInventoryOffset > 0 ? "white" : "#888888", KinkyDungeonRootDirectory + "Up.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkeyLabel: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
-					KDInventoryDrawContainerHotkeys[prefix].up() : KinkyDungeonKey[4]),
-				hotkeyPress: KDInventoryDrawContainerHotkeys[prefix] ?
-					KDInventoryDrawContainerHotkeys[prefix].up() : KinkyDungeonKey[4],
+				hotkeyLabel: KDHotkeyToText (hotkey_up),
+				hotkeyPress: hotkey_up,
 				keyDefs: [{
-					key: KinkyDungeonKey[4],
+					key: hotkey_up,
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
 				}, {
 					key: "PageUp",
@@ -1617,12 +1628,10 @@ function KDDrawInventoryContainer (
 			true,
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + 480*KinkyDungeonBookScale + canvasOffsetY_ui - 4, 90, 44, "", ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + 24 < filteredInventory.length) ? "white" : "#888888", KinkyDungeonRootDirectory + "Down.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
-				hotkeyLabel: KDHotkeyToText(KDInventoryDrawContainerHotkeys[prefix] ?
-					KDInventoryDrawContainerHotkeys[prefix].down() : KinkyDungeonKey[6]),
-				hotkeyPress: KDInventoryDrawContainerHotkeys[prefix] ?
-					KDInventoryDrawContainerHotkeys[prefix].down() : KinkyDungeonKey[6],
+				hotkeyLabel: KDHotkeyToText (hotkey_dn),
+				hotkeyPress: hotkey_dn,
 				keyDefs: [{
-					key: KinkyDungeonKey[6],
+					key: hotkey_dn,
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
 				}, {
 					key: "PageDown",
@@ -1662,13 +1671,13 @@ function KDDrawInventoryContainer (
 			const f_pgup_invchoice = function (arg: any): boolean {
 				const amount = typeof arg === "number" ?  arg :  -1;
 				//KDFilterIndex[CurrentFilter] = scroll (amount);
-				KDDrawInventoryContainer.scroll_filter = scroll (amount);
+				KDDrawInventoryContainer.filter_scroll = scroll (amount);
 				return true;
 			}
 			const f_pgdn_invchoice = function (arg: any): boolean {
 				const amount = typeof arg === "number" ?  arg :  1;
 				//KDFilterIndex[CurrentFilter] = scroll (amount);
-				KDDrawInventoryContainer.scroll_filter = scroll (amount);
+				KDDrawInventoryContainer.filter_scroll = scroll (amount);
 				return true;
 			}
 			if (index > 0 && i == index) {
@@ -1737,8 +1746,11 @@ function KDDrawInventoryContainer (
 }
 
 namespace KDDrawInventoryContainer {
-	export let scroll_inv: number = 0;
-	export let scroll_filter: number = 0;
+	export let inv_scroll: number           = 0;
+	export let inv_len: number              = 0;
+	export let container_scroll: number     = 0;
+	export let container_len: number        = 0;
+	export let filter_scroll: number        = 0;
 };
 
 
