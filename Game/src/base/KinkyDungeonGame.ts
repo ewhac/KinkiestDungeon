@@ -4925,18 +4925,18 @@ function KDProcessEVQ(): void {
 
 	let kev: KDEV_Key;
 	while (kev = KDEVQ_Keys.shift()) {
-		const ev_key = ((kev.ev.key.length == 1  &&  kev.ev.code != "Space")  ||  kev.ev.code.includes ("Digit"))
+		const ev_key = ((kev.ev.key.length == 1  &&  kev.ev.code != "Space")  ||  kev.ev.code.startsWith ("Digit"))
 		             ? kev.ev.key.toUpperCase()
 		             : kev.ev.code;
-		for (const [_, kd] of Object.entries (KDKeystrokeCache)) {
+		for (const kd of Object.values (KDKeystrokeCache)) {
 			if (ev_key !== kd.key) {
 				continue;
 			}
 
-			const strokes   = kd.strokes ?? KeyStrokeDefs.KEYSTROKEDEF_DOWN;
+			const strokes = kd.strokes ?? KeyStrokeDefs.KEYSTROKEDEF_DOWN;
 
 			if (!strokes) {
-				console.log (`ERR: invalid strokes in KeyModifier: ${JSON.stringify (kd)}`);
+				console.log (`ERR: invalid strokes in KDKeystrokeDef: ${JSON.stringify (kd)}`);
 				continue;
 			}
 

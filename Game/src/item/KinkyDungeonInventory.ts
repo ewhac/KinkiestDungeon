@@ -1615,7 +1615,6 @@ function KDDrawInventoryContainer (
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + canvasOffsetY_ui, 90, 44, "", KinkyDungeonInventoryOffset > 0 ? "white" : "#888888", KinkyDungeonRootDirectory + "Up.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
 				hotkeyLabel: KDHotkeyToText (hotkey_up),
-				hotkeyPress: hotkey_up,
 				keyDefs: [{
 					key: hotkey_up,
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
@@ -1629,7 +1628,6 @@ function KDDrawInventoryContainer (
 			canvasOffsetX_ui + xOffset + 640*KinkyDungeonBookScale + 526, yOffset + 480*KinkyDungeonBookScale + canvasOffsetY_ui - 4, 90, 44, "", ((prefix ? KinkyDungeonContainerOffset : KinkyDungeonInventoryOffset) + 24 < filteredInventory.length) ? "white" : "#888888", KinkyDungeonRootDirectory + "Down.png",
 			undefined, undefined, undefined, undefined, undefined, undefined, {
 				hotkeyLabel: KDHotkeyToText (hotkey_dn),
-				hotkeyPress: hotkey_dn,
 				keyDefs: [{
 					key: hotkey_dn,
 					strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
@@ -1708,7 +1706,6 @@ function KDDrawInventoryContainer (
 					centered: true,
 					scaleImage: false,
 					hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[0]),
-					hotkeyPress: KinkyDungeonKey[0],
 					keyDefs: [{
 						key: KinkyDungeonKey[0],
 						strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
@@ -1726,7 +1723,6 @@ function KDDrawInventoryContainer (
 					centered: true,
 					scaleImage: false,
 					hotkeyLabel: KDHotkeyToText(KinkyDungeonKey[2]),
-					hotkeyPress: KinkyDungeonKey[2],
 					keyDefs: [{
 						key: KinkyDungeonKey[2],
 						strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
