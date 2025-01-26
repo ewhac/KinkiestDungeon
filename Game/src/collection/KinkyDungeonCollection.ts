@@ -944,6 +944,7 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 	let II = 0;
 	let selectedIndex = 0;
 
+	/*  Apply pending scroll increment.  */
 	if (KDDrawCollectionInventory.scroll_amt) {
 		KDCollectionIndex = Math.max(
 			0,
@@ -952,50 +953,6 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 		KDDrawCollectionInventory.scroll_amt = 0;
 	}
 
-	if (KDCollectionIndex + KDCollectionRows * KDCollectionColumns < KDGameData.CollectionSorted.length) {
-		DrawButtonKDEx("collDOWN", (_b) => {
-			KDDrawCollectionInventory.scroll_amt = KDCollectionColumns;
-			return true;
-		},true,
-		1700, 870, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Down.png",
-		"", false, false, KDButtonColor, undefined,
-		undefined,
-		{
-			centered: true,
-			keyDefs: [{
-				key: "PageDown",
-				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-				func: (_) => {
-					KDDrawCollectionInventory.scroll_amt = (KDCollectionRows - 1) * KDCollectionColumns;
-					return true;
-				}
-			}]
-		});
-	}
-	if (KDCollectionIndex > 0) {
-		DrawButtonKDEx("collUP", (_b) => {
-			KDDrawCollectionInventory.scroll_amt = -KDCollectionColumns;
-			return true;
-		},true,
-		1700, 100, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Up.png",
-		"", false, false, KDButtonColor, undefined,
-		undefined, {
-			centered: true,
-			keyDefs: [{
-				key: "PageUp",
-				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
-				func: (_) => {
-					KDDrawCollectionInventory.scroll_amt = -(KDCollectionRows - 1) * KDCollectionColumns;
-					return true;
-				}
-			}]
-		});
-	}
-
-	KDDraw(kdcanvas, kdpixisprites, "collScrollBar",
-		KinkyDungeonRootDirectory + "UI/Checked.png",
-		1775, 125 + 590*(KDCollectionIndex/Math.max(1, KDGameData.CollectionSorted.length)), 60, 60
-	);
 	if (!KDGameData.NPCRestraints) KDGameData.NPCRestraints = {};
 
 	let ww = 800;
@@ -1036,6 +993,7 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 		}
 	}
 	let rendered = [];
+	let nEligible = 0;
 	let cf = KDCollFilter ? KDCollFilter.toLocaleUpperCase() : null;
 	// Iterate thru the collection, parting out the notable ones to the top
 	for (let value of KDGameData.CollectionSorted) {
@@ -1066,6 +1024,7 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 
 		if (filters.length > 0 && filters.some((filter) => {return !filter(value);})) continue;
 
+		nEligible++;
 		if (II++ < KDCollectionIndex || row >= KDCollectionRows) continue;
 
 		rendered.push(value);
@@ -1240,6 +1199,78 @@ function KDDrawCollectionInventory(x: number, y: number, drawCallback?: (value: 
 
 
 	KDDrawnCollectionInventory = rendered;
+
+	/*
+	 * Now that we know how many entries were eligible for display, set
+	 * up the scroll buttons.
+	 */
+	if (KDCollectionIndex + KDCollectionRows * KDCollectionColumns < nEligible) {
+		DrawButtonKDEx("collDOWN", (_b) => {
+			KDDrawCollectionInventory.scroll_amt = KDCollectionColumns;
+			return true;
+		},true,
+		1700, 870, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Down.png",
+		"", false, false, KDButtonColor, undefined,
+		undefined,
+		{
+			/*
+			 * Technically, these keyDefs are inconsistent, as
+			 * they scroll the container differently depending on
+			 * whether you click the gadget or press the hotkey.
+			 */
+			centered: true,
+			keyDefs: [{
+				key: "PageDown",
+				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
+				func: (_) => {
+					KDDrawCollectionInventory.scroll_amt = (KDCollectionRows - 1) * KDCollectionColumns;
+					return true;
+				}
+			}]
+		});
+	}
+	if (KDCollectionIndex > 0) {
+		DrawButtonKDEx("collUP", (_b) => {
+			KDDrawCollectionInventory.scroll_amt = -KDCollectionColumns;
+			return true;
+		},true,
+		1700, 100, 125, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Up.png",
+		"", false, false, KDButtonColor, undefined,
+		undefined, {
+			centered: true,
+			keyDefs: [{
+				key: "PageUp",
+				strokes: KeyStrokeDefs.KEYSTROKEDEF_DOWN | KeyStrokeDefs.KEYSTROKEDEF_REPEAT,
+				func: (_) => {
+					KDDrawCollectionInventory.scroll_amt = -(KDCollectionRows - 1) * KDCollectionColumns;
+					return true;
+				}
+			}]
+		});
+	}
+
+	/*  Register handlers for Home/End keys.  */
+	KDRegisterKeyDefs (
+		[{
+			key: "Home",
+			func: (_) => {
+				KDCollectionIndex = 0;
+				return true;
+			}
+		}, {
+			key: "End",
+			func: (_) => {
+				KDCollectionIndex = Math.max (0, Math.min (nEligible,
+									   (Math.floor ((nEligible + KDCollectionColumns - 1) / KDCollectionColumns) - KDCollectionRows) * KDCollectionColumns));
+				return true;
+			}
+		}],
+		"collHomeEnd");
+
+	KDDraw(kdcanvas, kdpixisprites, "collScrollBar",
+		KinkyDungeonRootDirectory + "UI/Checked.png",
+		1775, 125 + 590*(KDCollectionIndex/Math.max(1, nEligible)), 60, 60
+	);
 }
 
 namespace KDDrawCollectionInventory {
