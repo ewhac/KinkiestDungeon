@@ -4536,30 +4536,59 @@ function KinkyDungeonGetMovable() {
 function KinkyDungeonListenKeyMove() {
 	if ((document.activeElement && KDFocusableTextFields.includes(document.activeElement.id))) return true;
 
-	if (KinkyDungeonLastMoveTimer < performance.now() && (KinkyDungeonControlsEnabled() || KinkyDungeonInspect)
-		&& KinkyDungeonDrawState == "Game" && !KDModalArea) {
-		let moveDirection = null;
-		let moveDirectionDiag = null;
+	if (    KinkyDungeonLastMoveTimer < performance.now()
+	    &&  (KinkyDungeonControlsEnabled()  ||  KinkyDungeonInspect)
+	    &&  KinkyDungeonDrawState == "Game"
+	    &&  !KDModalArea)
+	{
+		let moveDirection: MoveDirection = null;
 
 		let MovableTiles = KinkyDungeonGetMovable();
 		let itemsAtTile = (x: number, y: number) => {
 			return KDMapData.GroundItems.some((item) => {return item.x == KinkyDungeonPlayerEntity.x + x && item.y == KinkyDungeonPlayerEntity.y + y;});
 		};
 
-		if ((KinkyDungeonGameKey.keyPressed[0]) && (KinkyDungeonInspect || itemsAtTile(0, -1) || MovableTiles.includes(KinkyDungeonMapGet(KinkyDungeonPlayerEntity.x,  KinkyDungeonPlayerEntity.y - 1)))) moveDirection = KinkyDungeonGetDirection(0, -1);
-		else if ((KinkyDungeonGameKey.keyPressed[1]) && (KinkyDungeonInspect || itemsAtTile(0, +1) || MovableTiles.includes(KinkyDungeonMapGet(KinkyDungeonPlayerEntity.x,  KinkyDungeonPlayerEntity.y + 1)))) moveDirection = KinkyDungeonGetDirection(0, 1);
-		else if ((KinkyDungeonGameKey.keyPressed[2]) && (KinkyDungeonInspect || itemsAtTile(-1, 0) || MovableTiles.includes(KinkyDungeonMapGet(KinkyDungeonPlayerEntity.x - 1,  KinkyDungeonPlayerEntity.y)))) moveDirection = KinkyDungeonGetDirection(-1, 0);
-		else if ((KinkyDungeonGameKey.keyPressed[3]) && (KinkyDungeonInspect || itemsAtTile(+1, 0) || MovableTiles.includes(KinkyDungeonMapGet(KinkyDungeonPlayerEntity.x + 1,  KinkyDungeonPlayerEntity.y)))) moveDirection = KinkyDungeonGetDirection(1, 0);
-		// Diagonal moves
-		if ((KinkyDungeonGameKey.keyPressed[4]) || (KinkyDungeonGameKey.keyPressed[2] && KinkyDungeonGameKey.keyPressed[0])) moveDirectionDiag = KinkyDungeonGetDirection(-1, -1);
-		else if ((KinkyDungeonGameKey.keyPressed[5]) || (KinkyDungeonGameKey.keyPressed[3] && KinkyDungeonGameKey.keyPressed[0])) moveDirectionDiag = KinkyDungeonGetDirection(1, -1);
-		else if ((KinkyDungeonGameKey.keyPressed[6]) || (KinkyDungeonGameKey.keyPressed[2] && KinkyDungeonGameKey.keyPressed[1])) moveDirectionDiag = KinkyDungeonGetDirection(-1, 1);
-		else if ((KinkyDungeonGameKey.keyPressed[7]) || (KinkyDungeonGameKey.keyPressed[3] && KinkyDungeonGameKey.keyPressed[1])) moveDirectionDiag = KinkyDungeonGetDirection(1, 1);
+		/*
+		 * Bitmasks are much easier to process.  This arrangement
+		 * also more easily supports chording on the cardinal
+		 * directions (e.g. U + L).
+		 */
+		const U = 1 << 0;
+		const D = 1 << 1;
+		const L = 1 << 2;
+		const R = 1 << 3;
+		let moveBits = 0;
 
-		if ((KinkyDungeonGameKey.keyPressed[8])) {moveDirection = KinkyDungeonGetDirection(0, 0); moveDirectionDiag = null;}
+		if (KinkyDungeonGameKey.keyPressed[0])	moveBits |= U;
+		if (KinkyDungeonGameKey.keyPressed[1])	moveBits |= D;
+		if (KinkyDungeonGameKey.keyPressed[2])	moveBits |= L;
+		if (KinkyDungeonGameKey.keyPressed[3])	moveBits |= R;
+		if (KinkyDungeonGameKey.keyPressed[4])	moveBits |= U | L;
+		if (KinkyDungeonGameKey.keyPressed[5])	moveBits |= U | R;
+		if (KinkyDungeonGameKey.keyPressed[6])	moveBits |= D | L;
+		if (KinkyDungeonGameKey.keyPressed[7])	moveBits |= D | R;
 
-		if (moveDirectionDiag && (KinkyDungeonInspect || itemsAtTile(moveDirectionDiag.x, moveDirectionDiag.y) || MovableTiles.includes(KinkyDungeonMapGet(moveDirectionDiag.x + KinkyDungeonPlayerEntity.x,  moveDirectionDiag.y + KinkyDungeonPlayerEntity.y)))) {
-			moveDirection = moveDirectionDiag;
+		let dx = 0;
+		let dy = 0;
+		if (moveBits & L)	--dx;
+		if (moveBits & R)	++dx;
+		if (moveBits & U)	--dy;
+		if (moveBits & D)	++dy;
+
+		/*  "Wait" key cancels any movement.  */
+		if (KinkyDungeonGameKey.keyPressed[8]) {
+			dx = 0;
+			dy = 0;
+			moveBits = 1 << 4;
+		}
+
+		if (    moveBits
+		    &&  (    KinkyDungeonInspect
+		         ||  itemsAtTile (dx, dy)
+		         ||  MovableTiles.includes (KinkyDungeonMapGet (KinkyDungeonPlayerEntity.x + dx,
+		                                                        KinkyDungeonPlayerEntity.y + dy))))
+		{
+			moveDirection = KinkyDungeonGetDirection (dx, dy);
 		}
 
 		if (moveDirection) {
