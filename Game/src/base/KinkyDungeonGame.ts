@@ -4541,53 +4541,74 @@ function KinkyDungeonListenKeyMove() {
 	    &&  KinkyDungeonDrawState == "Game"
 	    &&  !KDModalArea)
 	{
-		let moveDirection: MoveDirection = null;
-
-		let MovableTiles = KinkyDungeonGetMovable();
-		let itemsAtTile = (x: number, y: number) => {
-			return KDMapData.GroundItems.some((item) => {return item.x == KinkyDungeonPlayerEntity.x + x && item.y == KinkyDungeonPlayerEntity.y + y;});
+		const MovableTiles = KinkyDungeonGetMovable();
+		const itemsAtTile = (dx: number, dy: number) => {
+			return KDMapData.GroundItems.some((item) => {return item.x == KinkyDungeonPlayerEntity.x + dx && item.y == KinkyDungeonPlayerEntity.y + dy;});
+		};
+		const tileIsMovable = (dx: number, dy: number): boolean => {
+		    return (    KinkyDungeonInspect
+		            ||  itemsAtTile (dx, dy)
+		            ||  MovableTiles.includes (KinkyDungeonMapGet (KinkyDungeonPlayerEntity.x + dx,
+		                                                           KinkyDungeonPlayerEntity.y + dy)));
 		};
 
-		/*
-		 * Bitmasks are much easier to process.  This arrangement
-		 * also more easily supports chording on the cardinal
-		 * directions (e.g. U + L).
-		 */
+		let moveDirection: MoveDirection = null;
+
 		const U = 1 << 0;
 		const D = 1 << 1;
 		const L = 1 << 2;
 		const R = 1 << 3;
 		let moveBits = 0;
+		let dx = 0;
+		let dy = 0;
 
-		if (KinkyDungeonGameKey.keyPressed[0])	moveBits |= U;
-		if (KinkyDungeonGameKey.keyPressed[1])	moveBits |= D;
-		if (KinkyDungeonGameKey.keyPressed[2])	moveBits |= L;
-		if (KinkyDungeonGameKey.keyPressed[3])	moveBits |= R;
+		/*
+		 * "What's going on here?"
+		 * KD treats chorded diagonal movements (e.g. U+L) differently
+		 * from diagonal movements triggered by a single key.  If, for
+		 * example, the player is adjacent to a wall to their left,
+		 * and presses a U+L chord (WA), the player "slides" against
+		 * the wall in the unobstructed direction (e.g. up).  However,
+		 * if the player presses the up-left diagonal key (Q), the player
+		 * doesn't move (because there's a wall there).  There are
+		 * many players of KD who use chorded movements, and have come
+		 * to expect this behavior.
+		 *
+		 * Consider cardinal movements first, then consider diagonal
+		 * movements.  If a pure diagonal movement isn't possible, any
+		 * "leftover" cardinal movement takes effect.
+		 */
+		// Cardinal directions.
+		if (KinkyDungeonGameKey.keyPressed[0])	{ moveBits |= U;  --dy; }
+		if (KinkyDungeonGameKey.keyPressed[1])	{ moveBits |= D;  ++dy; }
+		if (KinkyDungeonGameKey.keyPressed[2])	{ moveBits |= L;  --dx; }
+		if (KinkyDungeonGameKey.keyPressed[3])	{ moveBits |= R;  ++dx; }
+		if (dy  &&  tileIsMovable (0, dy)) {
+			moveDirection = KinkyDungeonGetDirection (0, dy);
+		}
+		if (dx  &&  tileIsMovable (dx, 0)) {
+			moveDirection = KinkyDungeonGetDirection (dx, 0);
+		}
+
+		// Diagonal directions.
 		if (KinkyDungeonGameKey.keyPressed[4])	moveBits |= U | L;
 		if (KinkyDungeonGameKey.keyPressed[5])	moveBits |= U | R;
 		if (KinkyDungeonGameKey.keyPressed[6])	moveBits |= D | L;
 		if (KinkyDungeonGameKey.keyPressed[7])	moveBits |= D | R;
 
-		let dx = 0;
-		let dy = 0;
-		if (moveBits & L)	--dx;
-		if (moveBits & R)	++dx;
+		dx = dy = 0;
 		if (moveBits & U)	--dy;
 		if (moveBits & D)	++dy;
+		if (moveBits & L)	--dx;
+		if (moveBits & R)	++dx;
 
-		/*  "Wait" key cancels any movement.  */
+		// "Wait" key cancels any movement, but still ticks the clock.
 		if (KinkyDungeonGameKey.keyPressed[8]) {
 			dx = 0;
 			dy = 0;
 			moveBits = 1 << 4;
 		}
-
-		if (    moveBits
-		    &&  (    KinkyDungeonInspect
-		         ||  itemsAtTile (dx, dy)
-		         ||  MovableTiles.includes (KinkyDungeonMapGet (KinkyDungeonPlayerEntity.x + dx,
-		                                                        KinkyDungeonPlayerEntity.y + dy))))
-		{
+		if (moveBits  &&  tileIsMovable (dx, dy)) {
 			moveDirection = KinkyDungeonGetDirection (dx, dy);
 		}
 
