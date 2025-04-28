@@ -6008,55 +6008,36 @@ let KinkyDungeonGameKey: any = {
 			}
 			switch(code){
 				case KinkyDungeonGameKey.KEY_UP:
-					if(!KinkyDungeonGameKey.keyPressed[0]){
-						KinkyDungeonGameKey.keyPressed[0] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[0] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_DOWN:
-					if(!KinkyDungeonGameKey.keyPressed[1]){
-						KinkyDungeonGameKey.keyPressed[1] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[1] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_LEFT:
-					if(!KinkyDungeonGameKey.keyPressed[2]){
-						KinkyDungeonGameKey.keyPressed[2] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[2] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_RIGHT:
-					if(!KinkyDungeonGameKey.keyPressed[3]){
-						KinkyDungeonGameKey.keyPressed[3] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[3] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_UPLEFT:
-					if(!KinkyDungeonGameKey.keyPressed[4]){
-						KinkyDungeonGameKey.keyPressed[4] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[4] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_UPRIGHT:
-					if(!KinkyDungeonGameKey.keyPressed[5]){
-						KinkyDungeonGameKey.keyPressed[5] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[5] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_DOWNLEFT:
-					if(!KinkyDungeonGameKey.keyPressed[6]){
-						KinkyDungeonGameKey.keyPressed[6] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[6] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_DOWNRIGHT:
-					if(!KinkyDungeonGameKey.keyPressed[7]){
-						KinkyDungeonGameKey.keyPressed[7] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[7] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_WAIT:
-					if(!KinkyDungeonGameKey.keyPressed[8]){
-						KinkyDungeonGameKey.keyPressed[8] = true;
-					}
+					KinkyDungeonGameKey.keyPressed[8] = true;
 					break;
 				case KinkyDungeonGameKey.KEY_SKIP:
-					if(!KinkyDungeonGameKey.keyPressed[9]){
-						KinkyDungeonGameKey.keyPressed[9] = true;
-						KDConfirmDeleteSave = false;
-					}
+					KinkyDungeonGameKey.keyPressed[9] = true;
+					KDConfirmDeleteSave = false;
+				default:
 					break;
 			}
 		}
