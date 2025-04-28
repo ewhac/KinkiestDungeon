@@ -1,4 +1,4 @@
-let KDJailStripSearchTime = 300;
+let KDJailStripSearchTime = -1; // lasts forever till interrupted
 let KDJailStripSearchTempTime = 50;
 
 function KDShouldStripSearchPlayer(player: entity, allowFlag: boolean = false): boolean {
@@ -206,7 +206,7 @@ KDPrisonTypes.HighSec = {
 					}
 
 				}
-				KinkyDungeonHandleJailSpawns(delta, true);
+				KinkyDungeonHandleJailSpawns(delta, KDRandom() < 0.9);
 
 
 				let lostTrack = KDLostJailTrackCell(player);
@@ -234,7 +234,7 @@ KDPrisonTypes.HighSec = {
 
 
 
-				if (KDPrisonTick(player)) {
+				if (KDPrisonTick(player) && !KinkyDungeonFlags.get("suspendJailTick")) {
 					if (KDShouldStripSearchPlayer(player, true)) {
 						return "Strip";
 					}
@@ -397,7 +397,7 @@ KDPrisonTypes.HighSec = {
 					return KDGoToSubState(player, "StripRemove");
 				}
 				// Otherwise go to travel state
-				if (KDShouldStripSearchPlayer(player))
+				if (KDShouldStripSearchPlayer(player, true))
 					return KDGoToSubState(player, "StripTravel");
 				if (!KinkyDungeonPlayerInCell()) {
 					return KDGoToSubState(player, "CellTravel");

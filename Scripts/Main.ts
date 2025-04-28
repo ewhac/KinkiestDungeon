@@ -5,6 +5,9 @@ const PIXIWidth = 2000;
 const PIXIHeight = 1000;
 
 let resolution = KDResolutionList[parseFloat(localStorage.getItem("KDResolution")) || 0];
+
+KinkyDungeonSetupCrashHandler();
+
 var PIXIapp = new PIXI.Application({
 	//view: document.getElementById("MainCanvas"),
 	antialias: false,
@@ -84,6 +87,18 @@ window.onload = function() {
 
 	(PIXIapp.renderer as PIXIRenderer).gl.canvas.addEventListener('webglcontextlost', () => {
 		console.error('WebGl context lost');
+		KDForceAllCull = true;
+
+		if (!ContextLostAlready)
+			setTimeout(() => {
+				if (!ContextLostAlready) {
+					ContextLostAlready = true;
+					//@ts-ignore
+					PIXIapp.renderer.context.gl.getExtension('WEBGL_lose_context')?.loseContext();
+				}
+			}, 2000);
+		else ContextLostAlready = false;
+
 
 		//load();
 	});
@@ -91,6 +106,8 @@ window.onload = function() {
 
 	//MainRun(0);
 };
+
+let ContextLostAlready = false;
 
 let TimerRunInterval: number = 0;
 let TimerLastTime: number = 0;
@@ -172,7 +189,8 @@ function TouchMove(touch: Touch): void {
  * When mouse move, we keep the mouse position for other scripts
  */
 function MouseMove(event: MouseEvent): void {
-	if (PIXICanvas && (document.activeElement?.id == "MainCanvas" || document.activeElement?.id == PIXICanvas?.id || document.activeElement?.id == '')) {
+	if (PIXICanvas) {
+		// && (document.activeElement?.id == "MainCanvas" || document.activeElement?.id == PIXICanvas?.id || document.activeElement?.id == '')
 		MouseX = Math.round(event.offsetX * 2000 / PIXICanvas.clientWidth);
 		MouseY = Math.round(event.offsetY * 1000 / PIXICanvas.clientHeight);
 	}

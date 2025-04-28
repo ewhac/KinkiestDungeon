@@ -79,7 +79,7 @@ function AddModel(Model: Model, Strings?: Record<string, string>) {
 	ModelDefs[Model.Name] = Model;
 	if (Strings) {
 		for (let str of Object.entries(Strings)) {
-			addTextKey("m" + str[0], str[1]);
+			addTextKey("m_" + str[0], str[1]);
 		}
 	}
 }
@@ -112,6 +112,8 @@ class ModelContainer {
 	readonly ForceUpdate: Set<string>;
 	readonly Refresh: Set<string>;
 	readonly Mods: Map<string, PoseMod[]>;
+	readonly EndMods: Map<string, PoseMod[]>;
+
 
 	constructor(Character: Character, Models: Map<string, Model>, Containers: Map<string, ContainerInfo>, ContainersDrawn: Map<string, ContainerInfo>, Poses: Record<string, boolean>) {
 		this.Character = Character;
@@ -122,6 +124,7 @@ class ModelContainer {
 		this.TempPoses = {};
 		this.HighestPriority = {};
 		this.Mods = new Map();
+		this.EndMods = new Map();
 		this.Update = new Set();
 		this.ForceUpdate = new Set();
 		this.Refresh = new Set();
@@ -130,7 +133,7 @@ class ModelContainer {
 	/**
 	 * Adds a model to the modelcontainer
 	 */
-	addModel(Model: Model, Filters?: Record<string, LayerFilter>, LockType?: string, Properties?: Record<string, LayerProperties>) {
+	addModel(Model: Model, Filters?: Record<string, LayerFilter>, LockType?: string, Properties?: Record<string, LayerPropertiesType>) {
 		let mod: Model = JSON.parse(JSON.stringify(Model));
 		if (Filters) {
 			mod.Filters = JSON.parse(JSON.stringify(Filters)) || mod.Filters;
@@ -189,13 +192,20 @@ function ToLayerMap(Layers: ModelLayer[]): {[_: string]: ModelLayer} {
 	return ToNamedMap(Layers);
 }
 
-function GetModelLayers(ModelName: string, PrependString?: string, AppendString?: string, InheritColor?: string, PriBonus?: number, layerSwap?: string, Folder?: string): ModelLayer[] {
+function GetModelLayers(ModelName: string, PrependString?: string, AppendString?: string, InheritColor?: string, PriBonus?: number, layerSwap?: string, Folder?: string, noTieToLayer: boolean = false): ModelLayer[] {
 	if (ModelDefs[ModelName]) {
 		let ret : ModelLayer[] = JSON.parse(JSON.stringify(Object.values(ModelDefs[ModelName].Layers)));
 		for (let layer of ret) {
 			layer.Name = (PrependString || "") + layer.Name + (AppendString || "");
 			if (InheritColor) layer.InheritColor = InheritColor;
-			if (PriBonus) layer.Pri += PriBonus;
+			if (PriBonus) {
+				layer.Pri += PriBonus;
+				if (!noTieToLayer && !layerSwap && (PrependString || AppendString)) {
+					layer.NoOverride = true;
+					layer.TieToLayer = layer.Name;
+					delete layer.HideWhenOverridden;
+				}
+			}
 			if (layerSwap) layer.Layer = layerSwap;
 			if (Folder) layer.Folder = Folder;
 		}
@@ -375,9 +385,15 @@ function DisposeEntity(id: number, resort: boolean = true, deleteSpecial = false
  * @param DrawCanvas - Pixi container to draw to
  * @param Blend - The blend mode to use
  * @param StartMods - Mods applied
+ * @param EndMods - Mods applied at end
  * @param flip - Mods applied
  */
-function DrawCharacter(C: Character, X: number, Y: number, Zoom: number, IsHeightResizeAllowed: boolean = true, DrawCanvas: any = null, Blend: any = PIXI.SCALE_MODES.LINEAR, StartMods: PoseMod[] = [], zIndex: number = 0, flip: boolean = false, extraPoses: string[] = undefined, containerID?: string): void {
+function DrawCharacter(C: Character, X: number, Y: number, Zoom: number,
+	IsHeightResizeAllowed: boolean = true, DrawCanvas: any = null,
+	Blend: any = PIXI.SCALE_MODES.LINEAR,
+	StartMods: PoseMod[] = [], zIndex: number = 0, flip: boolean = false,
+	extraPoses: string[] = undefined, containerID?: string,
+	EndMods: PoseMod[] = []): void {
 	if (!DrawCanvas) DrawCanvas = kdcanvas;
 
 	// Update the RenderCharacterQueue
@@ -458,6 +474,7 @@ function DrawCharacter(C: Character, X: number, Y: number, Zoom: number, IsHeigh
 			y: Y,
 			Blend: Blend,
 			StartMods: StartMods,
+			EndMods: EndMods,
 		};
 		KinkyDungeonSendEvent("beforeMeshDestroy", data);
 		MC.Update.delete(containerID);
@@ -474,13 +491,16 @@ function DrawCharacter(C: Character, X: number, Y: number, Zoom: number, IsHeigh
 		refreshfilters = true;
 		if (KDGlobalFilterCacheRefresh) {
 			KDGlobalFilterCacheRefresh = false;
-			for (let fc of KDAdjustmentFilterCache.values()) {
+			for (let fce of KDAdjustmentFilterCache.entries()) {
+				let fc = fce[1];
 				for (let f of fc) {
-					if (!KDFilterDrawn.get(f))
+					if (!KDFilterDrawn.get(f)) {
 						KDFilterCacheToDestroy.push(f);
+						fc.splice(fc.indexOf(f), 1);
+					}
 				}
+				if (fc.length == 0) KDAdjustmentFilterCache.delete(fce[0]);
 			}
-			KDAdjustmentFilterCache.clear();
 			KDFilterDrawn = new Map();
 		}
 
@@ -521,6 +541,7 @@ function DrawCharacter(C: Character, X: number, Y: number, Zoom: number, IsHeigh
 			y: Y,
 			Blend: Blend,
 			StartMods: StartMods,
+			EndMods: EndMods,
 		};
 		KinkyDungeonSendEvent("meshCreate", data);
 		//Container.Container.filterArea = new PIXI.Rectangle(0,0,MODELWIDTH*MODEL_SCALE,MODELHEIGHT*MODEL_SCALE);
@@ -532,10 +553,14 @@ function DrawCharacter(C: Character, X: number, Y: number, Zoom: number, IsHeigh
 		let flippedPoses = DrawModelProcessPoses(MC, extraPoses);
 
 		if (PIXI.BaseTexture.defaultOptions.scaleMode != Blend) PIXI.BaseTexture.defaultOptions.scaleMode = Blend;
-		let modified = DrawCharacterModels(containerID, MC, X + Zoom * MODEL_SCALE * MODELHEIGHT * 0.25, Y + Zoom * MODEL_SCALE * MODELHEIGHT/2, (Zoom * MODEL_SCALE) || MODEL_SCALE, StartMods,
-			MC.Containers.get(containerID), refreshfilters, flip);
+		let modified = DrawCharacterModels(containerID,
+			MC, X + Zoom * MODEL_SCALE * MODELHEIGHT * 0.25,
+			Y + Zoom * MODEL_SCALE * MODELHEIGHT/2,
+			(Zoom * MODEL_SCALE) || MODEL_SCALE, StartMods,
+			MC.Containers.get(containerID), refreshfilters, flip, EndMods);
 		let oldBlend = PIXI.BaseTexture.defaultOptions.scaleMode;
 		MC.Mods.set(containerID, StartMods);
+		MC.EndMods.set(containerID, EndMods);
 		MC.Update.add(containerID);
 
 		let Container = MC.Containers.get(containerID);
@@ -619,12 +644,12 @@ function LayerIsHidden(MC: ModelContainer, l: ModelLayer, m: Model, Mods) : bool
 		return (
 			!entry[2]
 			|| !m.Properties
-			|| (!m.Properties[KDLayerPropName(l, MC.Poses)]
-				&& !m.Properties[l.InheritColor || l.Name])
-			|| ((!m.Properties[KDLayerPropName(l, MC.Poses)]
-					|| !m.Properties[KDLayerPropName(l, MC.Poses)][entry[2]])
-				&& (!m.Properties[l.InheritColor || l.Name]
-					|| !m.Properties[l.InheritColor || l.Name][entry[2]])
+			|| (!m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)]
+				&& !(m.Properties[l.Name] || m.Properties[l.InheritColor]))
+			|| ((!m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)]
+					|| !m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)][entry[2]])
+				&& (!(m.Properties[l.Name] || m.Properties[l.InheritColor])
+					|| !(m.Properties[l.Name] || m.Properties[l.InheritColor])[entry[2]])
 				)
 				)
 			&& (
@@ -666,13 +691,13 @@ function LayerPri(MC: ModelContainer, l: ModelLayer, m: Model, Mods?) : number {
 			if (MC.Poses[p[0]] || MC.TempPoses[p[0]]) temp += p[1];
 		}
 	}
-	let Properties: LayerProperties = m.Properties;
+	let Properties: LayerPropertiesType = m.Properties;
 	let lyr = l.InheritColor || l.Name;
 	if (Properties && Properties[lyr]) {
 		if (Properties[lyr].LayerBonus) temp += Properties[lyr].LayerBonus;
 	}
 	let oldProp = lyr;
-	lyr = KDLayerPropName(l, MC.Poses);
+	lyr = KDLayerPropName(l, MC.Poses, m.Properties);
 	if (oldProp != lyr && Properties && Properties[lyr]) {
 		if (Properties[lyr].LayerBonus) temp += Properties[lyr].LayerBonus;
 	}
@@ -680,24 +705,34 @@ function LayerPri(MC: ModelContainer, l: ModelLayer, m: Model, Mods?) : number {
 	return temp;
 }
 
-function KDLayerPropName(l: ModelLayer, Poses: Record<string, boolean>): string {
+function KDLayerPropName(l: ModelLayer, Poses: Record<string, boolean>, props: Record<string, LayerPropertiesType>): string {
 	if (l.Poses || l.MorphPoses) {
 		if (l.Poses)
 			for (let pose of Object.keys(l.Poses)) {
-				if (Poses[pose]) return (l.InheritColor || l.Name) + pose;
+				if (Poses[pose]) return (l.InheritColor && props && props[l.InheritColor + pose])
+					? l.InheritColor + pose : l.Name + pose;
 			}
-		if (l.MorphPoses)
+		if (l.MorphPoses) {
+			for (let pose of Object.keys(l.MorphPoses)) {
+				if (Poses[pose]) return  (l.InheritColor && props && props[l.InheritColor + pose])
+					? l.InheritColor + pose : l.Name + pose;
+			}
 			for (let pose of Object.values(l.MorphPoses)) {
-				if (Poses[pose]) return (l.InheritColor || l.Name) + pose;
+				if (Poses[pose]) return  (l.InheritColor && props && props[l.InheritColor + pose])
+					? l.InheritColor + pose : l.Name + pose;
 			}
+		}
 	}
-	return l.InheritColor || l.Name;
+	return (l.InheritColor && props && props[l.InheritColor])
+	? l.InheritColor : l.Name;
 }
 
 /**
  * Setup sprites from the modelcontainer
  */
-function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom, StartMods, ContainerContainer, refreshfilters: boolean, flip: boolean) : boolean {
+function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom,
+	StartMods: PoseMod[],
+	ContainerContainer, refreshfilters: boolean, flip: boolean, EndMods: PoseMod[]) : boolean {
 	// We create a list of models to be added
 	let Models = new Map(MC.Models.entries());
 	let modified = false;
@@ -729,22 +764,23 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 		for (let l of Object.values(m.Layers)) {
 
 
-			let prop: LayerProperties = null;
+			let prop: LayerPropertiesType = null;
 			if (m.Properties) {
-				prop = m.Properties[l.InheritColor || l.Name];
-				if (!prop && m.Properties[KDLayerPropName(l, MC.Poses)]) {
-					prop = m.Properties[KDLayerPropName(l, MC.Poses)];
+				prop = (m.Properties[l.Name] || m.Properties[l.InheritColor]);
+				if (!prop && m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)]) {
+					prop = m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)];
 				} else if (prop) {
-					Object.assign(prop, m.Properties[KDLayerPropName(l, MC.Poses)]);
+					Object.assign(prop, m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)]);
 				}
 			}
 
-			let pri = LayerPri(MC, l, m, StartMods);
-			if (!l.DontAlwaysOverride && LayerIsHidden(MC, l, m, StartMods)) continue;
+			let Mods = [...(StartMods || []), ...(EndMods || [])]
+			let pri = LayerPri(MC, l, m, Mods);
+			if (!l.DontAlwaysOverride && LayerIsHidden(MC, l, m, Mods)) continue;
 
 
 			if (!l.NoOverride && !(prop?.NoOverride != undefined && prop.NoOverride == 1)) {
-				let layer = LayerLayer(MC, l, m, StartMods);
+				let layer = LayerLayer(MC, l, m, Mods);
 				MC.HighestPriority[layer] = Math.max(MC.HighestPriority[layer] || -500, pri || -500);
 			}
 			if (l.CrossHideOverride) {
@@ -769,6 +805,8 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 	let {X_Offset, Y_Offset} = ModelGetPoseOffsets(MC.Poses, flip);
 	let {rotation, X_Anchor, Y_Anchor} = ModelGetPoseRotation(MC.Poses);
 	let mods = ModelGetPoseMods(MC.Poses);
+	let totalMods: {[_: string]: PoseMod[]} = {};
+	let endMods: {[_: string]: PoseMod[]} = {};
 	ContainerContainer.Container.angle = rotation;
 	ContainerContainer.Container.pivot.x = MODELWIDTH*Zoom * X_Anchor + MODEL_XOFFSET*Zoom;
 	ContainerContainer.Container.pivot.y = MODELHEIGHT*Zoom * Y_Anchor;
@@ -780,14 +818,27 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 	for (let m of StartMods) {
 		if (!mods[m.Layer]) mods[m.Layer] = [];
 		mods[m.Layer].push(m);
+		if (!totalMods[m.Layer]) totalMods[m.Layer] = [];
+		totalMods[m.Layer].push(m);
 	}
+
+
+	if (EndMods)
+		for (let m of EndMods) {
+			if (!endMods[m.Layer]) endMods[m.Layer] = [];
+			endMods[m.Layer].push(m);
+			if (!totalMods[m.Layer]) totalMods[m.Layer] = [];
+			totalMods[m.Layer].push(m);
+		}
+
+
 
 	let drawLayers: Record<string, boolean> = {};
 
 	// Yes we draw these layers
 	for (let m of Models.values()) {
 		for (let l of Object.values(m.Layers)) {
-			if (!LayerIsHidden(MC, l, m, mods))
+			if (!LayerIsHidden(MC, l, m, totalMods))
 				drawLayers[m.Name + "," + l.Name] = ModelDrawLayer(MC, m, l, MC.Poses);
 		}
 	}
@@ -796,9 +847,13 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 	// Create the layer extra filter matrix
 	let ExtraFilters: Record<string, LayerFilter[]> = {};
 	let DisplaceFilters: Record<string, {sprite: any, id: string, spriteName?: string, hash: string, amount: number, zIndex?: number}[]> = {};
-	let DisplaceFiltersInUse = {};
+	//let OcclusionFilters: Record<string, {sprite: any, id: string, spriteName?: string, hash: string, amount: number, zIndex?: number}[]> = {};
+	let DisplaceFiltersInUse: Record<string,number> = {};
+	let DisplaceFilterAmt: Record<string,number> = {};
+	//let OcclusionFiltersInUse = {};
 	let EraseFilters: Record<string, {sprite: any, id: string, spriteName?: string, hash: string, amount: number, zIndex?: number}[]> = {};
-	let EraseFiltersInUse = {};
+	let EraseFiltersInUse: Record<string,number> = {};
+	let EraseFiltersAmt: Record<string,number> = {};
 	for (let m of Models.values()) {
 		for (let l of Object.values(m.Layers)) {
 
@@ -817,17 +872,19 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 				}
 			}
 
-			let lyr = KDLayerPropName(l, MC.Poses);
-			// Apply displacement
-			if (l.DisplaceLayers
-				&& (!l.DisplacementPoses
-					|| l.DisplacementPoses.some((pose) => {return MC.Poses[pose];}))
-				&& (!l.DisplacementPosesExclude
-					|| l.DisplacementPosesExclude.every((pose) => {return !MC.Poses[pose];}))
+			let lyr = KDLayerPropName(l, MC.Poses, m.Properties);
+			// Apply occlusion
+			/*if (l.OccludeLayers
+				&& (!l.OccludePoses
+					|| l.OccludePoses.some((pose) => {return MC.Poses[pose];}))
+				&& (!l.OccludePosesExclude
+					|| l.OccludePosesExclude.every((pose) => {return !MC.Poses[pose];}))
 				) {
 				let transform = new Transform();
 
-				let layer = LayerLayer(MC, l, m, mods);
+				let layer = LayerLayer(MC, l, m, totalMods);
+
+
 				while (layer) {
 					let mod_selected: PoseMod[] = mods[layer] || [];
 					for (let mod of mod_selected) {
@@ -857,7 +914,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					);
 				}
 				let oldProps = Properties;
-				Properties = m.Properties ? m.Properties[l.InheritColor || l.Name] : undefined;
+				Properties = m.Properties ? (m.Properties[l.Name] || m.Properties[l.InheritColor]) : undefined;
 				if (Properties && oldProps != Properties) {
 					transform = transform.recursiveTransform(
 						Properties.XOffset || 0,
@@ -869,11 +926,207 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						(Properties.Rotation * Math.PI / 180) || 0
 					);
 				}
+				layer = LayerLayer(MC, l, m, totalMods);
+				while (layer) {
+					let mod_selected: PoseMod[] = endMods[layer] || [];
+					for (let mod of mod_selected) {
+						transform = transform.recursiveTransform(
+							mod.offset_x || 0,
+							mod.offset_y || 0,
+							mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+							mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+							mod.scale_x || 1,
+							mod.scale_y || 1,
+						(mod.rotation * Math.PI / 180) || 0
+						);
+					}
+					layer = LayerProperties[layer]?.Parent;
+				}
+
+				for (let ll of Object.entries(l.OccludeLayers)) {
+					let id = "occ_" + ModelLayerString(m, l, MC.Poses);
+
+					let zzz = (l.DisplaceZBonus || 0)*LAYER_INCREMENT-ModelLayers[LayerLayer(MC, l, m, totalMods)] + (LayerPri(MC, l, m, totalMods) || 0);
+					if (OcclusionFiltersInUse[id] != undefined && OcclusionFiltersInUse[id] < zzz) {
+						OcclusionFiltersInUse[id] = zzz;
+						for (let dg of Object.keys(LayerGroups[ll[0]])) {
+							if (OcclusionFilters[dg])
+								for (let ft of OcclusionFilters[dg]) {
+									if (ft.id == id && ft.zIndex < zzz) {
+										ft.zIndex = zzz;
+									}
+								}
+						}
+						continue;
+					}
+					OcclusionFiltersInUse[id] = zzz;
+
+					for (let dg of Object.keys(LayerGroups[ll[0]])) {
+						if (!OcclusionFilters[dg]) OcclusionFilters[dg] = [];
+
+						let tt = transform;
+						if (KDOptimizeDisplacementMapInfo[id]) {
+							tt = new Transform(
+								tt.ox,
+								tt.oy,
+								tt.ax,
+								tt.ay,
+								tt.sx,
+								tt.sy,
+								tt.rot,
+							).recursiveTransform(
+								KDOptimizeDisplacementMapInfo[id].xPad || 0,
+								KDOptimizeDisplacementMapInfo[id].yPad || 0,
+								0,
+								0,
+								1,
+								1,
+								0
+							);
+						}
+
+						let ox = tt.ox;
+						let oy = tt.oy;
+						let ax = tt.ax;
+						let ay = tt.ay;
+						let sx = tt.sx;
+						let sy = tt.sy;
+						let rot = tt.rot;
+						let img = ModelLayerString(m, l, MC.Poses);
+						OcclusionFilters[dg].push(
+							{
+								amount: (l.OccludeAmount || 1) * Zoom,
+								hash: id + m.Name + "," + l.Name,
+								zIndex: zzz,
+								id: id,
+								spriteName: img,
+								sprite: KDDrawRT(
+									ContainerContainer.Container,
+									ContainerContainer.SpriteList,
+									id, img,
+									img,
+									ox * Zoom, oy * Zoom, undefined, undefined,
+									rot, {
+										zIndex: zzz,
+										anchorx: (ax - (l.OffsetX/MODELWIDTH || 0)) * (l.AnchorModX || 1),
+										anchory: (ay - (l.OffsetY/MODELHEIGHT || 0)) * (l.AnchorModY || 1),
+										scalex: sx != 1 ? sx : undefined,
+										scaley: sy != 1 ? sy : undefined,
+										alpha: 0.0,
+										cullable: KDCulling,
+									}, false,
+									ContainerContainer.SpritesDrawn,
+									Zoom, undefined, undefined, true, false
+								),
+							}
+						);
+					}
+
+				}
+			}*/
+
+			let dAmount = 1;
+			let eAmount = 1;
+
+			let filter = m.Filters ? m.Filters[l.InheritColor || l.Name] :
+				undefined;
+			if (filter?.alpha != undefined && filter.alpha < 0.8) {
+				dAmount = 0;
+				eAmount = 0;
+			}
+
+
+			// Apply displacement
+			if (l.DisplaceLayers
+				&& (!l.DisplacementPoses
+					|| l.DisplacementPoses.some((pose) => {return MC.Poses[pose];}))
+				&& (!l.DisplacementPosesExclude
+					|| l.DisplacementPosesExclude.every((pose) => {return !MC.Poses[pose];}))
+				) {
+				let transform = new Transform();
+
+				let layer = LayerLayer(MC, l, m, totalMods);
+
+				while (layer) {
+					let mod_selected: PoseMod[] = mods[layer] || [];
+					for (let mod of mod_selected) {
+						transform = transform.recursiveTransform(
+							mod.offset_x || 0,
+							mod.offset_y || 0,
+							mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+							mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+							mod.scale_x || 1,
+							mod.scale_y || 1,
+						(mod.rotation * Math.PI / 180) || 0
+						);
+					}
+					layer = LayerProperties[layer]?.Parent;
+				}
+
+				let Properties: LayerPropertiesType = m.Properties ? m.Properties[lyr] : undefined;
+				if (Properties) {
+					if (Properties.DisplaceAmount != undefined) {
+						if (dAmount == 0) dAmount = 1;
+						dAmount *= Properties.DisplaceAmount;
+					}
+					if (Properties.EraseAmount != undefined) {
+						if (eAmount == 0) eAmount = 1;
+						eAmount *= Properties.EraseAmount;
+					}
+					transform = transform.recursiveTransform(
+						Properties.XOffset || 0,
+						Properties.YOffset || 0,
+						Properties.XPivot ||  0,
+						Properties.YPivot ||  0,
+						Properties.XScale ||  1,
+						Properties.YScale ||  1,
+						(Properties.Rotation * Math.PI / 180) || 0
+					);
+				}
+				let oldProps = Properties;
+				Properties = m.Properties ? (m.Properties[l.Name] || m.Properties[l.InheritColor]) : undefined;
+				if (Properties && oldProps != Properties) {
+					if (Properties.DisplaceAmount != undefined) {
+						if (dAmount == 0) dAmount = 1;
+						dAmount *= Properties.DisplaceAmount;
+					}
+					if (Properties.EraseAmount != undefined) {
+						if (eAmount == 0) eAmount = 1;
+						eAmount *= Properties.EraseAmount;
+					}
+					transform = transform.recursiveTransform(
+						Properties.XOffset || 0,
+						Properties.YOffset || 0,
+						Properties.XPivot ||  0,
+						Properties.YPivot ||  0,
+						Properties.XScale ||  1,
+						Properties.YScale ||  1,
+						(Properties.Rotation * Math.PI / 180) || 0
+					);
+				}
+				layer = LayerLayer(MC, l, m, totalMods);
+				while (layer) {
+					let mod_selected: PoseMod[] = endMods[layer] || [];
+					for (let mod of mod_selected) {
+						transform = transform.recursiveTransform(
+							mod.offset_x || 0,
+							mod.offset_y || 0,
+							mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+							mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+							mod.scale_x || 1,
+							mod.scale_y || 1,
+						(mod.rotation * Math.PI / 180) || 0
+						);
+					}
+					layer = LayerProperties[layer]?.Parent;
+				}
 
 				for (let ll of Object.entries(l.DisplaceLayers)) {
-					let id = ModelLayerStringCustom(m, l, MC.Poses, l.DisplacementSprite, "DisplacementMaps", false, l.DisplacementInvariant, l.DisplacementMorph, l.NoAppendDisplacement);
+					let id = ModelLayerStringCustom(m, l, MC.Poses, l.DisplacementSprite,
+						"DisplacementMaps", false, l.DisplacementInvariant,
+						l.DisplacementMorph, l.NoAppendDisplacement);
 
-					let zzz = (l.DisplaceZBonus || 0)*LAYER_INCREMENT-ModelLayers[LayerLayer(MC, l, m, mods)] + (LayerPri(MC, l, m, mods) || 0);
+					let zzz = (l.DisplaceZBonus || 0)*LAYER_INCREMENT-ModelLayers[LayerLayer(MC, l, m, totalMods)] + (LayerPri(MC, l, m, totalMods) || 0);
 					if (DisplaceFiltersInUse[id] != undefined && DisplaceFiltersInUse[id] < zzz) {
 						DisplaceFiltersInUse[id] = zzz;
 						for (let dg of Object.keys(LayerGroups[ll[0]])) {
@@ -886,10 +1139,15 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						}
 						continue;
 					}
+					if (dAmount == 0) continue;
 					DisplaceFiltersInUse[id] = zzz;
 
 					for (let dg of Object.keys(LayerGroups[ll[0]])) {
 						if (!DisplaceFilters[dg]) DisplaceFilters[dg] = [];
+						DisplaceFilterAmt[id + dg] = Math.max(
+							dAmount * (l.DisplaceAmount || 50) * Zoom,
+							DisplaceFilterAmt[id + dg] || 0,
+						)
 
 						let tt = transform;
 						if (KDOptimizeDisplacementMapInfo[id]) {
@@ -922,15 +1180,15 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 
 						DisplaceFilters[dg].push(
 							{
-								amount: (l.DisplaceAmount || 50) * Zoom,
+								amount: DisplaceFilterAmt[id + dg],
 								hash: id + m.Name + "," + l.Name,
 								zIndex: zzz,
 								id: id,
 								spriteName: l.DisplacementSprite,
-								sprite: KDDraw(
+								sprite: KDDrawRT(
 									ContainerContainer.Container,
 									ContainerContainer.SpriteList,
-									id,
+									id, id,
 									id,
 									ox * Zoom, oy * Zoom, undefined, undefined,
 									rot, {
@@ -943,7 +1201,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 										cullable: KDCulling,
 									}, false,
 									ContainerContainer.SpritesDrawn,
-									Zoom
+									Zoom, undefined, undefined, true, false
 								),
 							}
 						);
@@ -960,7 +1218,8 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 			) {
 				let transform = new Transform();
 
-				let layer = LayerLayer(MC, l, m, mods);
+				let layer = LayerLayer(MC, l, m, totalMods);
+
 				while (layer) {
 					let mod_selected: PoseMod[] = mods[layer] || [];
 					for (let mod of mod_selected) {
@@ -976,8 +1235,17 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					}
 					layer = LayerProperties[layer]?.Parent;
 				}
-				let Properties: LayerProperties = m.Properties ? m.Properties[lyr] : undefined;
+
+				let Properties: LayerPropertiesType = m.Properties ? m.Properties[lyr] : undefined;
 				if (Properties) {
+					if (Properties.DisplaceAmount != undefined) {
+						if (dAmount == 0) dAmount = 1;
+						dAmount *= Properties.DisplaceAmount;
+					}
+					if (Properties.EraseAmount != undefined) {
+						if (eAmount == 0) eAmount = 1;
+						eAmount *= Properties.EraseAmount;
+					}
 					transform = transform.recursiveTransform(
 						Properties.XOffset || 0,
 						Properties.YOffset || 0,
@@ -989,8 +1257,16 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					);
 				}
 				let oldProps = Properties;
-				Properties = m.Properties ? m.Properties[l.InheritColor || l.Name] : undefined;
+				Properties = m.Properties ? (m.Properties[l.Name] || m.Properties[l.InheritColor]) : undefined;
 				if (Properties && oldProps != Properties) {
+					if (Properties.DisplaceAmount != undefined) {
+						if (dAmount == 0) dAmount = 1;
+						dAmount *= Properties.DisplaceAmount;
+					}
+					if (Properties.EraseAmount != undefined) {
+						if (eAmount == 0) eAmount = 1;
+						eAmount *= Properties.EraseAmount;
+					}
 					transform = transform.recursiveTransform(
 						Properties.XOffset || 0,
 						Properties.YOffset || 0,
@@ -1001,11 +1277,26 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						(Properties.Rotation * Math.PI / 180) || 0
 					);
 				}
-
+				layer = LayerLayer(MC, l, m, totalMods);
+				while (layer) {
+					let mod_selected: PoseMod[] = endMods[layer] || [];
+					for (let mod of mod_selected) {
+						transform = transform.recursiveTransform(
+							mod.offset_x || 0,
+							mod.offset_y || 0,
+							mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+							mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+							mod.scale_x || 1,
+							mod.scale_y || 1,
+							(mod.rotation * Math.PI / 180) || 0
+						);
+					}
+					layer = LayerProperties[layer]?.Parent;
+				}
 
 				for (let ll of Object.entries(l.EraseLayers)) {
 					let id = ModelLayerStringCustom(m, l, MC.Poses, l.EraseSprite, "DisplacementMaps", false, l.EraseInvariant, l.EraseMorph, l.NoAppendErase);
-					let zzz = (l.EraseZBonus || 0)*LAYER_INCREMENT -ModelLayers[LayerLayer(MC, l, m, mods)] + (LayerPri(MC, l, m, mods) || 0);
+					let zzz = (l.EraseZBonus || 0)*LAYER_INCREMENT -ModelLayers[LayerLayer(MC, l, m, totalMods)] + (LayerPri(MC, l, m, totalMods) || 0);
 					if (EraseFiltersInUse[id] != undefined && EraseFiltersInUse[id] < zzz) {
 						EraseFiltersInUse[id] = zzz;
 						for (let dg of Object.keys(LayerGroups[ll[0]])) {
@@ -1018,11 +1309,16 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						}
 						continue;
 					}
+					if (eAmount == 0) continue;
 					EraseFiltersInUse[id] = zzz;
 
 
 					for (let dg of Object.keys(LayerGroups[ll[0]])) {
 						if (!EraseFilters[dg]) EraseFilters[dg] = [];
+						EraseFiltersAmt[id + dg] = Math.max(
+							eAmount * (l.EraseAmount || 50) * Zoom,
+							EraseFiltersAmt[id + dg] || 0,
+						)
 
 						let tt = transform;
 						if (KDOptimizeDisplacementMapInfo[id]) {
@@ -1056,15 +1352,15 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 
 						EraseFilters[dg].push(
 							{
-								amount: (l.EraseAmount || 50) * Zoom,
+								amount: EraseFiltersAmt[id + dg],
 								hash: id + m.Name + "," + l.Name,
 								id: id,
 								spriteName: l.EraseSprite,
 								zIndex: zzz,
-								sprite: KDDraw(
+								sprite: KDDrawRT(
 									ContainerContainer.Container,
 									ContainerContainer.SpriteList,
-									id,
+									id, id,
 									id,
 									ox * Zoom, oy * Zoom, undefined, undefined,
 									rot, {
@@ -1077,7 +1373,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 										cullable: KDCulling,
 									}, false,
 									ContainerContainer.SpritesDrawn,
-									Zoom
+									Zoom, undefined, undefined, true, false
 								),
 							}
 						);
@@ -1100,10 +1396,10 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 							amount: EraseAmount,
 							hash: x,
 							id: 'ef' + x,
-							sprite: KDDraw(
+							sprite: KDDrawRT(
 								ContainerContainer.Container,
 								ContainerContainer.SpriteList,
-								"xrayfilter_" + x,
+								"xrayfilter_" + x, "xrayfilter_" + x,
 								"DisplacementMaps/" + x + ".png",
 								0, 0, undefined, undefined,
 								0, {
@@ -1112,7 +1408,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 									cullable: KDCulling,
 								}, false,
 								ContainerContainer.SpritesDrawn,
-								Zoom
+								Zoom, undefined, undefined, true, false
 							),
 						}
 					);
@@ -1129,12 +1425,10 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 		for (let l of Object.values(m.Layers)) {
 			if (drawLayers[m.Name + "," + l.Name] && !ModelLayerHidden(drawLayers, MC, m, l, MC.Poses)) {
 
-				let layer = LayerLayer(MC, l, m, mods);
+				let layer = LayerLayer(MC, l, m, totalMods);
 				let origlayer = layer;
 
 				let transform = new Transform();
-
-
 
 				while (layer) {
 					let mod_selected: PoseMod[] = mods[layer] || [];
@@ -1152,7 +1446,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					layer = LayerProperties[layer]?.Parent;
 				}
 
-				let Properties: LayerProperties = m.Properties ? m.Properties[KDLayerPropName(l, MC.Poses)] : undefined;
+				let Properties: LayerPropertiesType = m.Properties ? m.Properties[KDLayerPropName(l, MC.Poses, m.Properties)] : undefined;
 				if (Properties) {
 					transform = transform.recursiveTransform(
 						Properties.XOffset || 0,
@@ -1165,7 +1459,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					);
 				}
 				let oldProps = Properties;
-				Properties = m.Properties ? m.Properties[l.InheritColor || l.Name] : undefined;
+				Properties = m.Properties ? (m.Properties[l.Name] || m.Properties[l.InheritColor]) : undefined;
 				if (Properties && oldProps != Properties) {
 					transform = transform.recursiveTransform(
 						Properties.XOffset || 0,
@@ -1178,6 +1472,24 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 					);
 				}
 
+
+				layer = LayerLayer(MC, l, m, totalMods);
+				while (layer) {
+					let mod_selected: PoseMod[] = endMods[layer] || [];
+					for (let mod of mod_selected) {
+						transform = transform.recursiveTransform(
+							mod.offset_x || 0,
+							mod.offset_y || 0,
+							mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+							mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+							mod.scale_x || 1,
+							mod.scale_y || 1,
+							(mod.rotation * Math.PI / 180) || 0
+						);
+					}
+					layer = LayerProperties[layer]?.Parent;
+				}
+
 				let ox = transform.ox;
 				let oy = transform.oy;
 				let ax = transform.ax;
@@ -1186,17 +1498,19 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 				let sy = transform.sy;
 				let rot = transform.rot;
 
-				let fh = containerID + (m.Filters ? (m.Filters[l.InheritColor || l.Name] ? FilterHash(m.Filters[l.InheritColor || l.Name]) : "") : "");
+
+				let fhash = (m.Filters ? (m.Filters[l.InheritColor || l.Name] ? FilterHash(m.Filters[l.InheritColor || l.Name]) : "") : "");
+				let fh = containerID + fhash;
 
 				let filter = m.Filters ? (m.Filters[l.InheritColor || l.Name] ?
-					(KDAdjustmentFilterCache.get(fh) || [adjustFilter(m.Filters[l.InheritColor || l.Name])])
+					((KDAdjustmentFilterCache.get(fh)) || [adjustFilter(m.Filters[l.InheritColor || l.Name])])
 					: undefined) : undefined;
 				if (filter && !KDAdjustmentFilterCache.get(fh)) {
 					KDAdjustmentFilterCache.set(containerID + FilterHash(m.Filters[l.InheritColor || l.Name]), filter);
 				}
 
 				let extrafilter: PIXIFilter[] = [];
-				let zz = -ModelLayers[origlayer] + (LayerPri(MC, l, m, mods) || 0);
+				let zz = -ModelLayers[origlayer] + (LayerPri(MC, l, m, totalMods) || 0);
 				// Add extrafilters
 				if (ExtraFilters[origlayer]) {
 					for (let ef of ExtraFilters[origlayer]) {
@@ -1216,6 +1530,7 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 				// Add erase filters BEFORE displacement
 				if (!l.NoErase && EraseFilters[origlayer]) {
 					for (let ef of EraseFilters[origlayer]) {
+						if (!ef.sprite) continue;
 						if (ef.spriteName != undefined && ef.spriteName == l.EraseSprite) continue;
 						if (ef.zIndex != undefined && ef.zIndex - (l.EraseZBonus || 0) <= zz + 0.01) continue;
 						let efh = containerID + "ers_" + ef.hash;
@@ -1224,10 +1539,14 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 							KDAdjustmentFilterCache.delete(efh);
 						}
 						KDTex(dsprite.name, false); // try to preload it
-						f = new EraseFilter(
-							dsprite,
-						);
-						f.multisample = 0;
+						if (!KDAdjustmentFilterCache.get(efh)) {
+							f = new EraseFilter(
+								dsprite,
+							);
+
+							KDSetFilterSprite({hash: efh, filter: f}, dsprite);
+							f.multisample = 0;
+						}
 						let efilter = (KDAdjustmentFilterCache.get(efh) || [f]);
 						if (efilter && !KDAdjustmentFilterCache.get(efh)) {
 							KDAdjustmentFilterCache.set(efh, efilter);
@@ -1235,9 +1554,11 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						extrafilter.push(...efilter);
 					}
 				}
+
 				// Add displacement filters
 				if (!l.NoDisplace && DisplaceFilters[origlayer]) {
 					for (let ef of DisplaceFilters[origlayer]) {
+						if (!ef.sprite) continue;
 						if (ef.spriteName != undefined && ef.spriteName == l.DisplacementSprite) continue;
 						if (ef.zIndex != undefined && ef.zIndex - (l.DisplaceZBonus || 0) <= zz + 0.01) continue;
 						let efh = containerID + "disp_" + ef.hash;
@@ -1246,9 +1567,37 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 							KDAdjustmentFilterCache.delete(efh);
 						}
 						KDTex(dsprite.name, false); // try to preload it
-						f = new DisplaceFilter(
+						if (!KDAdjustmentFilterCache.get(efh)) {
+							f = new DisplaceFilter(
+								dsprite,
+								ef.amount,
+							);
+							//Unneeded because its already in the filter cache
+							KDSetFilterSprite({hash: efh, filter: f}, dsprite);
+							f.multisample = 0;
+						}
+
+						let efilter = (KDAdjustmentFilterCache.get(efh) || [f]);
+						if (efilter && !KDAdjustmentFilterCache.get(efh)) {
+							KDAdjustmentFilterCache.set(efh, efilter);
+						}
+						extrafilter.push(...efilter);
+					}
+				}
+				// Add occlusion filters AFTER displacement
+				/*if (!l.NoErase && OcclusionFilters[origlayer]) {
+					for (let ef of OcclusionFilters[origlayer]) {
+						if (!ef.sprite) continue;
+						if (ef.spriteName != undefined && ef.spriteName == l.EraseSprite) continue;
+						if (ef.zIndex != undefined && ef.zIndex - (l.DisplaceZBonus || 0) <= zz + 0.01) continue;
+						let efh = containerID + "occ_" + ef.hash;
+						let dsprite = ef.sprite;
+						if (refreshfilters) {
+							KDAdjustmentFilterCache.delete(efh);
+						}
+						KDTex(dsprite.name, false); // try to preload it
+						f = new OcclusionFilter(
 							dsprite,
-							ef.amount,
 						);
 						f.multisample = 0;
 						let efilter = (KDAdjustmentFilterCache.get(efh) || [f]);
@@ -1257,18 +1606,41 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						}
 						extrafilter.push(...efilter);
 					}
-				}
+				}*/
 
 				let img = ModelLayerString(m, l, MC.Poses);
 				let id = `layer_${m.Name}_${l.Name}_${img}_${fh}_${Math.round(ax*10000)}_${Math.round(ay*10000)}_${Math.round(rot*1000)}_${Math.round(sx*1000)}_${Math.round(sy*1000)}`;
 				//id = LZString.compressToBase64(id);
 				if (!modified && !ContainerContainer.SpriteList.has(id)) modified = true;
 				let filters = filter;
+				let origFilters = filter;
 				if (extrafilter) filters = [...(filter || []), ...extrafilter];
 
 				for (let filter of filters) {
 					KDFilterDrawn.set(filter, true);
 				}
+				/*if (KDToggles.OptRender) {
+					KDDrawRT(
+						ContainerContainer.Container,
+						ContainerContainer.SpriteList,
+						id, fhash,
+						img,
+						ox * Zoom, oy * Zoom, undefined, undefined,
+						rot, {
+							zIndex: zz,
+							anchorx: (ax - (l.OffsetX/MODELWIDTH || 0)) * (l.AnchorModX || 1),
+							anchory: (ay - (l.OffsetY/MODELHEIGHT || 0)) * (l.AnchorModY || 1),
+							normalizeAnchorX: MODELWIDTH,
+							normalizeAnchorY: MODELHEIGHT,
+							scalex: sx != 1 ? sx : undefined,
+							scaley: sy != 1 ? sy : undefined,
+							filters: extrafilter,
+							cullable: KDCulling,
+						}, false,
+						ContainerContainer.SpritesDrawn,
+						Zoom, undefined, origFilters
+					);
+				} else {*/
 				KDDraw(
 					ContainerContainer.Container,
 					ContainerContainer.SpriteList,
@@ -1287,8 +1659,10 @@ function DrawCharacterModels(containerID: string, MC: ModelContainer, X, Y, Zoom
 						cullable: KDCulling,
 					}, false,
 					ContainerContainer.SpritesDrawn,
-					Zoom
+					Zoom, false
 				);
+				//}
+
 			}
 		}
 	}
@@ -1314,13 +1688,13 @@ const KDAdjustmentFilterCache: Map<string, PIXIFilter[]> = new Map();
  */
 function ModelDrawLayer(MC: ModelContainer, Model: Model, Layer: ModelLayer, Poses: Record<string, boolean>): boolean {
 	// Hide if not highest
-	let prop: LayerProperties = null;
+	let prop: LayerPropertiesType = null;
 	if (Model.Properties) {
-		prop = Model.Properties[Layer.InheritColor || Layer.Name];
-		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses)]) {
-			prop = Model.Properties[KDLayerPropName(Layer, Poses)];
+		prop = (Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor]);
+		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]) {
+			prop = Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)];
 		} else if (prop) {
-			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses)]);
+			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]);
 		}
 	}
 
@@ -1348,11 +1722,11 @@ function ModelDrawLayer(MC: ModelContainer, Model: Model, Layer: ModelLayer, Pos
 		}
 	}
 	if (Model.Properties) {
-		prop = Model.Properties[Layer.InheritColor || Layer.Name];
-		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses)]) {
-			prop = Model.Properties[KDLayerPropName(Layer, Poses)];
+		prop = (Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor]);
+		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]) {
+			prop = Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)];
 		} else if (prop) {
-			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses)]);
+			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]);
 		}
 		if (prop && prop.ExtraHidePoses) {
 			for (let p of Object.keys(Poses)) {
@@ -1384,11 +1758,11 @@ function ModelDrawLayer(MC: ModelContainer, Model: Model, Layer: ModelLayer, Pos
 		}
 	}
 	if (Model.Properties) {
-		let prop = Model.Properties[Layer.InheritColor || Layer.Name];
-		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses)]) {
-			prop = Model.Properties[KDLayerPropName(Layer, Poses)];
+		let prop = (Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor]);
+		if (!prop && Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]) {
+			prop = Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)];
 		} else if (prop) {
-			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses)]);
+			Object.assign(prop, Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]);
 		}
 		if (prop && prop.ExtraHidePrefixPose) {
 			for (let p of prop.ExtraHidePrefixPose) {
@@ -1430,12 +1804,12 @@ function ModelDrawLayer(MC: ModelContainer, Model: Model, Layer: ModelLayer, Pos
 		return (
 			!entry[2]
 			|| !Model.Properties
-			|| (!Model.Properties[KDLayerPropName(Layer, Poses)]
-				&& !Model.Properties[Layer.InheritColor || Layer.Name])
-			|| ((!Model.Properties[KDLayerPropName(Layer, Poses)]
-					|| !Model.Properties[KDLayerPropName(Layer, Poses)][entry[2]])
-				&& (!Model.Properties[Layer.InheritColor || Layer.Name]
-					|| !Model.Properties[Layer.InheritColor || Layer.Name][entry[2]])
+			|| (!Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]
+				&& !(Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor]))
+			|| ((!Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)]
+					|| !Model.Properties[KDLayerPropName(Layer, Poses, Model.Properties)][entry[2]])
+				&& (!(Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor])
+					|| !(Model.Properties[Layer.Name] || Model.Properties[Layer.InheritColor])[entry[2]])
 				)
 				)
 			&& (
@@ -1536,9 +1910,20 @@ function LayerSpriteCustom(Layer: ModelLayer, Poses: {[_: string]: boolean}, Spr
 
 	if (Layer.AppendPose && !forceInvariant && !noAppend) {
 		for (let p of Object.entries(Layer.AppendPose)) {
-			if (Poses[p[0]] != undefined && (!Layer.AppendPoseRequire || Layer.AppendPoseRequire[p[0]])) {
+			if (Poses[p[0]] != undefined && (!Layer.AppendPoseRequire ||
+				Object.keys(Layer.AppendPoseRequire).some((ap) => {return !!Poses[ap];})
+			)) {
 				pose = pose + (p[1]);
 				break;
+			}
+		}
+	}
+	if (Layer.AppendPoseMulti && !forceInvariant && !noAppend) {
+		for (let p of Object.entries(Layer.AppendPoseMulti)) {
+			if (Poses[p[0]] != undefined && (!Layer.AppendPoseRequire ||
+				Object.keys(Layer.AppendPoseRequire).some((ap) => {return !!Poses[ap];})
+			)) {
+				pose = pose + (p[1]);
 			}
 		}
 	}
@@ -1746,46 +2131,69 @@ async function ForceRefreshModelsAsync(C: Character, ms = 100) {
 /**
  * Returns a list of colorable layer names
  */
-function KDGetColorableLayers(Model: Model, Properties: boolean): string[] {
-	let ret = [];
+function KDGetColorableLayers(Model: Model, Properties: boolean): {name: string, layer: string}[] {
+	let ret: {name: string, layer: string}[] = [];
+	let dupe: Record<string, boolean> = {};
 	for (let layer of Object.values(Model.Layers)) {
-		if ((!layer.NoColorize || Properties) && !layer.InheritColor) {
-			if (Properties && (layer.Poses || layer.MorphPoses || layer.GlobalDefaultOverride)) {
-				let poses: Record<string, boolean> = {};
-				if (layer.Poses)
-					for (let pose of Object.keys(layer.Poses)) {
-						poses[pose] = true;
-					}
-				if (layer.MorphPoses)
-					for (let pose of Object.entries(layer.MorphPoses)) {
-						poses[pose[0]] = true;
-						poses[pose[1]] = true;
-					}
-				for (let key of Object.keys(poses)) {
-					ret.push(layer.Name + key);
+		if (layer.InheritColor && !ret.some((ee) => {return ee.name == layer.InheritColor;})) {
+			if (!Properties || (Model.Properties && Model.Properties[layer.InheritColor])) {
+				if (!dupe[layer.InheritColor]) {
+					dupe[layer.InheritColor] = true;
+					ret.push({layer: layer.Name, name: layer.InheritColor});
 				}
 			}
-			ret.push(layer.Name);
-		} else if (layer.InheritColor && !ret.includes(layer.InheritColor)) {
-			if (Properties && (layer.Poses || layer.MorphPoses || layer.GlobalDefaultOverride)) {
-				let poses: Record<string, boolean> = {};
-				if (layer.Poses)
-					for (let pose of Object.keys(layer.Poses)) {
-						poses[pose] = true;
-					}
-				if (layer.MorphPoses)
-					for (let pose of Object.entries(layer.MorphPoses)) {
-						poses[pose[0]] = true;
-						poses[pose[1]] = true;
-					}
-				for (let key of Object.keys(poses)) {
-					ret.push(layer.InheritColor + key);
-				}
-			}
-			ret.push(layer.InheritColor);
 
+	   }
+
+		if ((!layer.NoColorize || Properties) && (!layer.InheritColor || Properties)) {
+			if (!dupe[layer.Name]) {
+				dupe[layer.Name] = true;
+				ret.push({layer: layer.Name, name: layer.Name});
+			}
+			if (Properties && (layer.Poses || layer.MorphPoses || layer.GlobalDefaultOverride)) {
+				let poses: Record<string, boolean> = {};
+				if (layer.Poses)
+					for (let pose of Object.keys(layer.Poses)) {
+						poses[pose] = true;
+					}
+				if (layer.MorphPoses)
+					for (let pose of Object.entries(layer.MorphPoses)) {
+						poses[pose[0]] = true;
+						poses[pose[1]] = true;
+					}
+				for (let key of Object.keys(poses)) {
+					if (!dupe[layer.Name + key]) {
+						dupe[layer.Name + key] = true;
+						ret.push({layer: layer.Name, name: layer.Name + key});
+					}
+				}
+			}
+		}
+		if (layer.InheritColor && !ret.some((ee) => {return ee.name == layer.InheritColor;})) {
+			if (Properties && (layer.Poses || layer.MorphPoses || layer.GlobalDefaultOverride)) {
+				let poses: Record<string, boolean> = {};
+				if (layer.Poses)
+					for (let pose of Object.keys(layer.Poses)) {
+						poses[pose] = true;
+					}
+				if (layer.MorphPoses)
+					for (let pose of Object.entries(layer.MorphPoses)) {
+						poses[pose[0]] = true;
+						poses[pose[1]] = true;
+					}
+				for (let key of Object.keys(poses)) {
+					if (Model.Properties && Model.Properties[layer.InheritColor + key]) {
+						if (!dupe[layer.InheritColor + key]) {
+							dupe[layer.InheritColor + key] = true;
+							ret.push({layer: layer.Name, name: layer.InheritColor + key});
+						}
+					}
+
+				}
+			}
 		}
 	}
+
 	return ret;
 }
 
@@ -1851,38 +2259,56 @@ function GetUnnamedModels() {
 	console.log(keys);
 }
 
-function GetHardpointLoc(C: Character, X: number, Y: number, ZoomInit: number = 1, Hardpoint: string, Flip: boolean) {
+
+interface Hardpoint {
+	Parent: string;
+	X: number;
+	Y: number;
+	OffsetX?: number,
+	OffsetY?: number,
+	Angle: number;
+};
+
+function GetModelLoc(C: Character, X: number, Y: number, ZoomInit: number = 1, hp: Hardpoint, Flip: boolean, NoMods: boolean = false) {
 	let Zoom = (ZoomInit * MODEL_SCALE) || MODEL_SCALE
-	let hp = Hardpoints[Hardpoint];
 	let pos = {x: hp?.X*Zoom || 0, y: hp?.Y*Zoom || 0, angle: hp.Angle};
 
 	let MC = KDCurrentModels.get(C);
 	let StartMods = MC.Mods.get(`${X},${Y},${ZoomInit}`);
+	let EndMods = MC.EndMods.get(`${X},${Y},${ZoomInit}`);
 	let mods = ModelGetPoseMods(MC.Poses);
 
 	for (let m of StartMods) {
 		if (!mods[m.Layer]) mods[m.Layer] = [];
 		mods[m.Layer].push(m);
 	}
+	for (let m of EndMods) {
+		if (!mods[m.Layer]) mods[m.Layer] = [];
+		mods[m.Layer].push(m);
+	}
 	if (!mods) return pos;
 
 	let transform = new Transform();
-	let layer = hp.Parent;
-	while (layer) {
-		let mod_selected: PoseMod[] = mods[layer] || [];
-		for (let mod of mod_selected) {
-			transform = transform.recursiveTransform(
-				mod.offset_x || 0,
+
+	if (!NoMods) {
+		let layer = hp.Parent;
+		while (layer) {
+			let mod_selected: PoseMod[] = mods[layer] || [];
+			for (let mod of mod_selected) {
+				transform = transform.recursiveTransform(
+					mod.offset_x || 0,
 				mod.offset_y || 0,
 				mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
 				mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
 				mod.scale_x || 1,
 				mod.scale_y || 1,
 				(mod.rotation * Math.PI / 180) || 0
-			);
+				);
+			}
+			layer = LayerProperties[layer]?.Parent;
 		}
-		layer = LayerProperties[layer]?.Parent;
 	}
+
 
 	// Move the hardpoint
 	transform = transform.recursiveTransform(
@@ -1935,6 +2361,139 @@ function GetHardpointLoc(C: Character, X: number, Y: number, ZoomInit: number = 
 	}
 	return pos;
 }
+
+/** Gets the location of hp (in screen space) on the player model */
+function GetModelLocInverse(C: Character, X: number, Y: number, ZoomInit: number = 1,
+	hp: Hardpoint, Flip: boolean) {
+	let Zoom = 1/((ZoomInit * MODEL_SCALE) || MODEL_SCALE)
+	let pos = {x: hp?.X*Zoom || 0, y: hp?.Y*Zoom || 0, angle: hp.Angle};
+
+	if (Flip) {
+		pos.x = Zoom*((0.5 * MODELHEIGHT) * MODEL_SCALE - hp?.X);
+		pos.angle = Math.PI - pos.angle;
+	}
+
+	let MC = KDCurrentModels.get(C);
+	let StartMods = MC.Mods.get(`${X},${Y},${ZoomInit}`);
+	let EndMods = MC.EndMods.get(`${X},${Y},${ZoomInit}`);
+	let mods = ModelGetPoseMods(MC.Poses);
+
+	for (let m of StartMods) {
+		if (!mods[m.Layer]) mods[m.Layer] = [];
+		mods[m.Layer].push(m);
+	}
+	for (let m of EndMods) {
+		if (!mods[m.Layer]) mods[m.Layer] = [];
+		mods[m.Layer].push(m);
+	}
+	if (!mods) return pos;
+
+
+
+    let { X_Offset, Y_Offset } = ModelGetPoseOffsets(MC.Poses, Flip);
+
+
+    let xx = (MODELWIDTH * X_Offset) + (MODEL_XOFFSET);
+    let yy = (MODELHEIGHT * Y_Offset);
+
+
+	let transform = new Transform(-xx, -yy);
+
+	let callbacks = [];
+
+	let layer = hp.Parent;
+	while (layer) {
+		let mod_selected: PoseMod[] = mods[layer] || [];
+		callbacks.push(() => {
+			for (let i = mod_selected.length - 1; i >= 0; i--) {
+				let mod = mod_selected[i];
+				transform = transform.recursiveTransform(
+					mod.offset_x || 0,
+				mod.offset_y || 0,
+				mod.rotation_x_anchor ? mod.rotation_x_anchor : 0,
+				mod.rotation_y_anchor ? mod.rotation_y_anchor : 0,
+				mod.scale_x || 1,
+				mod.scale_y || 1,
+				-(mod.rotation * Math.PI / 180) || 0
+				);
+			}
+		})
+		layer = LayerProperties[layer]?.Parent;
+	}
+
+	for (let cb of callbacks) {
+		cb();
+	}
+
+	// Move the hardpoint
+	transform = transform.recursiveTransform(
+		(Flip ? (0.5 * MODELHEIGHT) * MODEL_SCALE - hp?.X : hp.X) * Zoom,
+		hp.Y * Zoom,
+		0,
+		0,
+		1,
+		1,
+		0,
+	);
+
+	let ox = transform.ox;
+	let oy = transform.oy;
+	let rot = transform.rot;
+
+
+	pos.x = ox;
+	pos.y = oy;
+	pos.angle += rot;
+    let { rotation, X_Anchor, Y_Anchor } = ModelGetPoseRotation(MC.Poses);
+    let pivotx = MODELHEIGHT*0.5 / ZoomInit * X_Anchor;
+    let pivoty = MODELHEIGHT / ZoomInit * Y_Anchor;
+    let lx = pos.x - pivotx;
+    let ly = pos.y - pivoty;
+    let angle = -rotation * Math.PI / 180;
+    pos.x = pivotx + (lx) * Math.cos(angle) - (ly) * Math.sin(angle);
+    pos.y = pivoty + (ly) * Math.cos(angle) + (lx) * Math.sin(angle);
+
+	pos.angle += angle;
+
+
+	// I give up. Im gonna do it the stupid way.
+	let resultingPosition = GetModelLoc(C, X, Y, ZoomInit, {
+		X: pos.x,
+		Y: pos.y,
+		Angle: 0,
+		Parent: hp.Parent
+	}, Flip);
+
+
+	/*if (Flip) {
+		resultingPosition.x = (0.5 * MODELHEIGHT) * Zoom - resultingPosition.x;
+		resultingPosition.angle = Math.PI - resultingPosition.angle;
+	}*/
+	//let resultingPosition2 = GetModelLoc(C, X, Y, ZoomInit, hp, Flip, true);
+	let differencex = (resultingPosition.x - hp.X)*Zoom;
+	let differencey = (resultingPosition.y - hp.Y)*Zoom;
+	let differencea = Math.PI + resultingPosition.angle; // No idea why this works
+	if (Flip) {
+		differencex = -differencex;
+		differencea = - resultingPosition.angle
+	}
+	// I have absolutely no idea why this is working. It seems to work in the usercases that I tested
+	// If you are doing high-level rendering stuff, you may run into issues stemming from the fact
+	// that I have no idea what I am doing
+	// cheers
+	pos.x += differencex*Math.cos(differencea) + differencey*Math.sin(differencea);
+	pos.y += differencey*Math.cos(differencea) - differencex*Math.sin(differencea);
+	pos.angle += differencea;
+
+
+	return pos;
+}
+
+
+function GetHardpointLoc(C: Character, X: number, Y: number, ZoomInit: number = 1, Hardpoint: string, Flip: boolean) {
+	return GetModelLoc(C, X, Y, ZoomInit, Hardpoints[Hardpoint], Flip);
+}
+
 
 function DrawModelProcessPoses(MC: ModelContainer, extraPoses: string[]) {
 	let flippedPoses = [];
@@ -2040,11 +2599,12 @@ function KDCullModelContainerContainer(MC: ModelContainer, containerID: string) 
 			if (cull) {
 				sprite[1].parent.removeChild(sprite[1]);
 				Container.SpriteList.delete(sprite[0]);
-				modified = true;
 				KDSpritesToCull.push(sprite[1]);
 			} else sprite[1].visible = false;
-		}
+			modified = true;
+		}// else sprite[1].visible = true;
 	}
+	if (cull) KDlastCull.set(containerID, CommonTime());
 	return modified;
 }
 
@@ -2155,7 +2715,23 @@ function KDModelIsProtected(m: Model): boolean {
 }
 
 function KDContainerClear(Container: ContainerInfo) {
-	Container.Mesh.destroy();
+	Container.Mesh.destroy({
+		texture: true,
+		baseTexture: true,
+	});
 	Container.Container.destroy();
-	Container.RenderTexture.destroy();
+	Container.RenderTexture.destroy(true);
+}
+
+function KDSetFilterSprite(info: {hash: string, filter: PIXIFilter}, sprite: PIXISprite) {
+	if (!kdFilterSprites.get(sprite)) {
+		kdFilterSprites.set(sprite, []);
+		kdFilterSprites.get(sprite).push(info);
+	}
+	if (sprite.texture) {
+		if (!kdFilterSprites.get(sprite.texture)) {
+			kdFilterSprites.set(sprite.texture, []);
+		}
+		kdFilterSprites.get(sprite.texture).push(info);
+	}
 }

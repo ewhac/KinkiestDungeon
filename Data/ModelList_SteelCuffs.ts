@@ -6,13 +6,286 @@
  */
 
 
+
+AddModel({
+	Name: "NeoLinkArmLeft",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkArms",
+	Restraint: true,
+	Categories: ["Restraints", "Links"],
+	AddPose: ["NeoLinkWristLeft"],
+	Layers: ToLayerMap([
+		{ Name: "ArmLeft", Layer: "LooseStraps", Pri: 5,
+			Poses: ToMap(["Free", "Front", "Crossed"]),
+			GlobalDefaultOverride: {Front: true, Crossed: true},
+			SwapLayerPose: {Front: "ForeLooseStraps", Crossed: "ForeLooseStraps"},
+			InheritColor: "LinkLeft",
+			HideWhenOverridden: true,
+			HidePoses: {"EncaseArmLeft": true, "EncaseArms": true},
+			RequirePoses: {"NeoBelt": true},
+			AppendPose: {"NeoWaistBelt": "Belt"},
+		},
+		{ Name: "ArmLeftHardware", Layer: "LooseStraps", Pri: 5.1,
+			Poses: ToMap(["Free", "Front", "Crossed"]),
+			GlobalDefaultOverride: {Front: true, Crossed: true},
+			SwapLayerPose: {Front: "ForeLooseStraps", Crossed: "ForeLooseStraps"},
+			InheritColor: "HardwareLeft",
+			NoOverride: true,
+			TieToLayer: "ArmLeft",
+			AppendPose: {"NeoWaistBelt": "Belt"},
+		},
+	])
+});
+AddModel({
+	Name: "NeoLinkArmRight",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkArms",
+	Restraint: true,
+	Categories: ["Restraints","Links"],
+	AddPose: ["NeoLinkWristRight"],
+	Layers: ToLayerMap([
+		{ Name: "ArmRight", Layer: "LooseStraps", Pri: 5,
+			Poses: ToMap(["Free", "Front", "Crossed"]),
+			GlobalDefaultOverride: {Front: true, Crossed: true},
+			SwapLayerPose: {Front: "ForeLooseStraps", Crossed: "ForeLooseStraps"},
+			InheritColor: "LinkRight",
+			HideWhenOverridden: true,
+			HidePoses: {"EncaseArmRight": true, "EncaseArms": true},
+			RequirePoses: {"NeoBelt": true},
+			AppendPose: {"NeoWaistBelt": "Belt"},
+		},
+		{ Name: "ArmRightHardware", Layer: "LooseStraps", Pri: 5.1,
+			Poses: ToMap(["Free", "Front", "Crossed"]),
+			GlobalDefaultOverride: {Front: true, Crossed: true},
+			SwapLayerPose: {Front: "ForeLooseStraps", Crossed: "ForeLooseStraps"},
+			InheritColor: "HardwareRight",
+			NoOverride: true,
+			TieToLayer: "ArmRight",
+			AppendPose: {"NeoWaistBelt": "Belt"},
+		},
+	])
+});
+AddModel({
+	Name: "NeoLinkArms",
+	Folder: "SteelCuffBands",
+	TopLevel: true,
+	Parent: "NeoLinkArms",
+	Restraint: true,
+	Categories: ["Restraints","Links"],
+	AddPose: ["NeoLinkWristRight", "NeoLinkWristLeft", "DiscourageYoked"],
+	Layers: ToLayerMap([
+		...GetModelLayers("NeoLinkArmLeft"),
+		...GetModelLayers("NeoLinkArmRight"),
+	])
+});
+
+
+
+
+AddModel(GetModelFashionVersion("NeoLinkArmLeft", true));
+AddModel(GetModelFashionVersion("NeoLinkArmRight", true));
+AddModel(GetModelFashionVersion("NeoLinkArms", true));
+
+
+
+
+
+
+AddModel({
+	Name: "NeoLinkThighLeft",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkThighs",
+	Restraint: true,
+	Categories: ["Restraints", "Links"],
+	AddPose: ["NeoLinkThighLeft"],
+	Layers: ToLayerMap([
+		{ Name: "ThighLeft", Layer: "OverGarters", Pri: 30,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighLinkLeft",
+			NoOverride: true,
+
+			HidePoses: {"EncaseLower": true},
+			RequirePoses: {"NeoBelt": true},
+			AppendPose: {"NeoChastityBelt": "", "NeoWaistBelt": "Belt"},
+			SwapLayerPose: {"ChastityOption2": "OverGarters", "NeoChastityBelt": "Garters"},
+		},
+		{ Name: "ThighLeftHardware", Layer: "OverGarters", Pri: 30.1,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighHardwareLeft",
+			NoOverride: true,
+			TieToLayer: "ThighLeft",
+			AppendPose: {"NeoChastityBelt": "", "NeoWaistBelt": "Belt"},
+			SwapLayerPose: {"ChastityOption2": "OverGarters", "NeoChastityBelt": "Garters"},
+		},
+	])
+});
+AddModel({
+	Name: "NeoLinkThighRight",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkThighs",
+	Restraint: true,
+	Categories: ["Restraints","Links"],
+	AddPose: ["NeoLinkThighRight"],
+	Layers: ToLayerMap([
+		{ Name: "ThighRight", Layer: "OverGarters", Pri: 30,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighLinkRight",
+			NoOverride: true,
+			HidePoses: {"EncaseLower": true},
+			RequirePoses: {"NeoBelt": true},
+			AppendPose: {"NeoChastityBelt": "", "NeoWaistBelt": "Belt"},
+			SwapLayerPose: {"ChastityOption2": "OverGarters", "NeoChastityBelt": "Garters"},
+		},
+		{ Name: "ThighRightHardware", Layer: "OverGarters", Pri: 30.1,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighHardwareRight",
+			NoOverride: true,
+			TieToLayer: "ThighRight",
+			AppendPose: {"NeoChastityBelt": "", "NeoWaistBelt": "Belt"},
+			SwapLayerPose: {"ChastityOption2": "OverGarters", "NeoChastityBelt": "Garters"},
+		},
+	])
+});
+AddModel({
+	Name: "NeoLinkThighs",
+	Folder: "SteelCuffBands",
+	TopLevel: true,
+	Parent: "NeoLinkThighs",
+	Restraint: true,
+	Categories: ["Restraints","Links"],
+	AddPose: ["NeoLinkThighRight", "NeoLinkThighLeft"],
+	Layers: ToLayerMap([
+		...GetModelLayers("NeoLinkThighLeft"),
+		...GetModelLayers("NeoLinkThighRight"),
+	])
+});
+
+
+
+
+
+AddModel({
+	Name: "FashionNeoLinkThighLeft",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkThighs",
+	Categories: ["FashionRestraints", "Links"],
+	AddPose: ["NeoLinkThighLeft"],
+	Layers: ToLayerMap([
+		{ Name: "ThighLeft", Layer: "OverGarters", Pri: 30,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighLinkLeft",
+			NoOverride: true,
+		},
+		{ Name: "ThighLeftHardware", Layer: "OverGarters", Pri: 30.1,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighHardwareLeft",
+			NoOverride: true,
+			TieToLayer: "ThighLeft",
+		},
+	])
+});
+AddModel({
+	Name: "FashionNeoLinkThighRight",
+	Folder: "SteelCuffBands",
+	TopLevel: false,
+	Parent: "NeoLinkThighs",
+	Restraint: true,
+	Categories: ["FashionRestraints","Links"],
+	AddPose: ["NeoLinkThighRight"],
+	Layers: ToLayerMap([
+		{ Name: "ThighRight", Layer: "OverGarters", Pri: 30,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighLinkRight",
+			NoOverride: true,
+		},
+		{ Name: "ThighRightHardware", Layer: "OverGarters", Pri: 30.1,
+			Poses: ToMap(["Spread", "Closed", "Kneel", "KneelClosed", "Hogtie"]),
+			InheritColor: "ThighHardwareRight",
+			NoOverride: true,
+			TieToLayer: "ThighRight",
+		},
+	])
+});
+AddModel({
+	Name: "FashionNeoLinkThighs",
+	Folder: "SteelCuffBands",
+	TopLevel: true,
+	Parent: "NeoLinkThighs",
+	Categories: ["FashionRestraints","Links"],
+	AddPose: ["NeoLinkThighRight", "NeoLinkThighLeft"],
+	Layers: ToLayerMap([
+		...GetModelLayers("FashionNeoLinkThighLeft"),
+		...GetModelLayers("FashionNeoLinkThighRight"),
+	])
+});
+
+
+
+
+
+
+
+AddModel({
+	Name: "NeoThighLink",
+	Folder: "SteelCuffBands",
+	TopLevel: true,
+	Restraint: true,
+	Categories: ["Restraints","Cuffs", "Links"],
+	AddPose: ["ThighLink"],
+	Layers: ToLayerMap([
+		{ Name: "ThighLink", Layer: "BindChainLinksUnderThigh", Pri: 1.5,
+			Poses: ToMap(["Spread"]),
+			Invariant: true,
+			//AppendPose: {"HighCuffs": "High"}, // "LowCuffs": "",
+			HideWhenOverridden: true,
+		},
+		{ Name: "ThighLinkHardware", Layer: "BindChainLinksUnderThigh", Pri: 1.6,
+			Poses: ToMap(["Spread"]),
+			Invariant: true,
+			//AppendPose: {"HighCuffs": "High"}, // "LowCuffs": "",
+			NoOverride: true,
+			TieToLayer: "ThighLink",
+		},
+	])
+});
+
+AddModel({
+	Name: "NeoAnkleLink",
+	Folder: "SteelCuffBands",
+	TopLevel: true,
+	Restraint: true,
+	Categories: ["Restraints","Cuffs", "Links"],
+	AddPose: ["AnkleLink"],
+	Layers: ToLayerMap([
+		{ Name: "AnkleLink", Layer: "BindChainLinksUnder", Pri: 1.5,
+			Poses: ToMap(["Spread"]),
+			HideWhenOverridden: true,
+			Invariant: true,
+		},
+		{ Name: "AnkleLinkHardware", Layer: "BindChainLinksUnder", Pri: 1.6,
+			Poses: ToMap(["Spread"]),
+			NoOverride: true,
+			Invariant: true,
+			TieToLayer: "AnkleLink",
+		},
+	])
+});
+
+AddModel(GetModelFashionVersion("NeoThighLink", true));
+AddModel(GetModelFashionVersion("NeoAnkleLink", true));
+
 AddModel({
 	Name: "SteelCuffsWristLeft",
 	Folder: "SteelCuffs",
 	TopLevel: false,
 	Parent: "CuffsArms",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["WristLeft"],
+	AddPose: ["WristLeft", "NeoWristLeft"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesWristLeft", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesWristLeft", "Rim", "", "Rim", 0.5),
@@ -24,7 +297,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsArms",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["WristRight"],
+	AddPose: ["WristRight", "NeoWristRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesWristRight", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesWristRight", "Rim", "", "Rim", 0.5),
@@ -37,7 +310,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsArms",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["WristLeft", "WristRight"],
+	AddPose: ["WristLeft", "WristRight", "NeoWristRight", "NeoWristLeft"],
 	Layers: ToLayerMap([
 		...GetModelLayers("SteelCuffsWristLeft"),
 		...GetModelLayers("SteelCuffsWristRight"),
@@ -90,7 +363,7 @@ AddModel({
 	TopLevel: true,
 	Parent: "Cuffs",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["ElbowLeft", "ElbowRight", "WristLeft", "WristRight"],
+	AddPose: ["ElbowLeft", "ElbowRight", "WristLeft", "WristRight", "NeoWristLeft", "NeoWristRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("SteelCuffsWrists"),
 		...GetModelLayers("SteelCuffsElbows"),
@@ -103,7 +376,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsAnkles",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["AnkleLeft"],
+	AddPose: ["AnkleLeft", "NeoAnkleLeft"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesAnklesLeft", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesAnklesLeft", "Rim", "", "Rim", 0.5),
@@ -116,7 +389,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsAnkles",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["AnkleRight"],
+	AddPose: ["AnkleRight", "NeoAnkleRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesAnklesRight", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesAnklesRight", "Rim", "", "Rim", 0.5),
@@ -129,7 +402,7 @@ AddModel({
 	Folder: "SteelCuffs",
 	TopLevel: true,
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["AnkleRight", "AnkleLeft"],
+	AddPose: ["AnkleRight", "AnkleLeft", "NeoAnkleLeft", "NeoAnkleRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("SteelCuffsAnklesRight"),
 		...GetModelLayers("SteelCuffsAnklesLeft"),
@@ -144,7 +417,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsThigh",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["ThighLeft"],
+	AddPose: ["ThighLeft", "NeoThighLeft"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesThighLeft", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesThighLeft", "Rim", "", "Rim", 0.5),
@@ -157,7 +430,7 @@ AddModel({
 	TopLevel: false,
 	Parent: "CuffsThigh",
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["ThighRight"],
+	AddPose: ["ThighRight", "NeoThighRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("ShacklesThighRight", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("ShacklesThighRight", "Rim", "", "Rim", 0.5),
@@ -170,7 +443,7 @@ AddModel({
 	Folder: "SteelCuffs",
 	TopLevel: true,
 	Categories: ["Restraints","Cuffs"],
-	AddPose: ["ThighRight", "ThighLeft", "LowCuffs"],
+	AddPose: ["ThighRight", "ThighLeft", "HighCuffs", "NeoThighLeft", "NeoThighRight"],
 	Layers: ToLayerMap([
 		...GetModelLayers("SteelCuffsThighRight"),
 		...GetModelLayers("SteelCuffsThighLeft"),
@@ -196,6 +469,7 @@ AddModel({
 	TopLevel: true,
 	Restraint: true,
 	Categories: ["Restraints", "Accessories"],
+	AddPose: ["NeoBelt", "NeoWaistBelt"],
 	Layers: ToLayerMap([
 		...GetModelLayers("IronBelt", "", "", "BaseMetal", 0.6),
 		...GetModelLayers("IronBelt", "Rim", "", "Rim", 0.5),

@@ -501,6 +501,11 @@ function KDGetAvailablePosesArms(C: Character, tags: Map<string, boolean> = unde
 	if (CheckPoseOrTags(C, "PreferCrossed") && poses.Crossed) {
 		poses = {Crossed: true};
 	}
+
+
+	if (CheckPoseOrTags(C, "DiscourageYoked", tags) && poses.Yoked && Object.keys(poses).length > 1) {
+		delete poses.Yoked;
+	}
 	//} else {
 	// Logic for NPC
 	// ???
@@ -617,6 +622,18 @@ function KDRefreshPoseOptions(Character: Character) {
 		KDCurrentModels.get(Character).TempPoses.ChastityBraOption = true;
 		KDCurrentModels.get(Character).Poses.ChastityBraOption = true;
 	}
+
+	if (Character == KinkyDungeonPlayer) {
+		let restraints = KinkyDungeonAllRestraintDynamic();
+		for (let inv of restraints) {
+			KDCurrentModels.get(Character).Poses[inv.item.name + "Worn"] = true;
+		}
+	} else if (KDNPCChar_ID.get(Character)) {
+		let restraints = KDGetNPCRestraints(KDNPCChar_ID.get(Character));
+		for (let inv of Object.values(restraints)) {
+			KDCurrentModels.get(Character).Poses[inv.name + "Worn"] = true;
+		}
+	}
 }
 
 function KDRefreshPoseOptionsMC(MC: ModelContainer) {
@@ -659,6 +676,19 @@ function KDRefreshPoseOptionsMC(MC: ModelContainer) {
 	if (KDToggles.ChastityBraOption) {
 		MC.Poses.ChastityBraOption = true;
 	}
+
+	if (MC.Character == KinkyDungeonPlayer) {
+		let restraints = KinkyDungeonAllRestraintDynamic();
+		for (let inv of restraints) {
+			MC.Poses[inv.item.name + "Worn"] = true;
+		}
+	} else if (KDNPCChar_ID.get(MC.Character)) {
+		let restraints = KDGetNPCRestraints(KDNPCChar_ID.get(MC.Character));
+		for (let inv of Object.values(restraints)) {
+			MC.Poses[inv.name + "Worn"] = true;
+		}
+	}
+
 }
 
 let KDArmorPoses = [

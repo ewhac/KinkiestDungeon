@@ -91,6 +91,10 @@ AddModel({
 			Invariant: true,
 			InheritColor: "Lining",
 		},
+		{ Name: "BraProtoLiningMidRim", Layer: "StrapsUnderbust", Pri: -14-99.9,
+			Invariant: true,
+			InheritColor: "Hem",
+		},
 		{ Name: "BraProtoCups", Layer: "BindChestLower", Pri: 14-100,
 			Invariant: true,
 			TieToLayer: "BraProto",
@@ -792,7 +796,7 @@ AddModel({
 	TopLevel: true,
 	Restraint: true,
 	Categories: ["Restraints", "ChastityBelt", "Metal"],
-	AddPose: ["ChastityBelt"],
+	AddPose: ["ChastityBelt", "NeoBelt", "NeoChastityBelt"],
 	AddPoseIf: {
 		ChastityOption2: ["CrotchStrap"],
 	},
@@ -828,7 +832,7 @@ AddModel({
 	TopLevel: false,
 	Restraint: true,
 	Categories: ["Restraints", "ChastityBelt", "Metal"],
-	AddPose: ["ChastityBelt"],
+	AddPose: ["ChastityBelt", "NeoBelt", "NeoChastityBelt"],
 	AddPoseIf: {
 		ChastityOption2: ["CrotchStrap"],
 	},
@@ -858,7 +862,7 @@ AddModel({
 	TopLevel: false,
 	Restraint: true,
 	Categories: ["Restraints", "ChastityBelt", "Metal"],
-	AddPose: ["ChastityBelt"],
+	AddPose: ["ChastityBelt", "NeoBelt", "NeoChastityBelt"],
 	AddPoseIf: {
 		ChastityOption2: ["CrotchStrap"],
 	},

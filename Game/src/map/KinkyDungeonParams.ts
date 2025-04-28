@@ -2,6 +2,7 @@
 
 const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 	"menu":{
+		curseTags: ["trap"],
 		successorNegative: {
 			menu: 1.0,
 		},
@@ -11,7 +12,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		successorSame: {
 			menu: 1.0,
 		},
-		color: "#ffffff",
+		color: KDBaseWhite,
 		music: {
 			"GENERIC-DOLLRACK.ogg": 4,
 		},
@@ -55,6 +56,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	},
 	"shoppe":{
+		curseTags: ["trap"],
 		successorNegative: {
 			menu: 1.0,
 		},
@@ -64,7 +66,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		successorSame: {
 			menu: 1.0,
 		},
-		color: "#ffffff",
+		color: KDBaseWhite,
 		music: {
 			"GENERIC-DOLLRACK.ogg": 4,
 			//"Shopping.ogg": 10,
@@ -109,6 +111,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	},
 	"bandit":{
+		curseTags: ["trap", "leatherRestraints", "leatherRestraintsHeavy"],
 		successorNegative: {
 			bandit: 1.0,
 		},
@@ -118,7 +121,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		successorSame: {
 			bandit: 1.0,
 		},
-		color: "#ffffff",
+		color: KDBaseWhite,
 		music: {
 			"Ada18980_SmokingIsBadForYou.ogg": 4,
 		},
@@ -180,6 +183,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		"traps": [
 			{Name: "CustomSleepDart", Level: 0, Power: 1, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapShackleWeak", Level: 0, Power: 1, Weight: 30},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 			{Name: "SpecificSpell", Spell: "TrapRopeWeak", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapLeatherWeak", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpawnEnemies", Enemy: "Bandit", strict: true, Level: 0, Power: 2, Weight: 10},
@@ -187,6 +191,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	},
 	"grv":{//DungeonName0,-Graveyard-
+		curseTags: ["trap"],
 		color: "#8cba75",
 		successorNegative: {
 			tmb: 1.0,
@@ -253,6 +258,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Name: "SpecificSpell", Spell: "TrapLeatherWeak", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapLustCloud", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpawnEnemies", Faction: "Enemy", Enemy: "SummonedZombie", strict: true, Level: 0, Power: 4, Weight: 30},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 
 			{Name: "SpawnEnemies", Enemy: "Gag", strict: true, Level: 0, Power: 1, Weight: 10, filterTag: "ItemMouthFull", filterBackup: "SummonedZombie"},
 			{Name: "SpawnEnemies", Enemy: "Cuffs", strict: true, Level: 0, Power: 1, Weight: 10, filterTag: "ItemArmsFull", filterBackup: "SummonedZombie"},
@@ -287,6 +293,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	},
 	"cat":{// DungeonName1,-Catacombs-
+		curseTags: ["trap", "shackleRestraints", "steelbondage"],
 		successorNegative: {
 			tmb: 0.5,
 			cry: 0.1,
@@ -359,6 +366,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		"traps": [
 			{Name: "CustomSleepDart", Level: 0, Power: 1, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapShackleWeak", Level: 0, Power: 1, Weight: 30},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 			{Name: "SpecificSpell", Spell: "TrapRopeWeak", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapLeatherWeak", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpecificSpell", Spell: "SpikeTrap", Level: 0, Power: 4, Weight: 70},
@@ -398,6 +406,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	},
 	"jng":{//DungeonName2,-Underground Jungle-
+		curseTags: ["trap", "latexRestraints", "mithrilCuffs"],
 		successorNegative: {
 			cry: 0.3,
 			cav: 0.5,
@@ -544,6 +553,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Name: "SpecificSpell", Spell: "TrapLeatherWeak", Level: 0, Power: 3, Weight: 10},
 			{Name: "SpecificSpell", Spell: "TrapLustCloud", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpawnEnemies", Enemy: "Bandit", strict: true, Level: 0, Power: 3, Weight: 10},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 
 			{Name: "SpawnEnemies", Enemy: "Gag", strict: true, Level: 0, Power: 1, Weight: 10, filterTag: "ItemMouthFull", filterBackup: "VinePlant"},
 			{Name: "SpawnEnemies", Enemy: "Cuffs", strict: true, Level: 0, Power: 1, Weight: 10, filterTag: "ItemArmsFull", filterBackup: "VinePlant"},
@@ -576,6 +586,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"tmp":{//DungeonName3,-Lost Temple-
+		curseTags: ["trap", "obsidianRestraints"],
 		successorNegative: {
 			ore: 1.0,
 		},
@@ -700,6 +711,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		"lockmult" : 1.5,
 	},
 	"tmb":{//DungeonName11,-Ancient Tombs-
+		curseTags: ["trap", "kittyRestraints", "leatherRestraints", "leatherRestraintsHeavy"],
 		successorNegative: {
 			tmp: 0.4,
 			lib: 0.6,
@@ -823,6 +835,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"lib":{//DungeonName12,-Magic Library-
+		curseTags: ["trap", "dressRestraints"],
 		successorNegative: {
 			bel: 0.4,
 			ore: 0.6,
@@ -899,6 +912,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Name: "SpecificSpell", Spell: "TrapLatexBall", Level: 0, Power: 3, Weight: 7},
 			{Name: "SpawnEnemies", Enemy: "Dressmaker", strict: true, Level: 0, Power: 2, Weight: 10},
 			{Name: "SpawnEnemies", Enemy: "Librarian", strict: true, Level: 4, Power: 1, Weight: 5},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 
 			{Name: "SpawnEnemies", Enemy: "Gag", strict: true, Level: 0, Power: 2, Weight: 10, filterTag: "ItemMouthFull", filterBackup: "BookBondage"},
 			{Name: "SpawnEnemies", Enemy: "Cuffs", strict: true, Level: 0, Power: 2, Weight: 10, filterTag: "ItemArmsFull", filterBackup: "BookBondage"},
@@ -932,6 +946,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"cry":{//DungeonName13,-Crystal Cave-
+		curseTags: ["trap", "crystalRestraints"],
 		successorNegative: {
 			jng: 0.5,
 			tmp: 0.1,
@@ -1045,6 +1060,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"cav":{//Caves
+		curseTags: ["trap", "steelBondage"],
 		successorNegative: {
 			jng: 0.3,
 			cry: 0.7,
@@ -1154,6 +1170,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"DragonLair":{//DragonLair (used for music only atm)
+		curseTags: ["trap", "steelBondage", "mithrilCuffs"],
 		successorNegative: {
 			jng: 0.3,
 			cry: 0.7,
@@ -1262,6 +1279,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Type: "Will", Weight: 13},]
 	},
 	"ore":{//DungeonName8,-Orrery-
+		curseTags: ["trap", "obsidianRestraints", "shadowLatexRestraints", "shadowLatexRestraintsHeavy", "shadowLatexPetsuit"],
 		successorNegative: {
 			jng: 0.6,
 			lib: 0.4,
@@ -1380,6 +1398,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 
 	"DollStorage":{//DungeonName8,-Orrery-
+		curseTags: ["cyberdollrestraints", "latexRestraints", "latexRestraintsHeavy"],
 		successorNegative: {
 			cry: 1.0,
 		},
@@ -1493,6 +1512,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 	},
 
 	"Summit":{//DungeonName8,-Orrery-
+		curseTags: ["trap"],
 		successorNegative: {
 			cry: 1.0,
 		},
@@ -1592,6 +1612,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 	},
 
 	"vault":{//DungeonName8,-Orrery-
+		curseTags: ["cyberdollrestraints", "controlHarness"],
 		successorNegative: {
 			cry: 1.0,
 		},
@@ -1706,6 +1727,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		"lockmult" : 2.0,
 	},
 	"bel":{//DungeonName8,-Orrery-
+		curseTags: ["blacksteelRestraints", "blacksteelchastity", "blacksteelCuffs"],
 		successorNegative: {
 			cav: 0.6,
 			cry: 0.4,
@@ -1789,6 +1811,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			{Name: "SpecificSpell", Spell: "TrapLatex", Level: 0, Power: 3, Weight: 30},
 			{Name: "SpecificSpell", Spell: "TrapLatexBubble", Level: 0, Power: 3, Weight: 25},
 			{Name: "SpecificSpell", Spell: "TrapLatexBall", Level: 0, Power: 3, Weight: 15},
+			{Name: "SpecificSpell", Spell: "TrapLinks", Level: 4, Power: 1, Weight: 40},
 
 			{Name: "SpawnEnemies", Enemy: "Gag", strict: true, Level: 0, Power: 2, Weight: 10, filterTag: "ItemMouthFull", filterBackup: "OldDrone"},
 			{Name: "SpawnEnemies", Enemy: "Cuffs", strict: true, Level: 0, Power: 2, Weight: 10, filterTag: "ItemArmsFull", filterBackup: "OldDrone"},
@@ -1831,6 +1854,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 
 	"Dollmaker":{//DungeonName8,-Orrery-
+		curseTags: ["cyberdollrestraints", "latexRestraints", "latexRestraintsHeavy"],
 		successorNegative: {
 			cry: 1.0,
 		},
@@ -1875,7 +1899,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 		},
 
 		music: {
-			"slimy_science_1.ogg": 20,
+			"UntitledRobot.ogg": 20,
 		},
 
 		tagModifiers: {
@@ -1940,6 +1964,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 
 	// Extra
 	"DemonTransition":{// DungeonName1,-Catacombs-
+		curseTags: ["trap", "obsidianRestraints", "shadowLatexRestraints", "shadowLatexRestraintsHeavy", "mithrilCuffs"],
 		successorNegative: {
 			DemonTransition: 1.0,
 		},
@@ -1950,7 +1975,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 			DemonTransition: 1.0,
 		},
 		color: "#222222",
-		shadowColor: 0x000000,
+		shadowColor: 0x010203,
 		"background" : "Dungeon",
 		"openness" : 0,
 		"density" : 2,
@@ -2042,6 +2067,7 @@ const KinkyDungeonMapParams: Record<mapKey, floorParams> = {
 	},
 
 	"cst":{// Coast
+		curseTags: ["trap", "latexRestraints", "latexRestraintsHeavy"],
 		worldGenCode: () => {
 			for (let X = 1; X < KDMapData.GridWidth - 1; X++) {
 				for (let Y = 1; Y < KDMapData.GridHeight - 1; Y++) {

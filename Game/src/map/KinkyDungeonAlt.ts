@@ -147,6 +147,8 @@ interface AltType {
 	/** Room title for display */
 	Title?: string,
 	bossroom?: boolean,
+	/** No going back thru start stairs */
+	noReverse?: boolean,
 	width: number,
 	height: number,
 	genType: string,
@@ -179,6 +181,7 @@ interface AltType {
 	/** If noRelease is true, will always release player instantly if security is low instead of waiting*/
 	releaseOnLowSec?: boolean,
 	noClutter?: boolean,
+	noTables?: boolean,
 	noShrineTypes?: string[],
 	/** Ticks flags with a floor component. Reserved for perk room generally */
 	tickFlags?: boolean,
@@ -232,6 +235,8 @@ interface AltType {
 
 	/** Allows highsec in here */
 	placeJailEntrances?: boolean,
+	sameFactionJailOnly?: boolean,
+	friendlyFactionOnly?: boolean,
 
 	/** Creates the jail entrances but doesnt let them be used unless this is a destination */
 	allowJailEntrances?: boolean,
@@ -630,7 +635,7 @@ let alts: Record<string, AltType> = {
 
 
 				// No inverse masks in PIXI.js. I crie
-				kdBGMask.beginFill(0x000000, 1.0);
+				kdBGMask.beginFill(0x010203, 1.0);
 
 				kdBGMask.drawRect(
 					(-1 - (CamX + CamX_offsetVis)) * KinkyDungeonGridSizeDisplay,
@@ -747,6 +752,7 @@ let alts: Record<string, AltType> = {
 			BanditFort: true,
 		},
 		placeJailEntrances: true,
+		sameFactionJailOnly: true,
 		genType: "Maze",
 		skin: "shoppe",
 		musicParams: "bandit",
@@ -1058,6 +1064,7 @@ let alts: Record<string, AltType> = {
 		noboring: true, // Skip generating boringness
 	},
 	"JourneyFloor": {
+		noReverse: true,
 		name: "JourneyFloor",
 		Title: "JourneyFloor",
 		bossroom: false,
@@ -1099,6 +1106,7 @@ let alts: Record<string, AltType> = {
 		noClutter: true,
 	},
 	"ShopStart": {
+		noReverse: true,
 		name: "ShopStart",
 		Title: "ShopStart",
 		skiptunnel: true, // Skip the ending tunnel
@@ -2027,7 +2035,7 @@ function KinkyDungeonCreateDollStorage(_POI: any, VisitedRooms: any[], _width: n
 }
 function KinkyDungeonCreateSummit(_POI: any, VisitedRooms: any[], _width: number, _height: number, _openness: number, _density: number, _hallopenness: number, data: any) {
 	if (!KinkyDungeonFlags.get("1stSummit")) {
-		KinkyDungeonSendTextMessage(10, TextGet("KDSummitIntro"), "#ffffff", 12, undefined, undefined, undefined, "");
+		KinkyDungeonSendTextMessage(10, TextGet("KDSummitIntro"), KDBaseWhite, 12, undefined, undefined, undefined, "");
 		KinkyDungeonSetFlag("1stSummit", -1);
 	}
 	KDMapData.StartPosition = {x: 11, y: 20};
@@ -2059,7 +2067,6 @@ function KinkyDungeonCreateSummit(_POI: any, VisitedRooms: any[], _width: number
 		Type: "Elevator",
 		Overlay: "Elevator",
 	});
-
 }
 
 function KinkyDungeonCreateDollRoom(_POI: any, _VisitedRooms: any[], width: number, height: number, _openness: number, _density: number, _hallopenness: number, _data: any) {
@@ -2154,7 +2161,7 @@ function KinkyDungeonCreateDollRoom(_POI: any, _VisitedRooms: any[], width: numb
 		let YY = CellY + 1 + Math.round(KDRandom() * (CellHeight-3));
 		let entity = KinkyDungeonEntityAt(XX, YY);
 		if (entity || (XX == width/2 && YY == height/2)) continue;
-		let Enemy = KinkyDungeonGetEnemy(["bellowsDoll"], KDGetEffLevel(),(KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["doll", "peaceful"]);
+		let Enemy = KinkyDungeonGetEnemy(["bellowsDoll"], KDGetEffLevel(),KDCurrIndex(), '0', ["doll", "peaceful"]);
 		if (Enemy) {
 			let e = DialogueCreateEnemy(XX, YY, Enemy.name);
 			if (KDRandom() < 0.33) KDTieUpEnemy(e, 15 + Math.floor(45 * KDRandom()), "Tape");
@@ -2213,7 +2220,7 @@ function KinkyDungeonCreateDollRoom(_POI: any, _VisitedRooms: any[], width: numb
 		let YY = CellY + 1 + Math.round(KDRandom() * (CellHeight-2));
 		let entity = KinkyDungeonEntityAt(XX, YY);
 		if (entity || (XX == width/2 && YY == height/2)) continue;
-		let Enemy = KinkyDungeonGetEnemy(robotTags, MiniGameKinkyDungeonLevel + 3, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["robot"], undefined, undefined);
+		let Enemy = KinkyDungeonGetEnemy(robotTags, MiniGameKinkyDungeonLevel + 3, KDCurrIndex(), '0', ["robot"], undefined, undefined);
 		if (Enemy) {
 			let e = DialogueCreateEnemy(XX, YY, Enemy.name);
 			e.faction = "Enemy";
@@ -2222,7 +2229,7 @@ function KinkyDungeonCreateDollRoom(_POI: any, _VisitedRooms: any[], width: numb
 	if (KDGameData.DollRoomCount > 1) { // Spawn a group of AIs
 		for (let i = 0; i < 1 + Math.ceil(robotCount * 0.1); i++) {
 			let point = KinkyDungeonGetNearbyPoint(KDMapData.EndPosition.x, KDMapData.EndPosition.y);
-			let Enemy = KinkyDungeonGetEnemy(eliteTags, MiniGameKinkyDungeonLevel + 4, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["robot"],
+			let Enemy = KinkyDungeonGetEnemy(eliteTags, MiniGameKinkyDungeonLevel + 4, KDCurrIndex(), '0', ["robot"],
 				undefined, undefined, ["minor", "miniboss", "noguard"]);
 			if (Enemy) {
 				let e = DialogueCreateEnemy(point.x, point.y, Enemy.name);
@@ -2234,7 +2241,7 @@ function KinkyDungeonCreateDollRoom(_POI: any, _VisitedRooms: any[], width: numb
 		}
 	}
 
-	let ExitGuard = KinkyDungeonGetEnemy(exitGuardTags, MiniGameKinkyDungeonLevel + 10, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["robot", "dollRoomBoss"],
+	let ExitGuard = KinkyDungeonGetEnemy(exitGuardTags, MiniGameKinkyDungeonLevel + 10, KDCurrIndex(), '0', ["robot", "dollRoomBoss"],
 		undefined, undefined, ["noguard"]);
 	if (ExitGuard) {
 		let e = DialogueCreateEnemy(KDMapData.EndPosition.x, KDMapData.EndPosition.y, ExitGuard.name);
@@ -2305,6 +2312,8 @@ function KinkyDungeonCreateDemonTransition(POI: any, VisitedRooms: any[], width:
 function KinkyDungeonCreateDollmaker(_POI: any, _VisitedRooms: any[], _width: number, _height: number, _openness: number, _density: number, _hallopenness: number, data: any) {
 	// Variable setup
 	KinkyDungeonSetFlag("NoDollRoomBypass", -1, 1);
+
+	KDPlayMusic("UntitledRobot.ogg", undefined, true);
 
 	// Now we STRETCH the map
 	KDMapData.GridWidth = Math.floor(KDMapData.GridWidth*2);
@@ -2384,9 +2393,15 @@ function KinkyDungeonCreateWarden(_POI: any, _VisitedRooms: any[], _width: numbe
 
 	DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2), KDMapData.StartPosition.y, "TheWarden1");
 	KDStageBossGenerated = true;
-	KinkyDungeonSetEnemyFlag(DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2) - 6, KDMapData.StartPosition.y - 8, "WardenArcher"), "imprisoned", -1);
-	KinkyDungeonSetEnemyFlag(DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2), KDMapData.StartPosition.y - 8, "WardenFighter"), "imprisoned", -1);
-	KinkyDungeonSetEnemyFlag(DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2) + 6, KDMapData.StartPosition.y - 8, "WardenMage"), "imprisoned", -1);
+	let en = DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2) - 6, KDMapData.StartPosition.y - 8, "WardenArcher");
+	KinkyDungeonSetEnemyFlag(en, "imprisoned", -1);
+	en.prisondialogue = "PrisonerJailOther";
+	en = DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2), KDMapData.StartPosition.y - 8, "WardenFighter");
+	KinkyDungeonSetEnemyFlag(en, "imprisoned", -1);
+	en.prisondialogue = "PrisonerJailOther";
+	en = DialogueCreateEnemy(KDMapData.StartPosition.x + Math.floor(cavityheight/2) + 6, KDMapData.StartPosition.y - 8, "WardenMage");
+	KinkyDungeonSetEnemyFlag(en, "imprisoned", -1);
+	en.prisondialogue = "PrisonerJailOther";
 
 	KDMapData.EndPosition = {x: KDMapData.StartPosition.x + cavitywidth, y: KDMapData.StartPosition.y};
 
@@ -2593,9 +2608,18 @@ function KinkyDungeonCreatePerkRoom(POI: any, VisitedRooms: any[], width: number
 			Type: "WardenCourier",
 			Overlay: "TiedCourier",
 			Light: 2,
-			lightColor: 0xffffff,
+			lightColor: 0xfffafa,
 		});
 	}
+	KinkyDungeonMapSet(VisitedRooms[0].x*2 - 1, VisitedRooms[0].y*2 - 2, '7');
+		KinkyDungeonTilesSet((VisitedRooms[0].x*2 - 1) + ',' + (VisitedRooms[0].y*2 - 2), {
+			Type: "Storage",
+			Container: "PlayerChest",
+			ContainerFilters: KDPlayerChestFilters,
+			Overlay: "Chests/Robot",
+			Light: 2,
+			lightColor: 0xbdcfff,
+		});
 
 	// Place the exit stairs
 	if (perksplaced > 0 && KinkyDungeonStatsChoice.get("perksmandatory"))
@@ -2653,7 +2677,7 @@ function KinkyDungeonCreateJourneyFloor(_POI: any, VisitedRooms: any[], width: n
 	// Normal end stairs
 	KinkyDungeonMapSet(b1*2 + 2, VisitedRooms[0].y*2, 's');
 	KinkyDungeonMapSet(b1*2 + 2, VisitedRooms[0].y*2 + 1, 'G');
-	KinkyDungeonTilesSet("" + (b1*2 + 2) + "," + (VisitedRooms[0].y*2), {RoomType: "ShopStart", Skin: "TabletSpent", Journey: undefined});
+	KinkyDungeonTilesSet("" + (b1*2 + 2) + "," + (VisitedRooms[0].y*2), {RoomType: "ShopStart", Skin: "TabletSpent", Journey: ""});
 	KinkyDungeonTilesSet("" + (b1*2 + 2) + "," + (VisitedRooms[0].y*2 + 1), {Type: "Ghost", Msg: "JourneyNone"});
 	KDCreateEffectTile(b1*2 + 2, VisitedRooms[0].y*2, {
 		name: "Portals/Portal",
@@ -2663,7 +2687,7 @@ function KinkyDungeonCreateJourneyFloor(_POI: any, VisitedRooms: any[], width: n
 	// Tutorial end stairs
 	KinkyDungeonMapSet(VisitedRooms[0].x*2 + 3, VisitedRooms[0].y*2 - 2, 'H');
 	KinkyDungeonMapSet(VisitedRooms[0].x*2 + 3, VisitedRooms[0].y*2 - 1, 'G');
-	KinkyDungeonTilesSet("" + (VisitedRooms[0].x*2 + 3) + "," + (VisitedRooms[0].y*2 - 2), {RoomType: "Tutorial", Journey: undefined, Skin: "TabletSpent"});
+	KinkyDungeonTilesSet("" + (VisitedRooms[0].x*2 + 3) + "," + (VisitedRooms[0].y*2 - 2), {RoomType: "Tutorial", Journey: "", Skin: "TabletSpent"});
 	KDCreateEffectTile(VisitedRooms[0].x*2 + 3, VisitedRooms[0].y*2 - 2, {
 		name: "Portals/Portal",
 		duration: 9999, infinite: true,
@@ -2766,6 +2790,10 @@ function KinkyDungeonCreateShopStart(_POI: any, VisitedRooms: any[], width: numb
 	DialogueCreateEnemy(KDMapData.StartPosition.x + 4, KDMapData.StartPosition.y - 3, "AntiqueQuest").AI = "guard";
 	KinkyDungeonMapSet(KDMapData.StartPosition.x + 4, KDMapData.StartPosition.y - 3, '2');
 	KinkyDungeonTilesSet((KDMapData.StartPosition.x + 4) + ',' + (KDMapData.StartPosition.y - 3), {OL: true});
+
+
+	KDGenerateShopVisitors();
+
 
 	if (KDRandom() < 0.1 * KDGameData.HighestLevel)
 		SetpieceSpawnPrisoner(KDMapData.StartPosition.x + 9, KDMapData.StartPosition.y);
@@ -2933,6 +2961,10 @@ function KinkyDungeonCreateElevatorRoom(_POI: any, VisitedRooms: any[], _width: 
 		Type: "Elevator",
 		Overlay: "ElevatorDisabled",
 	});
+	if (!KinkyDungeonFlags.get("tut_elevator")) {
+		KinkyDungeonSetFlag("tut_elevator", -1);
+		KinkyDungeonSendTextMessage(10, TextGet("KDTut_Elevator"), KDTutorialColor, 10);
+	}
 }
 
 
@@ -2969,6 +3001,10 @@ function KinkyDungeonCreateElevatorEgyptian(_POI: any, VisitedRooms: any[], _wid
 		Type: "Elevator",
 		Overlay: "ElevatorDisabled",
 	});
+	if (!KinkyDungeonFlags.get("tut_elevator")) {
+		KinkyDungeonSetFlag("tut_elevator", -1);
+		KinkyDungeonSendTextMessage(10, TextGet("KDTut_Elevator"), KDTutorialColor, 10);
+	}
 }
 
 
@@ -3005,6 +3041,10 @@ function KinkyDungeonCreateElevatorEgyptian2(_POI: any, VisitedRooms: any[], _wi
 		Type: "Elevator",
 		Overlay: "ElevatorDisabled",
 	});
+	if (!KinkyDungeonFlags.get("tut_elevator")) {
+		KinkyDungeonSetFlag("tut_elevator", -1);
+		KinkyDungeonSendTextMessage(10, TextGet("KDTut_Elevator"), KDTutorialColor, 10);
+	}
 }
 
 function KinkyDungeonCreateTestTile(_POI: any, VisitedRooms: any[], width: number, height: number, _openness: number, _density: number, _hallopenness: number, data: any) {
@@ -3222,4 +3262,25 @@ function KinkyDungeonCreateTutorial(_POI: any, VisitedRooms: any[], width: numbe
 
 	KDMapData.EndPosition = {x: width*2 - 2, y: VisitedRooms[0].y*2};
 	KinkyDungeonTilesSet("" + (width*2 - 2) + "," + (VisitedRooms[0].y*2), {RoomType: "ShopStart"});
+}
+
+
+function KDGenerateShopVisitors() {
+	// TODO expand
+	let options: Record<string, number> =  KDEnumerateShopVisitors();
+
+
+
+	if (Object.values(options).length > 0) {
+		let chosen = KDGetByWeight(options);
+		DialogueCreateEnemy(KDMapData.StartPosition.x + 2, KDMapData.StartPosition.y, chosen);
+	}
+}
+
+function KDEnumerateShopVisitors() {
+	let options: Record<string, number> = {}
+	if (KDCountMasterworks(KDPlayer()) > 0) {
+		options.AdaLovelock = 100;
+	}
+	return options;
 }

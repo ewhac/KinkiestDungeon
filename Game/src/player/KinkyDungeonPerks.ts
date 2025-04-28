@@ -160,12 +160,16 @@ let KDPerkUpdateStats = {
 		}
 	},
 	"StartShadow": () =>{
-		KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity,
-			{
-				id: "Cursed", type: "Cursed", power: 10, duration: 9999, infinite: true,aura: "#4488ff",aurasprite: "Null",
+		KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "Cursed",
+				type: "Cursed",
+				power: 10,
+				duration: 9999, infinite: true,
+				aura: "#4488ff", auraSprite: "Null",
 				events: [
 					{type: "Cursed", trigger: "tick", count: 1},
-				]});
+				],
+			});
 	},
 	"UnstableMagic": () => {
 		KDDamageAmpPerksSpell += KDUnstableAmp * Math.min(1, Math.max(KinkyDungeonStatDistraction / KinkyDungeonStatDistractionMax, KinkyDungeonMiscastChance));
@@ -249,22 +253,24 @@ let KDPerkCount: Record<string, () => string> = {
 };
 
 let KinkyDungeonStatsPresets: Record<string, KDPerk> = {
-	"MC_Fighter":  {category: "Multiclass", id: "MC_Fighter", debuff: true, cost: 2, blockclass: ["Fighter"], tags: ["start", "mc"]},
-	"MC_Rogue":  {category: "Multiclass", id: "MC_Rogue", cost: 2, blockclass: ["Rogue"], tags: ["start", "mc"]},
-	"MC_Wizard":  {category: "Multiclass", id: "MC_Wizard", debuff: true, cost: 2, blockclass: ["Mage"], tags: ["start", "mc"]},
-	"MC_Peasant":  {category: "Multiclass", id: "MC_Peasant", debuff: true, cost: 1, blockclass: ["Peasant"], tags: ["start", "mc"]},
-	"MC_Trainee":  {category: "Multiclass", id: "MC_Trainee", cost: 2, requireArousal: true, blockclass: ["Trainee"], tags: ["start", "mc"]},
+	"MC_Fighter":  {category: "Multiclass", id: "MC_Fighter", debuff: true, cost: 5, blockclass: ["Fighter"], tags: ["start", "mc"]},
+	"MC_Rogue":  {category: "Multiclass", id: "MC_Rogue", cost: 5, blockclass: ["Rogue"], tags: ["start", "mc"]},
+	"MC_Wizard":  {category: "Multiclass", id: "MC_Wizard", debuff: true, cost: 5, blockclass: ["Mage"], tags: ["start", "mc"]},
+	"MC_Peasant":  {category: "Multiclass", id: "MC_Peasant", debuff: true, cost: 5, blockclass: ["Peasant"], tags: ["start", "mc"]},
+	"MC_Trainee":  {category: "Multiclass", id: "MC_Trainee", cost: 5, requireArousal: true, blockclass: ["Trainee"], tags: ["start", "mc"]},
 
 
-	"More_Armbinders":  {category: "Toggles", id: "More_Armbinders", cost: 0, block: ["Less_Armbinders"]},
-	"More_Jackets":  {category: "Toggles", id: "More_Jackets", cost: 0, block: ["Less_Jackets"]},
-	"More_Boxbinders":  {category: "Toggles", id: "More_Boxbinders", cost: 0, block: ["Less_Boxbinders"]},
-	"More_Yokes":  {category: "Toggles", id: "More_Yokes", cost: 0, block: ["Less_Yokes"]},
+	"More_Armbinders":  {category: "Toggles2", id: "More_Armbinders", cost: 0, block: ["Less_Armbinders"]},
+	"More_Jackets":  {category: "Toggles2", id: "More_Jackets", cost: 0, block: ["Less_Jackets"]},
+	"More_Boxbinders":  {category: "Toggles2", id: "More_Boxbinders", cost: 0, block: ["Less_Boxbinders"]},
+	"More_Yokes":  {category: "Toggles2", id: "More_Yokes", cost: 0, block: ["Less_Yokes"]},
+	"More_Petsuits":  {category: "Toggles2", id: "More_Petsuits", cost: 0, block: ["NoPet"]},
 
-	"Less_Armbinders":  {category: "Toggles", id: "Less_Armbinders", cost: 0, block: ["More_Armbinders"], debuff: true,},
-	"Less_Jackets":  {category: "Toggles", id: "Less_Jackets", cost: 0, block: ["More_Jackets"], debuff: true,},
-	"Less_Boxbinders":  {category: "Toggles", id: "Less_Boxbinders", cost: 0, block: ["More_Boxbinders"], debuff: true,},
-	"Less_Yokes":  {category: "Toggles", id: "Less_Yokes", cost: 0, block: ["More_Yokes"], debuff: true,},
+	"Less_Armbinders":  {category: "Toggles2", id: "Less_Armbinders", cost: 0, block: ["More_Armbinders"], debuff: true,},
+	"Less_Jackets":  {category: "Toggles2", id: "Less_Jackets", cost: 0, block: ["More_Jackets"], debuff: true,},
+	"Less_Boxbinders":  {category: "Toggles2", id: "Less_Boxbinders", cost: 0, block: ["More_Boxbinders"], debuff: true,},
+	"Less_Yokes":  {category: "Toggles2", id: "Less_Yokes", cost: 0, block: ["More_Yokes"], debuff: true,},
+	"NoPet": {category: "Toggles2", id: "NoPet", cost: 0, block: ["More_Petsuits"], debuff: true,},
 
 	"NovicePet":  {category: "Major", id: "NovicePet", cost: 1},
 	"Fortify_Barricade":  {category: "Major", id: "Fortify_Barricade", cost: -1.5},
@@ -423,10 +429,9 @@ let KinkyDungeonStatsPresets: Record<string, KDPerk> = {
 	"NoKigu": {category: "Toggles", id: "NoKigu", cost: 0, tags: ["start"], debuff: true},
 
 	"NoDoll": {category: "Toggles", id: "NoDoll", cost: 0, tags: ["start"], debuff: true},
-	"NoPet": {category: "Toggles", id: "NoPet", cost: 0, tags: ["start"], debuff: true},
 	"NoHelp": {category: "Toggles", id: "NoHelp", cost: 0, tags: ["start"]},
 
-	"Estim": {category: "Toggles", id: "Estim", cost: 0, tags: ["start"]},
+	"Estim": {category: "Toggles", id: "Estim", cost: 0, tags: ["start"], debuff: true},
 
 
 
@@ -552,22 +557,22 @@ function KinkyDungeonGetStatPoints(Stats: Map<any, any>): number {
 
 /**
  * Determine if a perk can be picked with a certain number of points remaining
- * @param Stat
+ * @param Perk
  * @param [points]
  */
-function KinkyDungeonCanPickStat(Stat: string, points?: number): boolean {
-	let stat = KinkyDungeonStatsPresets[Stat];
-	if (!stat) return false;
-	if (KDGetPerkCost(stat) > 0 && (points != undefined ? points : KinkyDungeonGetStatPoints(KinkyDungeonStatsChoice)) < KDGetPerkCost(stat)) return false;
-	if (!KDValidatePerk(stat)) return false;
+function KDCanPickPerk(Perk: string, points?: number): boolean {
+	let perkdef = KinkyDungeonStatsPresets[Perk];
+	if (!perkdef) return false;
+	if (KDGetPerkCost(perkdef) > 0 && (points != undefined ? points : KinkyDungeonGetStatPoints(KinkyDungeonStatsChoice)) < KDGetPerkCost(perkdef)) return false;
+	if (!KDValidatePerk(perkdef)) return false;
 	for (let k of KinkyDungeonStatsChoice.keys()) {
 		if (KinkyDungeonStatsChoice.get(k)) {
-			if (KinkyDungeonStatsPresets[k] && KinkyDungeonStatsPresets[k].block && KinkyDungeonStatsPresets[k].block.includes(Stat)) {
+			if (KinkyDungeonStatsPresets[k] && KinkyDungeonStatsPresets[k].block && KinkyDungeonStatsPresets[k].block.includes(Perk)) {
 				return false;
 			}
-			if (KinkyDungeonStatsPresets[k] && stat.tags && KinkyDungeonStatsPresets[k].blocktags) {
+			if (KinkyDungeonStatsPresets[k] && perkdef.tags && KinkyDungeonStatsPresets[k].blocktags) {
 				for (let t of KinkyDungeonStatsPresets[k].blocktags)
-					if (stat.tags.includes(t)) return false;
+					if (perkdef.tags.includes(t)) return false;
 			}
 		}
 	}
@@ -858,24 +863,32 @@ let KDPerkStart = {
 		}
 	},
 	MC_Trainee: () => {
-		KDPushSpell(KinkyDungeonFindSpell("DistractionCast"));
+		if (!KDHasSpell("DistractionCast"))
+			KDPushSpell(KinkyDungeonFindSpell("DistractionCast"));
 	},
 	MC_Wizard: () => {
-		KDPushSpell(KinkyDungeonFindSpell("ManaRegen"));
+		if (!KDHasSpell("ManaRegen"))
+			KDPushSpell(KinkyDungeonFindSpell("ManaRegen"));
 	},
 	MC_Rogue: () => {
-		KDPushSpell(KinkyDungeonFindSpell("RogueTargets"));
+		if (!KDHasSpell("RogueTargets"))
+			KDPushSpell(KinkyDungeonFindSpell("RogueTargets"));
 	},
 	MC_Peasant: () => {
-		KDPushSpell(KinkyDungeonFindSpell("Peasant"));
+		if (!KDHasSpell("Peasant"))
+			KDPushSpell(KinkyDungeonFindSpell("Peasant"));
 	},
 	MC_Fighter: () => {
-		KDPushSpell(KinkyDungeonFindSpell("BattleRhythm"));
-		KinkyDungeonSpellChoices.push(KinkyDungeonSpells.length - 1);
-		KDPushSpell(KinkyDungeonFindSpell("Offhand"));
-		KinkyDungeonSpellChoices.push(KinkyDungeonSpells.length - 1);
-		KDPushSpell(KinkyDungeonFindSpell("FighterOffhand"));
-
+		if (!KDHasSpell("BattleRhythm")) {
+			KDPushSpell(KinkyDungeonFindSpell("BattleRhythm"));
+			KinkyDungeonSpellChoices.push(KinkyDungeonSpells.length - 1);
+		}
+		if (!KDHasSpell("Offhand")) {
+			KDPushSpell(KinkyDungeonFindSpell("Offhand"));
+			KinkyDungeonSpellChoices.push(KinkyDungeonSpells.length - 1);
+		}
+		if (!KDHasSpell("FighterOffhand"))
+			KDPushSpell(KinkyDungeonFindSpell("FighterOffhand"));
 	},
 };
 
@@ -974,7 +987,7 @@ function KinkyDungeonDrawPerks(NonSelectable: boolean): boolean {
 
 					//perksdrawn++;x
 					DrawButtonKDExTo(kdUItext, stat[0], (_bdata) => {
-						if (!KinkyDungeonStatsChoice.get(stat[0]) && KinkyDungeonCanPickStat(stat[0])) {
+						if (!KinkyDungeonStatsChoice.get(stat[0]) && KDCanPickPerk(stat[0])) {
 							KinkyDungeonStatsChoice.set(stat[0], true);
 							localStorage.setItem('KinkyDungeonStatsChoice' + KinkyDungeonPerksConfig, JSON.stringify(Array.from(KinkyDungeonStatsChoice.keys())));
 						} else if (KinkyDungeonStatsChoice.get(stat[0])) {
@@ -991,7 +1004,7 @@ function KinkyDungeonDrawPerks(NonSelectable: boolean): boolean {
 						return true;
 					}, !NonSelectable && (KinkyDungeonState == "Stats" || (KinkyDungeonDrawState == "Perks2" && KDDebugPerks)), XX, YY, KDPerksButtonWidth, KDPerksButtonHeight,
 					TextGet("KinkyDungeonStat" + (stat[1].id)) + ` (${Math.round(KDPERKCOSTMULT*KDGetPerkCost(stat[1]))})`,
-						(!KinkyDungeonStatsChoice.get(stat[0]) && KinkyDungeonCanPickStat(stat[0])) ? colorAvailable : (KinkyDungeonStatsChoice.get(stat[0]) ? colorSelected : (NonSelectable ? colorAvailable : colorExpensive)),
+						(!KinkyDungeonStatsChoice.get(stat[0]) && KDCanPickPerk(stat[0])) ? colorAvailable : (KinkyDungeonStatsChoice.get(stat[0]) ? colorSelected : (NonSelectable ? colorAvailable : colorExpensive)),
 						KinkyDungeonStatsChoice.get(stat[0]) ? (KinkyDungeonRootDirectory + "UI/TickPerk.png") : "",
 						undefined, false, true,
 						KinkyDungeonStatsChoice.get(stat[0]) ? "rgba(140, 140, 140, 0.5)" : KDButtonColor,
@@ -1025,7 +1038,7 @@ function KinkyDungeonDrawPerks(NonSelectable: boolean): boolean {
 		}
 
 		if (drawn > 0) {
-			DrawTextFitKDTo(kdUItext, TextGet("KDCategory" + c.name), X + KDPerksButtonWidth + KDPerksButtonWidthPad/2, oldY + KDPerksYPad - KDPerksButtonHeight/2 - 5, KDPerksButtonWidth*2, "#ffffff",
+			DrawTextFitKDTo(kdUItext, TextGet("KDCategory" + c.name), X + KDPerksButtonWidth + KDPerksButtonWidthPad/2, oldY + KDPerksYPad - KDPerksButtonHeight/2 - 5, KDPerksButtonWidth*2, KDBaseWhite,
 				undefined, undefined, undefined, undefined, undefined, undefined, true);
 			//MainCanvas.textAlign = "left";
 			//MainCanvas.textAlign = "center";
@@ -1076,7 +1089,7 @@ function KinkyDungeonDrawPerks(NonSelectable: boolean): boolean {
 		};
 	}, "KDCategory");
 
-	if ((catsdrawn < 3 || perksdrawn == 0) && KDPerksIndex > 0) KDPerksIndex -= 1;
+	if ((catsdrawn < 2 || perksdrawn == 0) && KDPerksIndex > 0) KDPerksIndex -= 1;
 
 
 	return tooltip;
@@ -1132,7 +1145,7 @@ function KDGetRandomPerks(existing: Record<string, boolean>, debuff?: boolean, t
 	let negcandidates = [];
 	if (!debuff) {
 		for (let p of Object.entries(KinkyDungeonStatsPresets)) {
-			if (!existing[p[0]] && !KinkyDungeonStatsChoice.get(p[0]) && KinkyDungeonCanPickStat(p[0], 999)) { // No dupes
+			if (!existing[p[0]] && !KinkyDungeonStatsChoice.get(p[0]) && KDCanPickPerk(p[0], 999)) { // No dupes
 				if ((!p[1].tags || !p[1].tags.includes("start"))) {
 					if (!p[1].locked || KDUnlockedPerks.includes(p[0])) {
 						if (KDGetPerkCost(p[1]) > 0) {
@@ -1151,7 +1164,7 @@ function KDGetRandomPerks(existing: Record<string, boolean>, debuff?: boolean, t
 		if (!poscandidate) return [];
 	} else {
 		for (let p of Object.entries(KinkyDungeonStatsPresets)) {
-			if (!existing[p[0]] && !KinkyDungeonStatsChoice.get(p[0]) && KinkyDungeonCanPickStat(p[0], 999)) { // No dupes
+			if (!existing[p[0]] && !KinkyDungeonStatsChoice.get(p[0]) && KDCanPickPerk(p[0], 999)) { // No dupes
 				if ((!p[1].tags || !p[1].tags.includes("start"))) {
 					if (!p[1].locked || KDUnlockedPerks.includes(p[0])) {
 						if (KDGetPerkCost(p[1]) < 0) {
@@ -1168,7 +1181,7 @@ function KDGetRandomPerks(existing: Record<string, boolean>, debuff?: boolean, t
 	let perks = poscandidate ? [poscandidate[0]] : [];
 	if (debuff || KDGetPerkCost(poscandidate[1]) > threshold) {
 		negcandidates = negcandidates.filter((p) => {
-			return (KinkyDungeonCanPickStat(p[0], 999))
+			return (KDCanPickPerk(p[0], 999))
 				&& (debuff || !KDPerkBlocked(p[0], poscandidate[0]))
 				&& (-KDGetPerkCost(p[1]) >= (debuff ? 0 : (KDGetPerkCost(poscandidate[1]) - 1)));
 		});
@@ -1181,7 +1194,7 @@ function KDGetRandomPerks(existing: Record<string, boolean>, debuff?: boolean, t
 
 		if (!debuff && netcost < 0 && negperk) {
 			singlepointcandidates = negcandidates.filter((p) => {
-				return (KinkyDungeonCanPickStat(p[0], 999)
+				return (KDCanPickPerk(p[0], 999)
 				&& p[0] != poscandidate[0]
 				&& p[0] != negperk[0]
 				&& !KDPerkBlocked(p[0], poscandidate[0])
@@ -1235,7 +1248,7 @@ function KDGetPerkShrineBondage(perks: string[]): string[] {
 				if (restraints.length == 0) {
 					if (i > 0)
 						randTheme();
-					restraints = KDGetRestraintsEligible({tags: [theme, theme+"Heavy", theme+"Chastity"]}, KDGetEffLevel(), (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint),
+					restraints = KDGetRestraintsEligible({tags: [theme, theme+"Heavy", theme+"Chastity"]}, KDGetEffLevel(), KDCurrIndex(),
 						true, "Gold");
 					restraints = restraints.filter((r) => {
 						return !ret.includes(r.restraint.name);

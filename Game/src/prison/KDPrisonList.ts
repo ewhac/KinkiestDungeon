@@ -51,7 +51,7 @@ let KDPrisonTypes: Record<string, KDPrisonType> = {
 
 			if (player.x == 18 && player.y == 20 && KinkyDungeonGetRestraintItem("ItemDevices")) {
 				if (KDRandom() < 0.2 && !KinkyDungeonEntityAt(18, 21)) {
-					KinkyDungeonSendTextMessage(10, TextGet("KDSummitSafeguard"), "#88ff88", 10);
+					KinkyDungeonSendTextMessage(10, TextGet("KDSummitSafeguard"), KDBaseMint, 10);
 					KDMovePlayer(18, 21, false);
 				}
 			}
@@ -161,7 +161,7 @@ function KDGetJailEnemy() {
 	] : "jailer";
 	let Enemy = KinkyDungeonGetEnemy(["jailGuard", jt],
 		KDGetEffLevel(),
-		(KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint),
+		KDCurrIndex(),
 		'0', [jt, "jailer"], undefined, undefined,
 		["gagged"]);
 	if (!Enemy) {
@@ -171,13 +171,13 @@ function KDGetJailEnemy() {
 		] : "jailer";
 		Enemy = KinkyDungeonGetEnemy(["jailGuard", jt],
 			KDGetEffLevel(),
-			(KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint),
+			KDCurrIndex(),
 			'0', [jt, "jailer"], undefined, undefined,
 			["gagged"]);
 		if (!Enemy) {
 			jt = "genericJailer";
 			Enemy = KinkyDungeonGetEnemy(["jailGuard", jt],
-				KDGetEffLevel(),(KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint),
+				KDGetEffLevel(),KDCurrIndex(),
 				'0', [jt, "jailer"]);
 		}
 	}

@@ -24,6 +24,7 @@ let LAYERS_BASE = [
 	"HairOver",
 	"Hood", // For Kigu
 	// Head items
+	"BlindfoldStraps",
 	"Blindfold",
 	"GagOver",
 	"GagMuzzleStraps",
@@ -130,10 +131,13 @@ let LAYERS_BASE = [
 	"NecklaceCharm",
 	"Necklace",
 
+	"ForeLooseStraps",
+
 
 	"WrapChest",
 	"HarnessOver",
 	"BindChest",
+	"NeckCorsetOver",
 	"BustierCollar",
 	"BustierChest",
 	"ShirtCollar",
@@ -197,6 +201,8 @@ let LAYERS_BASE = [
 	"LegbinderLegsOver2",
 	"Greaves",
 
+	"OverGarters",
+
 	"WrappingTorsoMid", // For stuff that goes over a shirt and clothes but under restraints, e.g. tape
 
 	"StrapsUnderbust",
@@ -249,7 +255,14 @@ let LAYERS_BASE = [
 	"LegbinderLegsOver",
 	"PetsuitLegs",
 
+	"Garters",
+
 	"WrappingTorsoUnder",// For skintight stuff
+
+
+	"LooseStraps",
+
+	"PetsuitLegsUnder",
 
 	// Left Leg
 	"KneeAccLeft",
@@ -415,6 +428,7 @@ let LAYERS_BASE = [
 	"Butt",
 	"TorsoLower",
 	"Torso",
+	"BehindTorso",
 
 	// Feet behind the body
 	"AnkleLeftHogtie",
@@ -449,6 +463,7 @@ let LAYERS_BASE = [
 	"ArmRight",
 
 	// Chain links for leg cuffs
+	"BindChainLinksUnderThigh",
 	"BindChainLinksUnder",
 
 	// Clothes that go behind
@@ -456,19 +471,19 @@ let LAYERS_BASE = [
 	"BeltFarBack",
 	"Coat",
 
-	// Hair and hat back
-	"HairBack",
-	"HatBack",
-
 	"Tail",
 	"Wings",
 	"Cape",
+	// Hair and hat back
+	"HairBack",
+	"HairPonytail",
+	"HatBack",
+
 
 	"FurnitureBackLinked",
 	"FurnitureBack",
 	"BG",
 ];
-
 
 interface metaLayerBound {
 	id: string,
@@ -537,6 +552,20 @@ let LayerGroups = {
 		"BeltBack",
 		"ShoeLeft",
 	]),
+	NeckCorsetOverStraps: ToMap([
+		"BustierCollar",
+		"BustierChest",
+		"ShirtCollar",
+		"ShirtChest",
+		"Option_BindChestLower",
+		"NeckCorset",
+		"SuitChestOver",
+		"BraChest",
+		"BindChestLower",
+		"SuitChest",
+		"CatsuitChest",
+		"Chest",
+	]),
 	BustierPoses: ToMap([
 		"Bustier",
 		"Corset",
@@ -554,6 +583,7 @@ let LayerGroups = {
 		"Panties",
 		"CrotchPanelMid",
 		"Bodysuit",
+		"BodysuitLower",
 		//"Skirt",
 		//"WrappingTorsoMid",
 	]),
@@ -573,6 +603,7 @@ let LayerGroups = {
 		"Panties",
 		"CrotchPanelMid",
 		"Bodysuit",
+		"BodysuitLower",
 		"WrappingTorsoMid",
 		"WrappingTorsoLower",
 	]),
@@ -688,6 +719,7 @@ let LayerGroups = {
 		"WrappingLegsUnder",
 		"WrappingLegsRight",
 		"PetsuitLegs",
+		"PetsuitLegsUnder",
 	]),
 	"SlimeThighs": ToMap([
 		"AnklesOver",
@@ -708,6 +740,7 @@ let LayerGroups = {
 		"LegbinderLegsOver",
 		"LegbinderAnklesOver",
 		"PetsuitLegs",
+		"PetsuitLegsUnder",
 	]),
 	"Boots": ToMap([
 		"AnklesOver",
@@ -1030,6 +1063,7 @@ let LayerGroups = {
 		"StockingRight",
 
 		"Bodysuit",
+		"BodysuitLower",
 		"Panties",
 		"Torso",
 		"TorsoUpper",
@@ -1061,6 +1095,7 @@ let LayerGroups = {
 		"StockingRight",
 
 		"Bodysuit",
+		"BodysuitLower",
 		"Panties",
 		"Torso",
 		"TorsoUpper",
@@ -1224,6 +1259,54 @@ let LayerGroups = {
 		"SockRightKneel",
 		"FootRightKneel",
 	]),
+
+	"Stockings": ToMap([
+
+		// Shoes
+		"StockingLeftKneel", "StockingLeft",
+		"StockingRight",
+
+		"LegLeft",
+		"LegRight",
+	]),
+	"StockingLeft": ToMap([
+		// Shoes
+		"StockingLeft",
+		"LegLeft",
+		"FootLeft",
+	]),
+	"StockingRight": ToMap([
+		// Shoes
+		"StockingRight",
+		"LegRight",
+		"FootRight",
+	]),
+	"ShoeLeft": ToMap([
+		// Shoes
+		"StockingLeft",
+		"LegLeft",
+		"ShoeLeft",
+		"ShoeLeftUnder",
+		"WrappingLegsUnder",
+		"Shorts",
+		"OverSocks",
+		"FootLeft",
+	]),
+	"ShoeRight": ToMap([
+		// Shoes
+		"StockingRight",
+		"FootRight",
+		"LegRight",
+		"ShoeRight",
+		"ShoeRightUnder",
+		"WrappingLegsUnder",
+		"Shorts",
+		"OverSocks",
+	]),
+
+
+
+
 	"ToeTie": ToMap([
 
 		"ShoeLeft",
@@ -1541,6 +1624,22 @@ let LayerGroups = {
 		"ForeGloveLeft",
 		"ForeHandLeft",
 	]),
+	"MittL": ToMap([
+		"CrossGloveLeft",
+		"CrossHandLeft",
+		"GloveLeft",
+		"HandLeft",
+		"ForeGloveLeft",
+		"ForeHandLeft",
+	]),
+	"MittR": ToMap([
+		"CrossGloveRight",
+		"CrossHandRight",
+		"GloveRight",
+		"HandRight",
+		"ForeGloveRight",
+		"ForeHandRight",
+	]),
 	"RightHand": ToMap([
 		"GloveRight",
 		"HandRight",
@@ -1564,6 +1663,8 @@ let LayerGroups = {
 			"Head",
 		]
 	),
+
+	HairBlockBF: {Blindfold: true},
 	EarsHelmet: ToMap(
 		[
 			"AnimalEars",
@@ -1585,6 +1686,7 @@ let LayerGroups = {
 	"OverCrotchStrapMid",
 
 	"NeckCorset",
+	"NeckCorsetOver",
 	// Hair mid
 	"Mask",
 	"BlindfoldWrap",
@@ -1685,6 +1787,7 @@ let LayerGroups = {
 	"WrappingLegsOver",
 	"LegbinderLegsOver",
 	"PetsuitLegs",
+	"PetsuitLegsUnder",
 	"WrappingAnklesOver",
 	"LegbinderAnklesOver",
 
@@ -1755,6 +1858,7 @@ let LayerGroups = {
 	// Upper body underwear and bodysuits
 	"CorsetLiner",
 	"CorsetLinerLower",
+	"BodysuitOver",
 
 	// Right arm clothes
 	"SleeveDecoRight",
@@ -1924,6 +2028,9 @@ let LayerProperties = {
 	HairBack: {
 		Parent: "Head",
 	},
+	HairPonytail: {
+		Parent: "Head",
+	},
 	Mouth: {
 		Parent: "Head",
 	},
@@ -1972,7 +2079,7 @@ let LayerProperties = {
 
 };
 
-let Hardpoints = {
+let Hardpoints: Record<string, Hardpoint> = {
 	Front: {
 		Parent: "Torso",
 		X: 1162,
@@ -1985,6 +2092,12 @@ let Hardpoints = {
 		Y: 690,
 		Angle: 0,
 	},
+	HeadpatHead: {
+        Parent: "Head",
+        X: 1220,
+        Y: 360,
+        Angle: 0,
+    },
 	Rear: {
 		Parent: "Torso",
 		X: 1127,

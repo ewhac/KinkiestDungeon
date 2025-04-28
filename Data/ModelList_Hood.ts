@@ -42,7 +42,7 @@ AddModel({
 	Restraint: true,
 	Categories: ["Restraints","Hoods"],
 	AddPose: ["HideEars", "FaceCoverGag", "Hooded"],
-	HideLayers: ["HairFront", "HairOver", "Brows", "Ears"],
+	HideLayers: ["HairFront", "HairOver", "HairBack", "Brows", "Ears"],
 	AddPoseConditional: {
 		Xray: ["HoodMask",],
 	},

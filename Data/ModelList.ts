@@ -503,6 +503,8 @@ AddModel({
 });
 
 
+AddModel(GetModelRestraintVersion("Cape", true));
+
 AddModel({
 	Name: "Pauldrons",
 	Folder: "ArmorPlate",
@@ -519,6 +521,44 @@ AddModel({
 		},
 	])
 });
+
+
+AddModel({
+	Name: "PauldronRight",
+	Folder: "ArmorPlate",
+	Parent: "PlateArmor",
+	Categories: ["Armor"],
+	Layers: ToLayerMap([
+		{ Name: "PauldronLeft", Layer: "Shoulders", Pri: 82,
+			Poses: ToMapSubtract([...ARMPOSES], [...HIDEARMPOSES, "Up"], "Hogtie"),
+			MorphPoses: {Yoked: "Yoked", Hogtie: "Hogtie", Wristtie: "Free", Boxtie: "Free", Front: "Free", Crossed: "Free"},
+			HideWhenOverridden: true,
+			HidePoseConditional: [
+				["DynamicArmor", "ArmArmor", "SuppressDynamic"],
+			],
+		},
+	])
+});
+
+
+AddModel({
+	Name: "PauldronLeft",
+	Folder: "ArmorPlate",
+	Parent: "PlateArmor",
+	Categories: ["Armor"],
+	Layers: ToLayerMap([
+		{ Name: "PauldronRight", Layer: "Shoulders", Pri: 82,
+			Poses: ToMapSubtract([...ARMPOSES], [...HIDEARMPOSES, "Up"], "Hogtie"),
+			MorphPoses: {Yoked: "Yoked", Hogtie: "Hogtie", Wristtie: "Free", Boxtie: "Free", Front: "Free", Crossed: "Free"},
+			HideWhenOverridden: true,
+			HidePoseConditional: [
+				["DynamicArmor", "ArmArmor", "SuppressDynamic"],
+			],
+		},
+	])
+});
+
+
 AddModel({
 	Name: "Breastplate",
 	Folder: "ArmorPlate",
@@ -660,6 +700,14 @@ AddModel({
 	])
 });
 
+
+AddModel(GetModelRestraintVersion("Breastplate", true));
+AddModel(GetModelRestraintVersion("Pauldrons", true));
+AddModel(GetModelRestraintVersion("PauldronLeft", true));
+AddModel(GetModelRestraintVersion("PauldronRight", true));
+AddModel(GetModelRestraintVersion("PlateBoots", true));
+AddModel(GetModelRestraintVersion("Gauntlets", true));
+
 AddModel({
 	Name: "ChainShirt",
 	Folder: "ArmorChain",
@@ -707,6 +755,8 @@ AddModel({
 		},
 	])
 });
+AddModel(GetModelRestraintVersion("ChainShirt", true));
+AddModel(GetModelRestraintVersion("ChainBikini", true));
 
 
 AddModel({
@@ -756,6 +806,7 @@ AddModel({
 		},
 	])
 });
+AddModel(GetModelRestraintVersion("ChainSkirt2", true));
 
 
 AddModel({
@@ -814,6 +865,70 @@ AddModel({
 		},
 	])
 });
+AddModel(GetModelRestraintVersion("ChainSkirt", true));
+
+AddModel({
+	Name: "ChainPanties",
+	Folder: "ArmorChain",
+	Parent: "ChainArmor",
+	Categories: ["Armor"],
+	Layers: ToLayerMap([
+		{ Name: "Panties", Layer: "CrotchPanelMid", Pri: 15,
+			Poses: ToMap([...LEGPOSES]),
+			MorphPoses: {Closed: "Closed", Hogtie: "Closed", Kneel: "Kneel", KneelClosed: "KneelClosed"},
+			Invariant: true,
+			InheritColor: "Panties",
+			HidePoseConditional: [
+				["DynamicArmor", "PelvisArmor", "SuppressDynamic"],
+			],
+		},
+		{ Name: "PantiesChain", Layer: "CrotchPanelMid", Pri: 14.9,
+			Poses: ToMap([...LEGPOSES]),
+			MorphPoses: {Closed: "Closed", Hogtie: "Closed"},
+			Invariant: true,
+			InheritColor: "Chain",
+			TieToLayer: "Panties",
+		},
+	])
+});
+AddModel(GetModelRestraintVersion("ChainPanties", true));
+
+
+AddModel({
+	Name: "ChainPanties2",
+	Folder: "ArmorChain",
+	Parent: "ChainArmor",
+	Categories: ["Armor"],
+	Layers: ToLayerMap([
+		{ Name: "Panties", Layer: "CrotchPanelMid", Pri: 15,
+			Poses: ToMap([...LEGPOSES]),
+			MorphPoses: {Closed: "Closed", Hogtie: "Closed", Kneel: "Kneel", KneelClosed: "KneelClosed"},
+			Invariant: true,
+			InheritColor: "Panties",
+			HidePoseConditional: [
+				["DynamicArmor", "PelvisArmor", "SuppressDynamic"],
+			],
+		},
+		{ Name: "PantiesChain", Layer: "CrotchPanelMid", Pri: 14.9,
+			Poses: ToMap([...LEGPOSES]),
+			MorphPoses: {Closed: "Closed", Hogtie: "Closed"},
+			Invariant: true,
+			InheritColor: "Chain",
+			TieToLayer: "Panties",
+		},
+		{ Name: "Skirt", Layer: "OverSkirt", Pri: 15.3,
+			Poses: ToMap([...LEGPOSES]),
+			MorphPoses: {Hogtie: "Hogtie", Kneel: "Kneel", KneelClosed: "Kneel"},
+			Invariant: true,
+			InheritColor: "Plate",
+			HidePoseConditional: [
+				["DynamicArmor", "PelvisArmor", "SuppressDynamic"],
+			],
+		},
+	])
+});
+
+AddModel(GetModelRestraintVersion("ChainPanties2", true));
 
 AddModel({
 	Name: "ChainArmor",
@@ -996,19 +1111,19 @@ AddModel({
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			Invariant: true,
+			HidePoses: {"SkimpyLower": true},
 		},
 		{ Name: "Stripe", Layer: "Skirt", Pri: 14.1,
 			TieToLayer: "Skirt",
 			NoOverride: true,
 			Poses: ToMap([...LEGPOSES]),
-			HideWhenOverridden: true,
 			//swaplayerpose: {Kneel: "SkirtLower", KneelClosed: "SkirtLower"},
 			MorphPoses: {Hogtie: "Closed", Closed: "Closed", Kneel: "Kneel", KneelClosed: "Kneel"},
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			Invariant: true,
 		},
-		{ Name: "SkirtOver", Layer: "SkirtOver", Pri: 7,
+		/*{ Name: "SkirtOver", Layer: "SkirtOver", Pri: 7,
 			Poses: ToMap([...KNEELPOSES]),
 			//RequirePoses: ToMap(["CrotchStrap"]),
 			TieToLayer: "Skirt", NoOverride: true,
@@ -1025,7 +1140,7 @@ AddModel({
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			//Invariant: true,
-		},
+		},*/
 	])
 });
 
@@ -1129,6 +1244,9 @@ AddModel({
 		{ Name: "SockLeft", Layer: "StockingLeft", Pri: 1,
 			Poses: ToMap([...LEGPOSES]),
 			GlobalDefaultOverride: ToMap(["Hogtie", "KneelClosed"]),
+			DisplaceLayers: {StockingLeft: true,},
+			DisplacementSprite: "SockLSquish_Long",
+			DisplaceAmount: 10,
 		},
 		{ Name: "FootSockLeftHogtie", Layer: "SockLeftHogtie", Pri: 1,
 			Poses: ToMap(["Hogtie"]),
@@ -1147,6 +1265,9 @@ AddModel({
 		{ Name: "SockRight", Layer: "StockingRight", Pri: 1,
 			Poses: ToMap([...LEGPOSES]),
 			GlobalDefaultOverride: ToMap(["Hogtie", "KneelClosed"]),
+			DisplaceLayers: {StockingRight: true,},
+			DisplacementSprite: "SockRSquish_Long",
+			DisplaceAmount: 10,
 		},
 		{ Name: "FootSockRightKneel", Layer: "SockRightKneel", Pri: 1,
 			HidePoses: ToMap(["FeetLinked"]),
@@ -1441,6 +1562,7 @@ AddModel({
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			Invariant: true,
+			HidePoses: {"SkimpyLower": true},
 		},
 		{ Name: "SkirtOver", Layer: "SkirtOver", Pri: 12,
 			Poses: ToMap([...KNEELPOSES]),
@@ -1536,6 +1658,8 @@ AddModel({
 	])
 });
 
+AddModel(GetModelRestraintVersion("WarriorBoots", true));
+
 
 AddModel({
 	Name: "SportsBra",
@@ -1570,10 +1694,16 @@ AddModel({
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoUpper"],
 			HideWhenOverridden: true,
 		},
+		{ Name: "BustierChestRim", Layer: "ShirtChest", Pri: 15.1,
+			Invariant: true,
+			TieToLayer: "BustierChest",
+			NoOverride: true,
+			InheritColor: "Rim",
+		},
 	])
 });
 
-
+AddModel(GetModelRestraintVersion("WarriorBustier", true));
 
 AddModel({
 	Name: "LeatherGloveLeft",
@@ -1689,6 +1819,8 @@ AddModel({
 		...GetModelLayers("LeatherGloveRight"),
 	])
 });
+
+AddModel(GetModelRestraintVersion("LeatherGloves", true));
 
 
 AddModel({
@@ -1872,6 +2004,7 @@ AddModel({
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			Invariant: true,
+			HidePoses: {"SkimpyLower": true},
 		},
 		{ Name: "SkirtOver", Layer: "SkirtOver", Pri: 7,
 			Poses: ToMap([...KNEELPOSES]),
@@ -2087,6 +2220,8 @@ AddModel({
 });
 
 
+AddModel(GetModelRestraintVersion("RobeSleeves", true));
+
 
 AddModel({
 	Name: "RobeSleeveDecoLeft",
@@ -2183,6 +2318,7 @@ AddModel({
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
 			Invariant: true,
+			HidePoses: {"SkimpyLower": true},
 		},
 		{ Name: "SkirtOver", Layer: "SkirtOver", Pri: 7,
 			Poses: ToMap([...KNEELPOSES]),

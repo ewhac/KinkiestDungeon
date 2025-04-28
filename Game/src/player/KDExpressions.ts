@@ -186,7 +186,7 @@ let KDExpressions: Record<string, KDExpression> = {
 		expression: (C, flags) => {
 			return {
 				EyesPose: (C == KinkyDungeonPlayer && KinkyDungeonGoddessRep.Ghost > 15) ? "EyesHeart" : "EyesAngry",
-				Eyes2Pose: (C == KinkyDungeonPlayer && KinkyDungeonGoddessRep.Ghost > 15) ? "Eyes2Heart" : "EyesAngry",
+				Eyes2Pose: (C == KinkyDungeonPlayer && KinkyDungeonGoddessRep.Ghost > 15) ? "Eyes2Heart" : "Eyes2Angry",
 				BrowsPose: "BrowsAnnoyed",
 				Brows2Pose: "Brows2Annoyed",
 				BlushPose: "BlushExtreme",
@@ -284,6 +284,25 @@ let KDExpressions: Record<string, KDExpression> = {
 				Brows2Pose: "Brows2Angry",
 				BlushPose: "BlushHigh",
 				MouthPose: "MouthPout",
+			};
+		},
+	},
+	"ClickHeadpat": {
+		priority: 1.5,
+		criteria: (C, flags) => {
+			if (flags.get("clickheadpatted_recently")) {
+				return true;
+			}
+			return false;
+		},
+		expression: (C, flags) => {
+			return {
+				EyesPose: "EyesClosed",
+				Eyes2Pose: "",
+				BrowsPose: "",
+				Brows2Pose: "",
+				BlushPose: "",
+				MouthPose: "MouthSmile",
 			};
 		},
 	},
@@ -881,8 +900,11 @@ let KDExpressions: Record<string, KDExpression> = {
 						return true;
 				}
 			}
-			return (KDGameData.PrisonerState == "jail" || KDGameData.PrisonerState == "parole")
-				&& KinkyDungeonGoddessRep.Ghost >= -25 && KinkyDungeonGoddessRep.Ghost < 25;
+			return (KDGameData.PrisonerState == "jail" || KDGameData.PrisonerState == "parole"
+				|| KinkyDungeonFlags.get("embarrassed")
+			)
+				&& ((KinkyDungeonGoddessRep.Ghost >= -25 && KinkyDungeonGoddessRep.Ghost < 25)
+					|| !KinkyDungeonHasWill(0.1));
 		},
 		expression: (C, flags) => {
 			return {
@@ -892,6 +914,35 @@ let KDExpressions: Record<string, KDExpression> = {
 				Brows2Pose: "",
 				BlushPose: "BlushMedium",
 				MouthPose: "MouthEmbarrassed",
+				FearPose: "",
+			};
+		},
+	},
+	"Frust": {
+		stackable: true,
+		priority: 0.2,
+		criteria: (C, flags) => {
+			if (C != KinkyDungeonPlayer) {
+				let id = KDNPCChar_ID.get(C);
+				if (id) {
+					let opinion = KDGetModifiedOpinionID(id);
+					if (opinion >= -15 && opinion <= 15)
+						return true;
+				}
+			}
+			return (KinkyDungeonFlags.get("embarrassed")
+			)
+				&& (KinkyDungeonGoddessRep.Ghost < -25
+					&& KinkyDungeonHasWill(0.1));
+		},
+		expression: (C, flags) => {
+			return {
+				EyesPose: "EyesSly",
+				Eyes2Pose: "Eyes2Sly",
+				BrowsPose: "BrowsAngry",
+				Brows2Pose: "Brows2Angry",
+				BlushPose: "BlushMedium",
+				MouthPose: "",
 				FearPose: "",
 			};
 		},

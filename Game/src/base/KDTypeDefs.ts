@@ -33,6 +33,8 @@ interface item extends NamedAndTyped {
 	faction?: string,
 	/** Faction of the applied item, impossible to override */
 	forceFaction?: string,
+
+	flags?: Record<string, number>,
 	/** When added to the inventory, is added as a different item instead. Good for cursed items! */
 	inventoryVariant?: string,
 	/** Events associated with the item*/
@@ -83,6 +85,8 @@ interface item extends NamedAndTyped {
 
 interface consumable extends NamedAndTyped {
 	name: string,
+	range?: number,
+	maxInventory?: number,
 	/** 1 - (Rarity * sub value) = sub threshold */
 	sub?: number,
 	rarity: number,
@@ -101,6 +105,10 @@ interface consumable extends NamedAndTyped {
 	arousalMode?: boolean,
 	/** Data var */
 	data?: Record<string, string|number>,
+	/** Modular system */
+	itemEffect?: string,
+	/** Whats inside the potion??? */
+	contains?: string,
 	/** Requirement that overrides all other requirements */
 	prereq?: string,
 	/** Requirement in addition to all other requirements such as not being gagged for potions, bound, etc */
@@ -158,7 +166,7 @@ interface KDRestraintPropsBase {
 	/** Used in standalone to replace Color */
 	Filters?: Record<string, LayerFilter>,
 	/** Used in standalone to replace Properties */
-	Properties?: Record<string, LayerProperties>,
+	Properties?: Record<string, LayerPropertiesType>,
 	/** Forces this restraint to always be conjured when applied to NPCs*/
 	forceConjure?: boolean,
 	/** TODO Used in standalone to indicate which faction colors map to which filter
@@ -178,7 +186,7 @@ interface KDRestraintPropsBase {
 	allFloors?: boolean,
 	cloneTag?: string,
 
-	escapeChance?: any,
+	escapeChance?: KDEscapeChanceList,
 
 	events?: KinkyDungeonEvent[],
 	enemyTags?: Record<string, number>,
@@ -444,6 +452,8 @@ interface KDRestraintPropsBase {
 	blindfold?: number
 	/** Maximum stamina percentage the player can have in order for the restraint to be applied. 0.25-0.35 for really strict stuff, 0.9 for stuff like ball gags, none for quick restraints like cuffs */
 	maxwill?: number,
+	/** for enemies only */
+	maxwillEnemy?: number,
 	Type?: string,
 	/** Item is removed when the wearer goes to prison */
 	removePrison?: boolean,
@@ -464,6 +474,8 @@ interface KDRestraintPropsBase {
 	slimeLevel?: number,
 	addTag?: string[],
 	addPose?: string[],
+	/** Do not render if this pose is present */
+	noRenderPose?: string[],
 	/** Bigger version of the item, for bigger gags perk */
 	biggerVersion?: string,
 	/** Adds a pose (standalonepatched only) if this is the top level restraint */
@@ -507,8 +519,6 @@ interface KDRestraintPropsBase {
 	forceOutfit?: string,
 	/** Outfit to force (priority default = base power) */
 	forceOutfitPriority?: number,
-	/** Clothes for dressing */
-	alwaysDress?: overrideDisplayItem[],
 	/** Clothes for dressing */
 	alwaysDressModel?: alwaysDressModel[],
 	/** The item always bypasses covering items, such as dresses and chastity belts */
@@ -582,7 +592,7 @@ interface restraint extends KDRestraintProps {
 	/** Descriptor for tightness, e.g. Secure, Thick */
 	tightType?: string,
 
-	escapeChance: any,
+	escapeChance: KDEscapeChanceList,
 
 	enemyTags: Record<string, number>,
 	/** Multiplies the weight AFTER, useful for minimizing things */
@@ -603,11 +613,19 @@ interface restraint extends KDRestraintProps {
 	ApplyVariants?: Record<string, {weightMod: number, weightMult: number, playerTags?: Record<string, number>, playerTagsMult?: Record<string, number>, playerTagsMissing?: Record<string, number>, playerTagsMissingMult?: Record<string, number>, enemyTags: Record<string, number>, enemyTagsMult?: Record<string, number>}>,
 }
 
+/**
+ * Used to define the chance of getting out of restraints
+ */
 interface KDEscapeChanceList {
+	/** Struggle inside the restraint */
 	Struggle?: number,
+	/** Cut the restraint */
 	Cut?: number,
+	/** Removing the restraint */
 	Remove?: number,
+	/** Picking the lock */
 	Pick?: number,
+	/** Removing an opened lock */
 	Unlock?: number,
 }
 
@@ -632,6 +650,8 @@ interface floorParams {
 	beforeWorldGenCode?: (coord: WorldCoord) => void;
 	tagModifiers?: Record<string, number>;
 	globalTags?: Record<string, boolean>;
+	/** Tags for cursed mimic restraints */
+	curseTags: string[],
 	shadowColor?: number,
 	lightColor?: number,
 	background : string,
@@ -760,7 +780,7 @@ interface alwaysDressModel {
 	/** Group */
 	Group?: string,
 	/** Filters */
-	Properties?: Record<string, LayerProperties>,
+	Properties?: Record<string, LayerPropertiesType>,
 	/** Filters */
 	Filters?: Record<string, LayerFilter>,
 	/** Faction filter index */
@@ -776,6 +796,8 @@ interface alwaysDressModel {
 interface KDLoadout {name: string, tags?: string[], singletag: string[], singletag2?: string[], forbidtags: string[], chance: number, items?: string[], restraintMult?: number, multiplier?: number};
 
 interface enemy extends KDHasTags {
+	/** Makes them special persistent */
+	special?: boolean,
 	overrideFactionDefeat?: boolean,
 	customDefeat?: string,
 	/** Run when created in some circumstances. NOT when summoned*/
@@ -890,6 +912,8 @@ interface enemy extends KDHasTags {
 
 	/** Behavior tags */
 	Behavior?: {
+		/** Condition for this enemy to try to apply leash */
+		leashCondition?: string,
 		/** This enemy will hold still when near the player */
 		holdStillWhenNear?: boolean,
 		/** If this is true, the intent is that it behaves more as an allied enemy rather than a summon */
@@ -929,6 +953,8 @@ interface enemy extends KDHasTags {
 	spellResist?: number,
 	/** Whether or not the enemy is friendly to the player and attacks enemies */
 	allied?: boolean,
+	/** Trats player willpower percentage as by this much lower */
+	willBonus?: number,
 	/** Enemies will prioritize this enemy less than other enemies. Used by allies only. */
 	lowpriority? : boolean,
 	/** lookup condition in KDPathConditions,
@@ -952,6 +978,7 @@ interface enemy extends KDHasTags {
 	hidetimerbar?: boolean,
 	Attack?: {
 		mustBindorFail?: boolean,
+		noFailifHasWP?: boolean,
 	},
 	/** Contains data pertaining to the creature's awareness */
 	Awareness?: {
@@ -1305,6 +1332,9 @@ interface enemy extends KDHasTags {
 			applyVariant?: string}[],
 	},
 	attackBonus?: number,
+
+	/** Does not leash the player */
+	noLeash?: boolean,
 	/** */
 	cohesion?: number,
 	/** */
@@ -1488,19 +1518,21 @@ interface weapon extends damageInfo, NamedAndTyped {
 	nocrit?: boolean;
 	noblock?: boolean,
 	tags?: string[];
-	special?: {
-		noSkip?: boolean,
-		type: string,
-		spell?: string,
-		prereq?: string,
-		selfCast?: boolean,
-		requiresEnergy?: boolean,
-		energyCost?: number,
-		range?: number,};
+	special?: KDWeaponSpecial;
 	/** Can be used with Floating weapon even with no hands */
 	telekinetic?: boolean,
 }
 
+interface KDWeaponSpecial {
+    noSkip?: boolean;
+    type: string;
+    spell?: string;
+    prereq?: string;
+    selfCast?: boolean;
+    requiresEnergy?: boolean;
+    energyCost?: number;
+    range?: number;
+}
 
 interface KinkyDungeonEvent {
 	sprite?: string,
@@ -1563,6 +1595,7 @@ interface KinkyDungeonEvent {
 	requireFlag?: string;
 	trigger: string;
 	threshold?: number,
+	removeOnUncurse?: boolean,
 	restraint?: string;
 	sfx?: string;
 	vol?: number;
@@ -1666,6 +1699,55 @@ interface String {
     KDReplaceOrAddDmg(dmg: string, replaceString?: string): string;
 }
 
+/**
+ * Holds all the information required to handle buffs
+ * TODO: Check which fields are required and document their use
+ */
+interface KDBuff {
+	id: string,
+	power?: number,
+	type?: string,
+	duration?: number,
+	infinite?: boolean,
+	aura?: string,
+	range?: number,
+	currentCount?: number,
+	maxCount?: number,
+	tags?: string[],
+	/** Holds additional data used by specific buffs. */
+	data?: Record<string, any>,
+	mushroom?: boolean,
+	cancelOnReapply?: boolean,
+
+	player?: boolean,
+	enemies?: boolean,
+	events?: KinkyDungeonEvent[],
+	endFloor?: boolean,
+	endSleep?: boolean,
+	spell?: any,
+	auraSprite?: any,
+	noAuraColor?: boolean,
+	showHelpless?: boolean,
+	replaceSprite?: any,
+	replaceSpriteBound?: any,
+	replaceSpriteSuff?: any,
+	replaceSpriteSuffBound?: any,
+	replacePower?: any,
+	labelcolor?: string,
+	hide?: boolean,
+	text?: any,
+	desc?: string,
+	buffTextReplace?: Record<string, any>,
+	buffSprite?: boolean,
+	pose?: any,
+	buffSpriteSpecific?: string,
+	click?: string,
+	disableTypes?: string[],
+	sfxApply?: string,
+	onlyAlly?: boolean,
+	noAlly?: boolean,
+}
+
 interface entity {
 	/** Tick of last move */
 	lastmove?: number,
@@ -1685,6 +1767,14 @@ interface entity {
 	strugglePoints?: number,
 
 	partyLeader?: number,
+
+	/** BindStun is a mechanic that reduces the struggle rate based on how much bondage is added
+	 * Each turn it is reduced by 10% of enemy current hp, 10% of bindStun, or 2.5% of max hp, whichever is more
+	 * The amount is always set to the maximum of current bindStun or the amount of binding taken, or half damage taken
+	 *
+	 * BIG hits increase bindstun by a lot
+	 */
+	bindStun?: number,
 
 	/** Optional leash data, used for both NPC and player */
 	leash?: KDLeashData,
@@ -1809,6 +1899,8 @@ interface entity {
 	tempitems?: string[],
 	x: number,
 	y: number,
+	targetingX?: number,
+	targetingY?: number,
 	lastx?: number,
 	lasty?: number,
 	fx?: number,
@@ -1841,7 +1933,7 @@ interface entity {
 	stun?: number,
 	silence?: number,
 	vulnerable?: number,
-	buffs?: Record<string, any>,
+	buffs?: Record<string, KDBuff>,
 	warningTiles?: any,
 	visual_x?: number,
 	visual_y?: number,
@@ -1851,7 +1943,7 @@ interface entity {
 	playWithPlayerCD?: number,
 
 	IntentAction?: string,
-	IntentLeashPoint?: {x: number, y: number, type: string, radius: number},
+	IntentLeashPoint?: {x: number, y: number, type: string, radius: number, entrance?: boolean},
 
 	CurrentAction?: string,
 	RemainingJailLeashTourWaypoints?: number,
@@ -1867,7 +1959,7 @@ type KinkyDungeonDress = {
 	Group?: string;
 	Color: string | string[];
 	Filters?: Record<string, LayerFilter>;
-	Properties?: Record<string, LayerProperties>;
+	Properties?: Record<string, LayerPropertiesType>;
 
 	Lost: boolean;
 	NoLose?: boolean;
@@ -1976,6 +2068,57 @@ type KDPerk = {
 	costGroup?: string,
 	startPriority?: number,
 	requireArousal?: boolean,
+}
+
+interface SubCastInfo {
+	/** do not define */
+	target?: string,
+	/** do not define */
+	tx?: number,
+	/** do not define */
+	ty?: number,
+	/** do not define */
+	mx?: number,
+	/** do not define */
+	my?: number,
+	/** do not define */
+	targetID?: number,
+	/** Spell does NOT cast in direction of target, instead appears on caster tile */
+	noTargetMoveDir?: boolean,
+	/** Spell cast in direction based on target */
+	directional?: boolean,
+	/** Appears in a random position nearby */
+	randomDirection?: boolean
+	/** like randomDirection but only in the 180 degrees facing the target */
+	randomDirectionPartial?: boolean,
+	/** randomDirection, but only if the main direction is occupied */
+	randomDirectionFallback?: boolean,
+	/** If the target has this buff its in a random direction, e.g. sagitta */
+	alwaysRandomBuff?: string
+	/** Tracking behavior like leather spells or ropestorm */
+	aimAtTarget?: boolean,
+	/** Spell to cast */
+	spell: string,
+	/** chance to happen each turn */
+	chance?: number,
+	/** number of times to do the subcast */
+	countPerCast?: number,
+	/** ??? */
+	offset?: boolean
+	/** shotgun */
+	spread?: number
+	/** sfx */
+	sfx?: string
+	/** for summon, strict condition  */
+	strict?: boolean,
+}
+
+interface BulletTickData {
+	bullet: KDBullet,
+	delta: number,
+	allied: boolean,
+	cancelCast: boolean,
+	cancelMove: boolean,
 }
 
 interface spell {
@@ -2112,10 +2255,14 @@ interface spell {
 	learnPage?: string[],
 	/** This spell wont trigger an aggro action */
 	noAggro?: boolean;
+	/** itemeffect linked to this cast */
+	itemEffect?: string;
 	/** Whether the spell defaults to the Player faction */
 	allySpell?: boolean;
 	/** This spell wont friendly fire the player */
 	noFF?: boolean;
+	/** This spell will hit anything */
+	friendlyfire?: boolean;
 	/** This spell wont affect the player if belonging to an allied entity */
 	noHitAlliedPlayer?: boolean,
 	/** Spell overrides the faction */
@@ -2187,6 +2334,10 @@ interface spell {
 	costOnToggle?: boolean;
 	/** Type of the spell */
 	type: string;
+	/** Do not consume consumable */
+	noconsume?: boolean,
+	/** quantity of consumables */
+	quantity?: number,
 	/** Type of effect on hit */
 	onhit?: string;
 	/** Duration of the status effect applied */
@@ -2220,7 +2371,7 @@ interface spell {
 	/** trailEvadeable */
 	trailEvadeable?: boolean;
 	/** trailNoblock */
-	trailNoblock?: boolean;
+	trailNoBlock?: boolean;
 	/** trailPower */
 	trailPower?: number;
 	/** trailHit */
@@ -2274,13 +2425,13 @@ interface spell {
 	/** Casts a spellcast during the delay */
 	castDuringDelay?: boolean;
 	/** Casts spell */
-	spellcast?: any;
+	spellcast?: SubCastInfo;
 	/** Casts spell on cast */
-	extraCast?: any;
+	extraCast?: SubCastInfo[];
 	/** spell cast on hit */
-	spellcasthit?: any;
+	spellcasthit?: SubCastInfo;
 	/** List of buffs applied by the spell */
-	buffs?: any[];
+	buffs?: KDBuff[];
 	/** Whether the spell is off by default */
 	defaultOff?: boolean;
 	/** List of events  applied by the spell */
@@ -2305,6 +2456,7 @@ interface spell {
 	piercingTrail?: boolean;
 	/** nonVolatile */
 	nonVolatile?: boolean;
+	nonVolatileTrail?: boolean;
 	/** likely to cause chain reactions */
 	volatile?: boolean;
 	/** likely to cause chain reactions */
@@ -2357,7 +2509,7 @@ interface spell {
 	secret?: boolean;
 	/** Enemies summoned by this spell will have their default faction and not the caster's faction */
 	defaultFaction?: boolean;
-
+	trailBind?: number,
 }
 
 interface KDQuest {
@@ -2374,9 +2526,10 @@ interface KDQuest {
 };
 
 interface KDPoint {x: number, y: number}
-interface KDJailPoint extends KDPoint {type: string, radius: number, requireLeash?: boolean, requireFurniture?: boolean, direction?:{x: number, y: number}, restraint?:string, restrainttags?:string[]}
+interface KDJailPoint extends KDPoint {type: string, entrance?: boolean, radius: number, requireLeash?: boolean, requireFurniture?: boolean, direction?:{x: number, y: number}, restraint?:string, restrainttags?:string[]}
 
 interface KinkyDialogue {
+	image?: string,
 	/** REPLACETEXT -> Replacement */
 	data?: Record<string, string>;
 	/** Tags for filtering */
@@ -2387,6 +2540,9 @@ interface KinkyDialogue {
 	inventory?: boolean;
 	/** Function to play when clicked. If not specified, nothing happens.  Bool is whether or not to abort current click*/
 	clickFunction?: (gagged: boolean, player: entity) => boolean | undefined;
+	/** Function to play when entered from a diff stage*/
+	enterFunction?: (gagged: boolean, player: entity, fromstage: string) => void;
+
 	/** Draw function. Fires each frame. Good for highlighting things, drawing extra buttons, etc. Boolean = true will prevent the rest of dialogue from being drawn, use with caution*/
 	drawFunction?: (gagged: boolean, player: entity, delta: number) => boolean;
 	/** Function to play when clicked, if considered gagged. If not specified, will use the default function. */
@@ -2509,6 +2665,7 @@ interface VibeMod {
 }
 
 interface KDStruggleData {
+	angelHelp: boolean,
 	minSpeed: number;
 	handBondage: number;
 	armsBound: boolean;
@@ -2520,6 +2677,8 @@ interface KDStruggleData {
 	escapeChance: number,
 	cutBonus: number,
 	origEscapeChance: number,
+	/** Gets set to a low value when escapeChance would be clipped to 0, helping player understand how helpless */
+	lowEscapeChance: number,
 	origLimitChance: number,
 	helpChance: number,
 	limitChance: number,
@@ -2536,6 +2695,8 @@ interface KDStruggleData {
 	canCut: boolean,
 	canCutMagic: boolean,
 	toolBonus: number,
+	cutMultBonus: number,
+	cutMult: number,
 	toolMult: number,
 	buffBonus: number,
 	buffMult: number,
@@ -2767,6 +2928,91 @@ interface RepopQueueData {
 	loose?: boolean,
 }
 
+interface KDBullet {
+	type?: string,
+	born: number,
+	time?: number,
+	lifetime?: number,
+	reflected?: boolean,
+	y: number,
+	x: number,
+	vx: number,
+	vy: number,
+	xx?: number
+	yy?: number,
+	ox?: number
+	oy?: number,
+	visual_x?: number,
+	visual_y?: number,
+	spriteID?: string,
+	bullet: KDBulletData,
+	trail?: string,
+	trailEffectTile?: effectTileRef,
+	shadowBuff?: boolean,
+	/** TODO: Check if needed */
+	source?: number,
+	delay?: number,
+	warnings?: string[],
+	alreadyHit?: string[],
+	secondary?: boolean
+	collisionUpdate?: boolean,
+	faction?: string,
+}
+interface KDBulletData {
+	name: string,
+	width: number,
+	height: number,
+	bulletColor?: number,
+	bulletLight?: number,
+	faction: string,
+	spell?: spell,
+	damage?: damageInfo,
+	lifetime: number,
+	passthrough?: boolean,
+	noSprite?: boolean,
+	hit?: string,
+	trail?: boolean,
+	source?: number,
+	bulletSpin?: number,
+	hitevents?: KinkyDungeonEvent[],
+	effectTile?: effectTileRef,
+	effectTileDurationMod?: number,
+	playerEffect?: any;
+	summon?: Record<string, any>,
+	blockType?: string[],
+	followPlayer?: boolean,
+	followCaster?: number,
+	cancelCaster?: number,
+	dot?: boolean,
+	cast?: Record<string, any>,
+	events?: KinkyDungeonEvent[],
+	block?: number,
+	volatile?: boolean,
+	volatilehit?: boolean,
+	targetX?: number,
+	targetY?: number,
+	effectTileTrail?: effectTileRef,
+	effectTileDurationModTrail?: number,
+	effectTileTrailAoE?: number,
+	noEnemyCollision?: boolean,
+	alwaysCollideTags?: string[],
+	nonVolatile?: boolean,
+	noDoubleHit?: boolean,
+	pierceEnemies?: boolean,
+	piercing?: boolean,
+	origin?: Record<string, number>,
+	range?: number,
+	NoMsg?: boolean,
+	aoe?: number,
+	noise?: number,
+	blockhit?: number,
+	blockTypehit?: string[],
+	effectTileLinger?: effectTileRef,
+	effectTileDurationModLinger?: number,
+	aoetype?: string,
+}
+
+
 interface KDMapDataType {
 	RespawnQueue: {faction: string, enemy: string}[],
 	SpecialAreas: {x: number, y: number, radius: number}[],
@@ -2813,7 +3059,7 @@ interface KDMapDataType {
 	EffectTiles: Record<string, Record<string, effectTile>>;
 	RandomPathablePoints: Record<string, {x: number, y: number, tags?:string[]}>;
 	Entities: entity[];
-	Bullets: any[];
+	Bullets: KDBullet[];
 	StartPosition: {x: number, y: number};
 	EndPosition: {x: number, y: number};
 	ShortcutPositions: Record<string, {x: number, y: number}>;
@@ -2850,6 +3096,7 @@ interface KDMapDataType {
 	JailFaction: string[],
 	GuardFaction: string[],
 	MapFaction: string,
+	clickHeadpatted: boolean
 }
 
 
@@ -3093,7 +3340,7 @@ interface KDAIData extends KDAITriggerData {
 	/** Position to leash/pull the player to */
 	leashPos?: {x: number, y: number},
 	/** nearest jail to take the player to */
-	nearestJail?: {x: number, y: number, type: string, radius: number},
+	nearestJail?: KDJailPoint,
 
 	/** Enemy to follow */
 	master?: entity,
@@ -3298,6 +3545,9 @@ interface KDCursedVar {
 interface KDDelayedAction {
 	data: any,
 	time: number,
+	/** Tick of the action */
+	tick: number,
+	maxtime: number,
 	commit: string,
 	update?: string,
 	/** Cancel this in certain cases */
@@ -3990,6 +4240,7 @@ type PIXIContainer = import('pixi.js').Container;
 type PIXIMesh = import('pixi.js').Mesh;
 type PIXIRenderTexture = import('pixi.js').RenderTexture;
 type PIXITexture = import('pixi.js').Texture;
+type PIXIText = import('pixi.js').Text;
 type PIXISprite = import('pixi.js').Sprite;
 
 

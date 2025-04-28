@@ -20,6 +20,32 @@ interface RestraintGenericTypeSlot {
 
 
 let KDRestraintGenericTypes: Record<string, RestraintGenericType> = {
+	"Chain": {
+		raw: "ChainRaw",
+		items: [
+			{count: 1, restraint: "ChainArms"},
+			{count: 1, restraint: "ChainFeet"},
+			{count: 1, restraint: "ChainLegs"},
+			{count: 1, restraint: "ChainCrotch"},
+			{count: 1, restraint: "AnkleLink"},
+			{count: 1, restraint: "AnkleLinkShort"},
+			{count: 1, restraint: "ThighLink"},
+			{count: 1, restraint: "WristLink"},
+			{count: 1, restraint: "ElbowLink"},
+		],
+	},
+	"NeoLink": {
+		raw: "NeoLinkRaw",
+		items: [
+			{count: 1, restraint: "NeoAnkleLink"},
+			{count: 1, restraint: "NeoAnkleLinkShort"},
+			{count: 1, restraint: "NeoThighLink"},
+			{count: 1, restraint: "NeoWristLink"},
+			{count: 1, restraint: "NeoElbowLink"},
+			{count: 1, restraint: "NeoLinkArms"},
+			{count: 1, restraint: "NeoLinkThighs"},
+		],
+	},
 	"HempRope": {
 		raw: "RopeSnakeRaw",
 		items: [
@@ -149,6 +175,30 @@ let KDRestraintGenericTypes: Record<string, RestraintGenericType> = {
 			{count: 1, restraint: "HardSlimeBoots"},
 		],
 	},
+	"HardBlueSlime": {
+		raw: "HardBlueSlimeRaw",
+		items: [
+			{count: 1, restraint: "HardBlueSlimeHead"},
+			{count: 1, restraint: "HardBlueSlimeMouth"},
+			{count: 2, restraint: "HardBlueSlimeArms"},
+			{count: 1, restraint: "HardBlueSlimeHands"},
+			{count: 1, restraint: "HardBlueSlimeLegs"},
+			{count: 1, restraint: "HardBlueSlimeFeet"},
+			{count: 1, restraint: "HardBlueSlimeBoots"},
+		],
+	},
+	"HardRedSlime": {
+		raw: "HardRedSlimeRaw",
+		items: [
+			{count: 1, restraint: "HardRedSlimeHead"},
+			{count: 1, restraint: "HardRedSlimeMouth"},
+			{count: 2, restraint: "HardRedSlimeArms"},
+			{count: 1, restraint: "HardRedSlimeHands"},
+			{count: 1, restraint: "HardRedSlimeLegs"},
+			{count: 1, restraint: "HardRedSlimeFeet"},
+			{count: 1, restraint: "HardRedSlimeBoots"},
+		],
+	},
 	"ProtoSlime": {
 		raw: "ProtoSlimeRaw",
 		items: [
@@ -195,6 +245,18 @@ let KDRestraintGenericTypes: Record<string, RestraintGenericType> = {
 			{count: 1, restraint: "HardCaptureFoamLegs"},
 			{count: 1, restraint: "HardCaptureFoamFeet"},
 			{count: 1, restraint: "HardCaptureFoamBoots"},
+		],
+	},
+	"LiquidMetal": {
+		raw: "LiquidMetalRaw",
+		items: [
+			{count: 1, restraint: "LiquidMetalHead"},
+			{count: 1, restraint: "LiquidMetalMouth"},
+			{count: 2, restraint: "LiquidMetalArms"},
+			{count: 1, restraint: "LiquidMetalHands"},
+			{count: 1, restraint: "LiquidMetalLegs"},
+			{count: 1, restraint: "LiquidMetalFeet"},
+			{count: 1, restraint: "LiquidMetalBoots"},
 		],
 	},
 	"DuctTape": {
@@ -275,11 +337,15 @@ let KDRestraintGenericTypes: Record<string, RestraintGenericType> = {
 
 let KDGenericRestraintRawCache: Record<string, {raw: string, count: number}> = {};
 let KDGenericRestraintRawOriginalCache: Record<string, {name: string, count: number}[]> = {};
+let KDGenericRestraintRawInfo: Record<string, string> = {};
 
 function KDRefreshRawCache() {
 	KDGenericRestraintRawCache = {};
-	for (let mat of Object.values(KDRestraintGenericTypes)) {
+	for (let entry of Object.entries(KDRestraintGenericTypes)) {
+		let mat = entry[1];
 		let raw = mat.raw;
+
+		KDGenericRestraintRawInfo[mat.raw] = entry[0];
 		if (!KDGenericRestraintRawOriginalCache[mat.raw] )
 			KDGenericRestraintRawOriginalCache[mat.raw] = [];
 		for (let item of mat.items) {

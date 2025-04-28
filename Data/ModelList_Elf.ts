@@ -163,6 +163,7 @@ AddModel({
 			MorphPoses: {Kneel: "Kneel", KneelClosed: "Kneel"},
 			AppendPose: ToMapDupe(["CrotchStrap"]),
 			HidePrefixPose: ["Encase"],	HidePrefixPoseSuffix: ["TorsoLower"],
+			HidePoses: {"SkimpyLower": true},
 		},
 		{ Name: "SkirtBand", Layer: "Skirt", Pri: 99.9,
 			Invariant: true,

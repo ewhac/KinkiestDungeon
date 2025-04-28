@@ -118,7 +118,7 @@ let KDCurses: Record<string, KDCursedDef> = {
 			KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfo" + Curse)
 				.replace("RestraintName", KDGetItemName(item))//TextGet("Restraint" + KDRestraint(item).name))
 				.replace("AMNT", "" + (amount)),
-			"#ffffff", 2);
+			KDBaseWhite, 2);
 		},
 	},
 	"CursedCollar": {
@@ -159,7 +159,7 @@ let KDCurses: Record<string, KDCursedDef> = {
 			KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfo" + Curse)
 				.replace("RestraintName", KDGetItemName(item))//TextGet("Restraint" + KDRestraint(item).name))
 				.replace("AMNT", "" + (Math.round(10 * ((KDItemDataQuery(item, "cursedDamageHP") || 0) - (KDItemDataQuery(item, "cursedDamage") || 0))) || "???")),
-			"#ffffff", 2);
+			KDBaseWhite, 2);
 		},
 		events: [
 			{type: "cursedDamage", trigger: "afterPlayerDamage", mult: 1.0, power: 20, limit: 40},
@@ -185,6 +185,7 @@ let KDCurses: Record<string, KDCursedDef> = {
 	"5Keys" : {
 		lock: true,
 		level: 3,
+		powerMult: 2.4,
 		weight: (_item) => {
 			return 3;
 		},
@@ -450,8 +451,80 @@ let KDCursedVars: Record<string, KDCursedVar> = {
 		variant: (restraint, newRestraintName) => {
 			return KDAddEventVariant(restraint, newRestraintName, [
 				// We add this to ALL cursed items (including dormant curses)
-				{trigger: "curseCount", type: "add", power: 1},
-			], 4, "", {commonCurse: 10});
+				{trigger: "curseCount", type: "add", power: 1, inheritLinked: true,
+					removeOnUncurse: true},
+			], 4, restraint.DefaultLock || "", {commonCurse: 10});
+		}
+	},
+	"Skimpy": {
+		level: 1,
+		variant: (restraint, newRestraintName) => {
+			let ret = KDAddEventVariant(restraint, newRestraintName, [
+				// We add this to ALL cursed items (including dormant curses)
+				{trigger: "curseCount", type: "add", power: 1, inheritLinked: true,
+					removeOnUncurse: true},
+				{original: "MimicHoly", trigger: "inventoryTooltip",
+					type: "invtooltipworn", msg: "SkimpyCurse", color: "#000044", bgcolor: KDBaseWhite,
+					removeOnUncurse: true},
+			], 4, restraint.DefaultLock || "", {});
+			if (KDSkimpyModelReplace[restraint.Model]) {
+				KDSkimpyModelReplace[restraint.Model](ret, restraint, newRestraintName);
+			}
+			return ret;
+		}
+	},
+	"Mimic": {
+		level: 2,
+		variant: (restraint, newRestraintName) => {
+			return KDAddEventVariant(restraint, newRestraintName, [
+				// We add this to ALL cursed items (including dormant curses)
+				{trigger: "curseCount", type: "add", power: 1, inheritLinked: true,
+					removeOnUncurse: true},
+				{trigger: "tick", type: "mimiccurse", time: 10, chance: 0.2, sfx: "Evil",
+					inheritLinked: true, removeOnUncurse: true},
+			], 8, restraint.DefaultLock || "", {mimicCurse: 10});
+		}
+	},
+	"MimicHoly": {
+		level: 2,
+		variant: (restraint, newRestraintName) => {
+			return KDAddEventVariant(restraint, newRestraintName, [
+				// We add this to ALL cursed items (including dormant curses)
+				{trigger: "curseCount", type: "add", power: 1, inheritLinked: true,
+					removeOnUncurse: true},
+				{trigger: "tick", type: "mimiccurse", time: 10, chance: 0.2, sfx: "Evil",
+					inheritLinked: true, removeOnUncurse: true},
+				{trigger: "cleanse", type: "RemoveAndRevert", kind: restraint.name, sfx: "Magic",
+					inheritLinked: true},
+				{original: "MimicHoly", trigger: "inventoryTooltip",
+					type: "invtooltipworn", msg: "MimicHolyGlow", color: "#000044", bgcolor: "#ffff88",
+					removeOnUncurse: true},
+
+			], 8, restraint.DefaultLock || "", {divinemimicCurse: 10});
+		}
+	},
+	"Shibari": {
+		level: 2,
+		variant: (restraint, newRestraintName) => {
+			let ret = KDAddEventVariant(restraint, newRestraintName, [
+				// We add this to ALL cursed items (including dormant curses)
+				{trigger: "curseCount", type: "add", power: 1, inheritLinked: true,
+					removeOnUncurse: true},
+				{original: "MimicHoly", trigger: "inventoryTooltip",
+					type: "invtooltipworn", msg: "ShibariCurse", color: "#000044", bgcolor: KDBaseWhite,
+					removeOnUncurse: true},
+			], 8, restraint.DefaultLock || "", {shibariCurse: 10});
+			let mapGroup = KDRopeMapByGroup;
+			if (!ret.alwaysDressModel) ret.alwaysDressModel = [];
+			ret.alwaysDressModel.push(
+				{
+					Model: mapGroup[restraint.Group] || "RopeHarness",
+					factionFilters: {
+						Rope: {color: "Highlight", override: true},
+					},
+				}
+			);
+			return ret;
 		}
 	},
 };
@@ -502,8 +575,8 @@ function KDAddEventVariant(restraint: restraint, newRestraintName: string, ev: K
 		preview: restraint.preview || restraint.name,
 		protectionCursed: true,
 		escapeChance: escapeChance,
-		DefaultLock: lock,
-		HideDefaultLock: true,
+		DefaultLock: lock == undefined ? restraint.DefaultLock : lock,
+		HideDefaultLock: lock != restraint.DefaultLock || restraint.HideDefaultLock,
 		magic: true,
 		events: events,
 		power: power,
@@ -517,21 +590,21 @@ function KDAddEventVariant(restraint: restraint, newRestraintName: string, ev: K
 
 function KinkyDungeonCurseInfo(item: item, Curse: string) {
 	if (Curse == "MistressKey" && KinkyDungeonItemCount("MistressKey")) {
-		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfoMistressKeyHave").replace("KeyAmount", "" + KinkyDungeonItemCount("MistressKey")), "White", 2);
+		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfoMistressKeyHave").replace("KeyAmount", "" + KinkyDungeonItemCount("MistressKey")), KDBaseWhite, 2);
 	} else if (KDCurses[Curse].customInfo) {
 		KDCurses[Curse].customInfo(item, Curse);
 	} else {
-		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfo" + Curse), "White", 2);
+		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseInfo" + Curse), KDBaseWhite, 2);
 	}
 }
 
 function KinkyDungeonCurseStruggle(item: item, Curse: string) {
 	if (Curse == "MistressKey") {
-		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseStruggle" + Curse + item.name), "White", 2);
+		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseStruggle" + Curse + item.name), KDBaseWhite, 2);
 	} else if (KDCurses[Curse].customStruggle) {
 		KDCurses[Curse].customStruggle(item, Curse);
 	} else {
-		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseStruggle" + Curse), "White", 2);
+		KinkyDungeonSendActionMessage(4, TextGet("KinkyDungeonCurseStruggle" + Curse), KDBaseWhite, 2);
 	}
 }
 
@@ -602,4 +675,44 @@ function KDCurseMult(curse: string): number {
 		return KDCurses[curse].powerMult || 3;
 	}
 	return 1;
+}
+
+type KDSkimpyReplacer = (ret, restraint: restraint, newRestraintName: string) => any
+
+let KDSkimpyModelReplace: Record<string, KDSkimpyReplacer> = {
+	ChainSkirtRestraint: (ret, restraint, newRestraintName) => {
+		ret.enemyTags = {skimpyCurse: 10};
+		ret.Model = "ChainPanties";
+		ret.remove = ["ClothLower", "Skirts", "Pants"];
+		if (restraint.addPose) {
+			ret.addPose = [...restraint.addPose, "SkimpyLower"];
+		} else ret.addPose = ["SkimpyLower"];
+		return ret;
+	},
+	ChainSkirt2Restraint: (ret, restraint, newRestraintName) => {
+		ret.enemyTags = {skimpyCurse: 10};
+		ret.Model = "ChainPanties2";
+		ret.remove = ["ClothLower", "Skirts", "Pants"];
+		if (restraint.addPose) {
+			ret.addPose = [...restraint.addPose, "SkimpyLower"];
+		} else ret.addPose = ["SkimpyLower"];
+		return ret;
+	},
+	ChainTunicRestraint: (ret, restraint, newRestraintName) => {
+		ret.enemyTags = {skimpyCurse: 10};
+		ret.Model = "ChainBikini";
+		ret.remove = ["Cloth", "Shirts"];
+		if (restraint.addPose) {
+			ret.addPose = [...restraint.addPose, "SkimpyUpper"];
+		} else ret.addPose = ["SkimpyUpper"];
+		return ret;
+	},
+}
+
+let KDRopeMapByGroup = {
+	ItemTorso: "RopeHarness",
+	ItemPelvis: "RopeCrotch",
+	ItemLegs: "RopeCrotch",
+	ItemArms: "RopeChestStraps2",
+	ItemBreast: "RopeChestStraps2",
 }

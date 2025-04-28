@@ -184,6 +184,29 @@ let KDRecyclerCategories: Record<string, KDBlueprintCategory> = {
 		prereq: () => {return true;},
 		items: [
 
+			{
+				name: "ChainRaw",
+				item: "ChainRaw",
+				type: Restraint,
+				recyclecategory: "Metal",
+				recyclecost: {
+					Metal: 25,
+				},
+				count: 20,
+				prereq: () => {return true;},
+			},
+			{
+				name: "NeoLinkRaw",
+				item: "NeoLinkRaw",
+				type: Restraint,
+				recyclecategory: "Metal",
+				recyclecost: {
+					Metal: 25,
+					Latex: 25,
+				},
+				count: 20,
+				prereq: () => {return true;},
+			},
 
 			KDAutoGenRestraintBlueprint("TrapCuffs", "Metal", "", 1.2),
 			KDAutoGenRestraintBlueprint("ThumbCuffsNew", "Metal", "", 0.8),
@@ -209,6 +232,7 @@ let KDRecyclerCategories: Record<string, KDBlueprintCategory> = {
 		name: "Metal2",
 		prereq: () => {return true;},
 		items: [
+
 
 			KDAutoGenRestraintBlueprint("BlacksteelArmCuffs", "Metal", ""),
 			KDAutoGenRestraintBlueprint("BlacksteelLegCuffs", "Metal", ""),
@@ -364,6 +388,28 @@ let KDRecyclerCategories: Record<string, KDBlueprintCategory> = {
 				item: "HardSlimeRaw",
 				type: Restraint,
 				count: 25,
+				recyclecategory: "Latex",
+				recyclecost: {
+					Latex: 50,
+				},
+				prereq: () => {return true;},
+			},
+			{
+				name: "HardRedSlimeRaw",
+				item: "HardRedSlimeRaw",
+				type: Restraint,
+				count: 20,
+				recyclecategory: "Latex",
+				recyclecost: {
+					Latex: 50,
+				},
+				prereq: () => {return true;},
+			},
+			{
+				name: "HardBlueSlimeRaw",
+				item: "HardBlueSlimeRaw",
+				type: Restraint,
+				count: 20,
 				recyclecategory: "Latex",
 				recyclecost: {
 					Latex: 50,

@@ -223,8 +223,8 @@ AddModel({
 	Categories: ["Restraints","Cuffs"],
 	AddPose: ["AnkleLeft"],
 	Layers: ToLayerMap([
-		...GetModelLayers("ShacklesAnklesLeft", "", "", "Cuff"),
-		...GetModelLayers("ShacklesAnklesLeft", "Band", "", "Band", 0.4),
+		...GetModelLayers("ShacklesAnklesLeft", "", "", "Cuff", 4.5),
+		...GetModelLayers("ShacklesAnklesLeft", "Band", "", "Band", 4.6),
 	])
 });
 
@@ -236,8 +236,8 @@ AddModel({
 	Categories: ["Restraints","Cuffs"],
 	AddPose: ["AnkleRight"],
 	Layers: ToLayerMap([
-		...GetModelLayers("ShacklesAnklesRight", "", "", "Cuff"),
-		...GetModelLayers("ShacklesAnklesRight", "Band", "", "Band", 0.4),
+		...GetModelLayers("ShacklesAnklesRight", "", "", "Cuff", 4.5),
+		...GetModelLayers("ShacklesAnklesRight", "Band", "", "Band", 4.6),
 	])
 });
 
@@ -377,6 +377,9 @@ AddModel({
 			Poses: ToMap([...LEGPOSES]),
 			GlobalDefaultOverride: ToMap(["Hogtie", "KneelClosed"]),
 			InheritColor: "Cloth",
+			DisplaceLayers: {StockingLeft: true,},
+			DisplacementSprite: "SockLSquish_Long",
+			DisplaceAmount: 10,
 		},
 		{ Name: "LegRimLeft", Layer: "StockingLeft", Pri: -.9,
 			Poses: ToMap([...LEGPOSES]),
@@ -412,6 +415,9 @@ AddModel({
 			Poses: ToMap([...LEGPOSES]),
 			GlobalDefaultOverride: ToMap(["Hogtie", "KneelClosed"]),
 			InheritColor: "Cloth",
+			DisplaceLayers: {StockingRight: true,},
+			DisplacementSprite: "SockRSquish_Long",
+			DisplaceAmount: 10,
 		},
 		{ Name: "LegRimRight", Layer: "StockingRight", Pri: -.9,
 			Poses: ToMap([...LEGPOSES]),

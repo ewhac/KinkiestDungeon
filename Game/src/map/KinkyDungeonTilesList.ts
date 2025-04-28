@@ -377,10 +377,40 @@ let KDTileUpdateFunctions: Record<string, (delta: number) => boolean> = {
 				furn.tickFunction(delta);
 			}
 		} else {
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel", type: "SlowDetection", duration: 1, power: 9.0, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["SlowDetection", "move", "cast"]});
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel3", type: "Sneak", duration: 1, power: 1.95, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["Sneak", "darkness", "move", "cast"]});
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel2", type: "SlowLevel", duration: 1, power: 1, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["Slow", "move", "cast"]});
-			KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonBarrel"), "lightgreen", 1, true);
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel",
+				type: "SlowDetection",
+				duration: 1,
+				power: 9.0,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["SlowDetection", "move", "cast"],
+			});
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel3",
+				type: "Sneak",
+				duration: 1,
+				power: 1.95,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["Sneak", "darkness", "move", "cast"],
+			});
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel2",
+				type: "SlowLevel",
+				duration: 1,
+				power: 1,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["Slow", "move", "cast"],
+			});
+			KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonBarrel"), KDBaseLightGreen, 1, true);
 		}
 		return true;
 	},
@@ -392,19 +422,49 @@ let KDTileUpdateFunctions: Record<string, (delta: number) => boolean> = {
 				furn.tickFunction(delta);
 			}
 		} else {
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel", type: "SlowDetection", duration: 1, power: 9.0, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["SlowDetection", "move", "cast"]});
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel3", type: "Sneak", duration: 1, power: 1.95, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["Sneak", "darkness", "move", "cast"]});
-			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {id: "barrel2", type: "SlowLevel", duration: 1, power: 1, player: true, enemies: true, endSleep: true, maxCount: 1, tags: ["Slow", "move", "cast"]});
-			KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonBarrelChest"), "lightgreen", 1, true);
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel",
+				type: "SlowDetection",
+				duration: 1,
+				power: 9.0,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["SlowDetection", "move", "cast"],
+			});
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel3",
+				type: "Sneak",
+				duration: 1,
+				power: 1.95,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["Sneak", "darkness", "move", "cast"],
+			});
+			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+				id: "barrel2",
+				type: "SlowLevel",
+				duration: 1,
+				power: 1,
+				player: true,
+				enemies: true,
+				endSleep: true,
+				maxCount: 1,
+				tags: ["Slow", "move", "cast"],
+			});
+			KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonBarrelChest"), KDBaseLightGreen, 1, true);
 		}
 		return true;
 	},
 	"?": (_delta) =>  { // High hook
-		KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonHookHigh"), "lightgreen", 1, true);
+		KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonHookHigh"), KDBaseLightGreen, 1, true);
 		return true;
 	},
 	"/": (_delta) =>  { // Low hook
-		KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonScrap"), "lightgreen", 1, true);
+		KinkyDungeonSendTextMessage(3, TextGet("KinkyDungeonScrap"), KDBaseLightGreen, 1, true);
 		return true;
 	},
 };
@@ -414,14 +474,14 @@ let KDTileUpdateFunctions: Record<string, (delta: number) => boolean> = {
  */
 let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => boolean> = {
 	'B': (_moveX, _moveY) => {
-		/*if (!KinkyDungeonFlags.get("slept") && !KinkyDungeonFlags.get("nobed") && KinkyDungeonStatWill < KinkyDungeonStatWillMax * 0.49) {
+		/*if (KDCanSleep()) {
 			KDGameData.InteractTargetX = moveX;
 			KDGameData.InteractTargetY = moveY;
 			KDStartDialog("Bed", "", true);
 		}*/
 
 		if (!KinkyDungeonFlags.get("1stBed")) {
-			KinkyDungeonSendTextMessage(10, TextGet("KDBedHelp"), "#ffffff", 12, undefined, undefined, undefined, "");
+			KinkyDungeonSendTextMessage(10, TextGet("KDBedHelp"), KDBaseWhite, 12, undefined, undefined, undefined, "");
 			KinkyDungeonSetFlag("1stBed", -1);
 		}
 		return false;
@@ -460,7 +520,7 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 			KinkyDungeonMapSet(moveX, moveY, 'r');
 			KinkyDungeonAggroAction('rubble', {});
 		} else {
-			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), "#ff8933",1, false, true);
+			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), KDBaseOrange,1, false, true);
 			return false;
 		}
 
@@ -477,11 +537,11 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 			let roll = KinkyDungeonTilesGet(moveX + "," +moveY) ? KinkyDungeonTilesGet(moveX + "," +moveY).Roll : KDRandom();
 			if (faction && !KinkyDungeonChestConfirm) {
 				KinkyDungeonChestConfirm = true;
-				KinkyDungeonSendActionMessage(10, TextGet("KinkyDungeonChestFaction").replace("FACTION", TextGet("KinkyDungeonFaction" + faction)), "#ff5277", 2, true);
+				KinkyDungeonSendActionMessage(10, TextGet("KinkyDungeonChestFaction").replace("FACTION", TextGet("KinkyDungeonFaction" + faction)), KDBaseRed, 2, true);
 				return true;
 			} else {
 				if (KDHandsfreeChestTypes.includes(chestType)) {
-					KinkyDungeonSendTextMessage(7, TextGet("KDAutoChest"), "#ffffff",1, false, true);
+					KinkyDungeonSendTextMessage(7, TextGet("KDAutoChest"), KDBaseWhite,1, false, true);
 				}
 				let data = {
 					chestType: chestType,
@@ -491,10 +551,16 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 					tile: KinkyDungeonTilesGet(moveX + "," +moveY),
 					noTrap: noTrap,
 					level: MiniGameKinkyDungeonLevel,
-					index: (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint),
+					index: KDCurrIndex(),
 					lootTrap: lootTrap,
 					aggro: true,
+					selectedChestTrap: "",
+					selectedChestPossibilities: {},
 				};
+				KinkyDungeonSendEvent("enumerateBeforeChest", data);
+				if (!data.selectedChestTrap && Object.values(data.selectedChestPossibilities).length > 0) {
+					data.selectedChestTrap = KDGetByWeight(data.selectedChestPossibilities);
+				}
 				KinkyDungeonSendEvent("beforeChest", data);
 				if (data.aggro)
 					KinkyDungeonAggroAction('chest', {faction: faction, x: moveX, y: moveY});
@@ -543,7 +609,7 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 
 							KinkyDungeonSendTextMessage(2,
 								TextGet("KDAutoLoot") + `${KDGetItemName(inv)} x${q}` + suff,
-								"#88ff88", 2)
+								KDBaseMint, 2)
 						}
 					} else {
 						KDUI_ContainerBackScreen = KinkyDungeonDrawState;
@@ -562,7 +628,7 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 				KDGameData.AlreadyOpened.push({x: moveX, y: moveY});
 			}
 		} else {
-			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), "#ff8933",1, false, true);
+			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), KDBaseOrange,1, false, true);
 		}
 
 
@@ -572,12 +638,12 @@ let KDMoveObjectFunctions: Record<string, (moveX: number, moveY: number) => bool
 		let allowManip = KDAllowUseItems(true);
 		if (allowManip) {
 			let chestType = (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint) == "lib" ? "shelf" : "rubble";
-			KinkyDungeonLoot(MiniGameKinkyDungeonLevel, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), chestType);
+			KinkyDungeonLoot(MiniGameKinkyDungeonLevel, KDCurrIndex(), chestType);
 			if (KDSoundEnabled()) AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/Coins.ogg");
 			KinkyDungeonMapSet(moveX, moveY, 'X');
 			KDGameData.AlreadyOpened.push({x: moveX, y: moveY});
 		} else {
-			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), "#ff8933",1, false, true);
+			KinkyDungeonSendActionMessage(6, TextGet("KDCantTouchThat"), KDBaseOrange,1, false, true);
 		}
 		return true;
 	},
@@ -780,9 +846,16 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 				sprite: "Particles/PinkGlow.png",
 			});
 			KinkyDungeonApplyBuffToEntity(_entity, {
-				id: "DistractionCast", type: "MiscastChance", power: -1, duration: KDEssenceMoteDuration(),
-				aura: "#ff8888", aurasprite: "Heart", buffsprite: true,
-				events: [{type: "EssenceMote", trigger: "tick", mult: -1/KDEssenceMoteDuration()}],
+				id: "DistractionCast",
+				type: "MiscastChance",
+				power: -1,
+				duration: KDEssenceMoteDuration(),
+				aura: KDBasePink,
+				auraSprite: "Heart",
+				buffSprite: true,
+				events: [
+					{type: "EssenceMote", trigger: "tick", mult: -1/KDEssenceMoteDuration()}
+				],
 			});
 			KDAddEssenceMoteDP();
 			KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/PowerMagic.ogg");
@@ -802,9 +875,16 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 				sprite: "Particles/PinkGlow.png",
 			});
 			KinkyDungeonApplyBuffToEntity(_entity, {
-				id: "DistractionCast", type: "MiscastChance", power: -1, duration: KDEssenceMoteDuration(),
-				aura: "#ff8888", aurasprite: "Heart", buffsprite: true,
-				events: [{type: "EssenceMote", trigger: "tick", mult: -1/KDEssenceMoteDuration()}],
+				id: "DistractionCast",
+				type: "MiscastChance",
+				power: -1,
+				duration: KDEssenceMoteDuration(),
+				aura: KDBasePink,
+				auraSprite: "Heart",
+				buffSprite: true,
+				events: [
+					{type: "EssenceMote", trigger: "tick", mult: -1/KDEssenceMoteDuration()}
+				],
 			});
 			KDAddEssenceMoteDP();
 			KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/PowerMagic.ogg");
@@ -889,8 +969,8 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 			let slimeWalker = KDSlimeWalker(entity);
 			if (!slimeWalker) {
 				if (KinkyDungeonVisionGet(tile.x, tile.y) > 0.5 && !KinkyDungeonFlags.get("1stLatex")) {
-					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), "#ffffff", 12, undefined, undefined, undefined, "");
-					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), "#ffffff", 12, undefined, undefined, undefined, "");
+					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), KDBaseWhite, 12, undefined, undefined, undefined, "");
+					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), KDBaseWhite, 12, undefined, undefined, undefined, "");
 					KinkyDungeonSetFlag("1stLatex", -1);
 				}
 				KinkyDungeonApplyBuffToEntity(entity, KDSlimed);
@@ -906,8 +986,8 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 			let slimeWalker = KDSlimeWalker(entity);
 			if (!slimeWalker) {
 				if (KinkyDungeonVisionGet(tile.x, tile.y) > 0.5 && !KinkyDungeonFlags.get("1stLatex")) {
-					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), "#ffffff", 12, undefined, undefined, undefined, "");
-					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), "#ffffff", 12, undefined, undefined, undefined, "");
+					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), KDBaseWhite, 12, undefined, undefined, undefined, "");
+					KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), KDBaseWhite, 12, undefined, undefined, undefined, "");
 					KinkyDungeonSetFlag("1stLatex", -1);
 				}
 				KinkyDungeonApplyBuffToEntity(entity, KDSlimed);
@@ -940,8 +1020,8 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 			if (!slimeWalker) {
 				if (!KDEntityHasBuff(entity, "Drenched")) {
 					if (KinkyDungeonVisionGet(tile.x, tile.y) > 0.5 && !KinkyDungeonFlags.get("1stLatex")) {
-						KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), "#ffffff", 12, undefined, undefined, undefined, "");
-						KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), "#ffffff", 12, undefined, undefined, undefined, "");
+						KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp2"), KDBaseWhite, 12, undefined, undefined, undefined, "");
+						KinkyDungeonSendTextMessage(10, TextGet("KDLatexHelp1"), KDBaseWhite, 12, undefined, undefined, undefined, "");
 						KinkyDungeonSetFlag("1stLatex", -1);
 					}
 					KinkyDungeonApplyBuffToEntity(entity, KDSlimed);
@@ -1093,7 +1173,7 @@ let KDEffectTileFunctions: Record<string, (delta: number, entity: entity, tile: 
 				bind: 0,
 				flags: ["BurningDamage"]
 			});
-			KinkyDungeonSendTextMessage(5, TextGet("KinkyDungeonInfernoBurn"), "#ff5277", 2);
+			KinkyDungeonSendTextMessage(5, TextGet("KinkyDungeonInfernoBurn"), KDBaseRed, 2);
 		} else {
 			KinkyDungeonDamageEnemy(entity, {
 				type: "fire",
@@ -1749,10 +1829,10 @@ let KDStairsAltAction = {
 			KinkyDungeonMapSet(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, '2');
 			delete KinkyDungeonTilesGet(KinkyDungeonPlayerEntity.x + "," + KinkyDungeonPlayerEntity.y).AltStairAction;
 
-			KinkyDungeonSendTextMessage(10, TextGet("KDRandomStairTeleport"), "#ff5555", 5);
+			KinkyDungeonSendTextMessage(10, TextGet("KDRandomStairTeleport"), KDBaseRed, 5);
 			if (KDSoundEnabled()) AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/Teleport.ogg");
 		} else {
-			KinkyDungeonSendTextMessage(10, TextGet("KDRandomStairTeleportFail"), "#ff5555", 5);
+			KinkyDungeonSendTextMessage(10, TextGet("KDRandomStairTeleportFail"), KDBaseRed, 5);
 			if (KDSoundEnabled()) AudioPlayInstantSoundKD(KinkyDungeonRootDirectory + "Audio/Teleport.ogg");
 		}
 	},
@@ -1767,21 +1847,21 @@ function KDAttemptDoor(moveX: number, moveY: number) {
 		|| !KinkyDungeonIsHandsBound(true, true, 0.45);
 	if (!open) {
 		if (KinkyDungeonCanUseFeet(false)) {
-			KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobFeet"), "#88ff88", 2);
+			KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobFeet"), KDBaseMint, 2);
 			open = true;
 		} else {
 			let grace = 0;
 			if (KinkyDungeonFlags.get("failUnfairFirst") && !KinkyDungeonFlags.get("failUnfair")) grace = 0.4;
 			let armsbound = KinkyDungeonIsArmsBound(true, true);
 			if (KDRandom() - grace < (armsbound ? KDDoorKnobChance : KDDoorKnobChanceArms)) {
-				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobSuccess" + ((armsbound) ? "" : "Arms")), "#88ff88", 2);
+				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobSuccess" + ((armsbound) ? "" : "Arms")), KDBaseMint, 2);
 				open = true;
 			} else if (KDRandom() - grace < (armsbound ? KDDoorAttractChance : KDDoorAttractChanceArms) && DialogueBringNearbyEnemy(moveX, moveY, 10, true)) {
-				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobAttract" + ((armsbound) ? "" : "Arms")), "#ff5555", 2);
+				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobAttract" + ((armsbound) ? "" : "Arms")), KDBaseRed, 2);
 				KinkyDungeonMakeNoise(armsbound ? 6 : 3, moveX, moveY);
 				open = true;
 			} else {
-				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobFail" + (armsbound ? "" : "Arms")), "#ff5555", 2);
+				KinkyDungeonSendActionMessage(10, TextGet("KDDoorknobFail" + (armsbound ? "" : "Arms")), KDBaseRed, 2);
 				KinkyDungeonMakeNoise(armsbound ? 6 : 3, moveX, moveY);
 				if (!KinkyDungeonFlags.get("failUnfairFirst")) {
 					KinkyDungeonSetFlag("failUnfair", 5);

@@ -8,30 +8,6 @@ enum KDModifierEnum {
 	consumable,
 };
 
-let PostTranslationRecord: [string, string][] = [];
-let MissingCSVTranslation: Record<string, string> = {};
-
-function addTextKey(Name: string, Text: string) {
-	let ct = 0;
-
-	for (let screen of TextAllScreenCache.entries()) {
-		if (screen[0].includes("KinkyDungeon")) {
-			if (!screen[1].cache[Name]) MissingCSVTranslation[Name] = Text;
-			screen[1].cache[Name] = screen[1].translationcache[Text] || Text;
-			PostTranslationRecord.push([Name, Text]);
-		} else console.log("ERROR LOADING TEXT!!!");
-	}
-	if (ct == 0) KDLoadingTextKeys[Name] = Text;
-}
-function deleteTextKey(Name: string) {
-	let ct = 0;
-	for (let screen of TextAllScreenCache.entries()) {
-		if (screen[0].includes("KinkyDungeon")) {
-			delete screen[1].cache[Name];
-		} else console.log("ERROR LOADING TEXT!!!");
-	}
-	if (ct == 0) delete KDLoadingTextKeys[Name];
-}
 
 const cloneDeep = (obj: any) =>
 	JSON.parse(JSON.stringify(obj));
@@ -100,7 +76,8 @@ let KDCursedVariantsCreated: Record<string, Record<string, number>> = {};
 function KinkyDungeonAddCursedVariants(Restraint: restraint, Variants: string[]): void {
 	for (let v of Variants) {
 		if (KDCursedVars[v]) {
-			KinkyDungeonCloneRestraint(Restraint.name, Restraint.name+v, KDCursedVars[v].variant(Restraint, Restraint.name+v));
+			KinkyDungeonCloneRestraint(Restraint.name, Restraint.name+v,
+				KDCursedVars[v].variant(Restraint, Restraint.name+v));
 			if (!KDCursedVariantsCreated[Restraint.name]) KDCursedVariantsCreated[Restraint.name] = {};
 			KDCursedVariantsCreated[Restraint.name][v] = KDCursedVars[v].level;
 		}
@@ -543,12 +520,4 @@ function HasPerk(perk: string): boolean {
  */
 function KDPlayer(): entity {
 	return KinkyDungeonPlayerEntity;
-}
-
-function ExportMissingCSVLines() {
-	let str = "";
-	for (let [k,v] of Object.entries(MissingCSVTranslation)) {
-		str = str + k + ',"' + v + '"\n';
-	}
-	return str;
 }

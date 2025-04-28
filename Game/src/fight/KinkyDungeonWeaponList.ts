@@ -89,7 +89,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		events: [
 			{type: "armorBuff", trigger: "tick", offhand: true, kind: "Shield", power: 3.0},
 			{type: "blockBuff", trigger: "tick", offhand: true, kind: "Shield", power: 1.2},
-			{type: "slowLevel", trigger: "tick", offhand: true, kind: "Shield", power: 1},
+			{type: "inertia", trigger: "inertia", offhand: true, kind: "Shield", power: 1},
 			{type: "ElementalEffect", trigger: "playerAttack", power: 0, damage: "stun", time: 7}
 		]},
 	"ShieldReinforced": {name: "ShieldReinforced", damage: 3.0, chance: 0.4, staminacost: 5.5,  type: "crush", unarmed: false, rarity: 3, shop: true, sfx: "HeavySwing",
@@ -125,7 +125,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		tags: ["sword"],
 		crit: 1.5,
 		events: [
-			{type: "Patience", trigger: "tick", power: 11, buffType: "KatanaCharge", color: "#ffffff"},
+			{type: "Patience", trigger: "tick", power: 11, buffType: "KatanaCharge", color: KDBaseWhite},
 			{type: "KatanaBoost", trigger: "beforePlayerAttack", power: 0.25, sfx: "Fwoosh"},
 		]
 	},
@@ -306,7 +306,8 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		stamPenType: "Staff",
 		events: [
 			{type: "Buff", kind: "Staff", trigger: "tick", power: 0.2, buffType: "electricDamageBuff", offhand: true},
-			{type: "EchoDamage", trigger: "beforeDamageEnemy", aoe: 2.99, power: 1.5, damage: "electric"}]},
+			{type: "StaffStormAura", kind: "Staff", trigger: "tick"},
+			]},
 	"StaffDoll": {name: "StaffDoll", damage: 3.0, chance: 1.0, staminacost: 4.0, type: "soul", unarmed: false, rarity: 6, shop: true, sfx: "MagicSlash", magic: true,
 		tags: ["staff", "bondage"], noDamagePenalty: true,
 		crit: 1.1,
@@ -376,7 +377,8 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 1.4,
 		digSpell: "Pickaxe",
 		special: {type: "spell", spell: "Pickaxe", range: 1.5},
-		events: [{type: "ApplyBuff", trigger: "playerAttack", buff: {id: "ArmorDown", type: "ArmorBreak", duration: 6, power: -1.5, player: true, enemies: true, tags: ["debuff", "armor"]}}]},
+		events: [{type: "ApplyBuff", trigger: "playerAttack",
+			buff: {id: "ArmorDown", type: "ArmorBreak", duration: 6, power: 2, player: true, enemies: true, tags: ["debuff", "armor"]}}]},
 	"Torch": {name: "Torch", damage: 1.5, chance: 0.75, type: "fire", unarmed: false, rarity: 1, shop: true, sfx: "FireSpell",
 		crit: 1.1, noDamagePenalty: true,
 		angle: 0,
@@ -485,7 +487,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		tags: ["gun", "ranged", "duster"], noDamagePenalty: true,
 		clumsy: true,
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.02, power: 3, color: "#ffffff", prereq: "LightLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.02, power: 3, color: KDBaseWhite, prereq: "LightLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "PlayerRubberSniper", prereq: "Loaded", requiresEnergy: true, energyCost: 0.02, range: 12}},
@@ -515,7 +517,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 1.5,
 		tags: ["bow", "normalbow", "ranged"],
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.014, power: 1, color: "#ffffff", prereq: "LightLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.014, power: 1, color: KDBaseWhite, prereq: "LightLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "ArrowRecurve", prereq: "Loaded", requiresEnergy: true, energyCost: 0.014, range: 6}},
@@ -524,7 +526,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 1.5,
 		tags: ["bow", "normalbow", "ranged"],
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.018, power: 2, color: "#ffffff", prereq: "LightLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.018, power: 2, color: KDBaseWhite, prereq: "LightLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "ArrowLongbow", prereq: "Loaded", requiresEnergy: true, energyCost: 0.018, range: 8}},
@@ -534,7 +536,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 2.0,
 		tags: ["bow", "normalbow", "crossbow", "ranged"],
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.02, power: 3, color: "#ffffff", prereq: "HeavyLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.02, power: 3, color: KDBaseWhite, prereq: "HeavyLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "ArrowBolt", prereq: "Loaded", requiresEnergy: true, energyCost: 0.02, range: 8}},
@@ -544,7 +546,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 2.0,
 		tags: ["bow", "normalbow", "crossbow", "ranged"],
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.015, power: 3, color: "#ffffff", prereq: "LightLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.015, power: 3, color: KDBaseWhite, prereq: "LightLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "ArrowBoltPistol", prereq: "Loaded", requiresEnergy: true, energyCost: 0.015, range: 9}},
@@ -555,7 +557,7 @@ let KinkyDungeonWeapons: Record<string, weapon> = {
 		crit: 2.5,
 		tags: ["bow", "normalbow", "crossbow", "ranged"],
 		events: [
-			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.025, power: 5, color: "#ffffff", prereq: "HeavyLoad"},
+			{type: "Reload", trigger: "tick", requireEnergy: true, energyCost: 0.025, power: 5, color: KDBaseWhite, prereq: "HeavyLoad"},
 			{type: "Unload", trigger: "playerCastSpecial", power: 0, mult: 0},
 		],
 		special: {type: "spell", spell: "ArrowBoltHeavy", prereq: "Loaded", requiresEnergy: true, energyCost: 0.025, range: 12}},

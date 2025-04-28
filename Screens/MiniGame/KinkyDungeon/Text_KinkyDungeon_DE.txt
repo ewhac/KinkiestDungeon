@@ -66,7 +66,15 @@
 
 ### Keybindings
 
+### Mouse Shortcuts
 
+### Auto-path through NPCs
+
+### Auto-path through Doors
+
+### Show Enemy Binding as %
+
+### Auto-wait Through Delayed Actions
 
 ### Show Minimap Labels
 
@@ -85,6 +93,8 @@
 ### Use character palette for default outfit
 
 ### Show Background Art
+
+### Experimental Rendering (unstable)
 
 ### Mute when Minimized
 
@@ -190,7 +200,7 @@
 
 ### Show Trajectory on Auto-Path
 
-### Show Player Facing
+### Always Show Player Facing
 
 ### Show more learnable spells
 
@@ -672,7 +682,7 @@
 
 ### Unstable Magic
 
-### Spells do up to 60% additional damage based on distraction or miscast chance, whichever is higher.
+### Spells do up to 30% additional damage based on distraction or miscast chance, whichever is higher.
 
 ### Absolute Focus
 
@@ -1182,7 +1192,7 @@
 
 ### Enchanted (and cursed) wearables and weapons are unidentified until the item is used.
 
-### Unknown 
+### Unknown
 
 ### Copy (clipboard)
 
@@ -1254,9 +1264,9 @@
 
 ### Everywhere!
 
-### Physical Armor: 
+### Physical Armor:
 
-### Magic Armor: 
+### Magic Armor:
 
 ### In the Shadows: You are harder to see.
 
@@ -1264,7 +1274,7 @@
 
 ### Quickness: Your next movement is so fast it doesn't advance a turn.
 
-### All Damage Reduction: 
+### All Damage Reduction:
 
 ### You take PERCENT1 DAMAGETYPE damage, based on PERCENT2 DAMAGETYPE resist and PERCENT3 DAMAGECATEGORY modifier.
 
@@ -1516,7 +1526,7 @@
 
 ### You are protected from damage and can't be bound until the shield is broken!
 
-### Chance for a spell to fizzle: 
+### Chance for a spell to fizzle:
 
 ### Dodge Chance: Percent%, based on EVASIONSUM Evasion and EVASIONPENALTY% penalty.
 
@@ -1676,7 +1686,7 @@
 
 ### Clear Perks
 
-### Config 
+### Config
 
 ### Cancel
 
@@ -1800,15 +1810,15 @@
 
 ### Floor FLOORNUMBER: DUNGEONNAME
 
-### Lockpicks: 
+### Lockpicks:
 
-### Keys: 
+### Keys:
 
-### Magic Keys: 
+### Magic Keys:
 
-### Knife: 
+### Knife:
 
-### Mag. Knife: 
+### Mag. Knife:
 
 ### You climb down the stairs. The passage closes behind you.
 
@@ -2002,7 +2012,7 @@
 
 ### You find a medley of potions.
 
-### Rarity: 
+### Rarity:
 
 ### Lesser
 
@@ -2792,7 +2802,7 @@
 
 ### Forged in nightmares, woven in steel. Summons a Shadow Warrior on unaware targets for 2% ancient energy.
 
-### Deals shadow damage. Deals up to 30 bonus psychic damage on unaware (100%) or vulnerable (50%) targets. 
+### Deals shadow damage. Deals up to 30 bonus psychic damage on unaware (100%) or vulnerable (50%) targets.
 
 ### Axe
 
@@ -2800,11 +2810,11 @@
 
 ### Also deals 20 damage to enemies next to you. Deals slash damage.
 
-### Accuracy: 
+### Accuracy:
 
-### Crit Multiplier: 
+### Crit Multiplier:
 
-### Bind Crit Multiplier: 
+### Bind Crit Multiplier:
 
 ### Find the keys..
 
@@ -2822,9 +2832,9 @@
 
 ### You found something sticky and might be able to pull off fabrics.
 
-### Evasion: 
+### Evasion:
 
-### Visibility: 
+### Visibility:
 
 
 
@@ -2866,13 +2876,13 @@
 
 
 
-### Damage: 
+### Damage:
 
-### Bind: 
+### Bind:
 
-### Crit: 
+### Crit:
 
-### SP Cost: 
+### SP Cost:
 
 ### Cut PWR: AMNT%
 
@@ -5532,17 +5542,17 @@
 
 ### Shrine of SHRINETYPE
 
-### Tablet of 
+### Tablet of
 
-### Goddess: 
+### Goddess:
 
-### Goddess Blessing: 
+### Goddess Blessing:
 
-### Goddess Curse: 
+### Goddess Curse:
 
-### Mana Bonus: 
+### Mana Bonus:
 
-### Lack of Mana Penalty: 
+### Lack of Mana Penalty:
 
 ### Your excess mana helps you suppress the enchantment!
 
@@ -5562,11 +5572,11 @@
 
 ### You try to read the runes but cannot understand them.
 
-### Allies: 
+### Allies:
 
-### Enemies: 
+### Enemies:
 
-### Favorable: 
+### Favorable:
 
 ### None
 
@@ -6072,7 +6082,7 @@
 
 
 
-### You find 
+### You find
 
 
 
@@ -6197,6 +6207,12 @@
 ### A muzzle used to keep a Bast gag secure.
 
 ### The leather panel is tough and tight.
+
+### Blessed Muzzle
+
+### A muzzle enchanted with magical energies to keep its wearer's mouth sealed inescapably.
+
+### Made of an ancient and exotic form of leather.
 
 ### Bast Blindfold
 
@@ -6597,6 +6613,16 @@
 ### A leather strap secured onto your face and blocking vision.
 
 ### You can still see through the gap around your nose.
+
+
+
+### High-Security Blindfold
+
+### A chin harness stretches this leather blindfold tightly against your face.
+
+### Total blackout. The tough leather is reinforced with rivets.
+
+
 
 ### Magic Chastity Belt
 
@@ -7926,6 +7952,10 @@
 
 
 
+### Flipped Table
+
+### Relieved some stress.
+
 ### Unlit Torch
 
 ### Can be lit
@@ -8124,7 +8154,7 @@
 
 ### Vision
 
-### Components: 
+### Components:
 
 ### Arm Movements
 
@@ -9144,7 +9174,7 @@
 
 ### Precise Critical
 
-### When landing a critical strike with physical damage, accuracy over 100% is converted to bonus crit multiplier at 50% efficiency.
+### When landing a critical strike with physical damage, accuracy over 100% is converted to bonus crit multiplier at 25% efficiency (50% for Light weapons)
 
 ### Precise Magic
 
@@ -9758,7 +9788,7 @@
 
 ### Iron Blood
 
-### Channel 4 turns: Halves SP cost of melee attacks by 50%, but increases MP cost of spells by 25%. Ends on sleep or recast.
+### Channel 4 turns: Reduces SP cost of melee attacks by 30%, but increases MP cost of spells by 15%. Ends on recast.
 
 ### Your skin glows a pale red!
 
@@ -10528,7 +10558,7 @@
 
 ### You don't have enough maximum mana to cast this spell!
 
-### School: 
+### School:
 
 ### Generic
 
@@ -10538,15 +10568,15 @@
 
 ### Learn Spell
 
-### Spell Points: 
+### Spell Points:
 
 
 
-### Level: 
+### Level:
 
-### Spell Point Cost: 
+### Spell Point Cost:
 
-### Mana Cost: 
+### Mana Cost:
 
 
 
@@ -10578,19 +10608,19 @@
 
 ### Replace Spell 7
 
-### Current Spell 1: 
+### Current Spell 1:
 
-### Current Spell 2: 
+### Current Spell 2:
 
-### Current Spell 3: 
+### Current Spell 3:
 
-### Current Spell 4: 
+### Current Spell 4:
 
-### Current Spell 5: 
+### Current Spell 5:
 
-### Current Spell 6: 
+### Current Spell 6:
 
-### Current Spell 7: 
+### Current Spell 7:
 
 ### ???
 
@@ -10626,7 +10656,7 @@
 
 ### (A page from the Book of Aeons)|They say that Archmagus Sariel Vinlaga studied in this very library. Having gathered together all of human knowledge, magical, spiritual, technological, she tasked her twelve lesser magi with the job of sorting and collating the wealth of knowledge she had acquired. No one knows why she suddenly abandoned it, or why it remains in such disrepair today.
 
-### (A page from the Book of Aeons)|The Overgown Ruins remain a puzzle to scholars. Hardly any light comes through the cracks in the ceiling, and yet the area teems with life. It is known that the regenerative powers that keep humans from dying relies on an individual's own mana supply. So how do plants and beasts without mana survive? The devout say it is the Goddess of Restoration who preserves the jungle, but could it be that the Old Civilization developed a means of sustaining life underground? 
+### (A page from the Book of Aeons)|The Overgown Ruins remain a puzzle to scholars. Hardly any light comes through the cracks in the ceiling, and yet the area teems with life. It is known that the regenerative powers that keep humans from dying relies on an individual's own mana supply. So how do plants and beasts without mana survive? The devout say it is the Goddess of Restoration who preserves the jungle, but could it be that the Old Civilization developed a means of sustaining life underground?
 
 ### (A page from the Book of Aeons)|The problem of Energy has plagued civilization for millenia. Before the leylines were discovered, humankind relied on natural sources of power such as rivers and firewood. When the Crystal Caves were discovered, a great revolution occurred. No longer reliant on natural sources, civilizations could tap the wellsprings of chaotic energy underground to power machinery like never seen before.
 
@@ -11080,9 +11110,9 @@
 
 ### Enraged
 
-### Thankful
-
 ### Pleased
+
+### Thankful
 
 ### Neutral
 
@@ -11121,6 +11151,16 @@
 ### That's a good girl. Now behave yourself, okay? You're free to go.
 
 ### Looks like you got yourself in a bind! (she pats your butt playfully) Go make the others happy!
+
+### I hope you learned your lesson.|Now get your butt out of here.
+
+### You've been a good girl. I hope you don't make the same mistake again.|You can leave.
+
+### That's a good girl. Now behave yourself, okay?|You're free to go.
+
+### Looks like you got yourself in a bind!|(she pats your butt playfully)|You're free to go!
+
+
 
 ### Good girl.
 
@@ -11200,11 +11240,11 @@
 
 ### For 3 rep the goddess will grant you a key.
 
-### For 3 rep the goddess will grant you 
+### For 3 rep the goddess will grant you
 
 ### For 3 rep the goddess
 
-### For 3 rep the goddess 
+### For 3 rep the goddess
 
 ### The goddess will fully restore your mana in exchange for AMOUNT rep
 
@@ -11522,9 +11562,11 @@
 
 ### Resistances:
 
-### HP: 
+### HP:
 
-### Binding: 
+### Shield:
+
+### Binding:
 
 ### Ambivalent
 
@@ -11826,7 +11868,7 @@
 
 ### A supposedly reasonable difficulty curve.
 
-### Play the game the way it was intended. Cruel and restrictive. 
+### Play the game the way it was intended. Cruel and restrictive.
 
 ### Play at your own peril. Unlocked by double-clicking the Hard Mode button.
 
@@ -12238,7 +12280,7 @@
 
 ### I can't get free!
 
-### Hey! Where do you think you're going?
+### Hey! Where do you think you're going~
 
 ### You look like you're having fun!
 
@@ -17370,7 +17412,7 @@
 
 ### (The SPEAKER gives you a firm handshake)|Welcome to the sisterhood, adventurer!
 
-### (The SPEAKER tilts her head and shrugs)|Ah well. 
+### (The SPEAKER tilts her head and shrugs)|Ah well.
 
 ### (The SPEAKER frowns)|What is it?|You're not an enemy of justice, are you?
 
@@ -18850,7 +18892,7 @@
 
 ### Hmmmph? Mmmm! (Act worried and whimper)
 
-### (The SPEAKER folds her arms)|Mistress Oriel's orders 
+### (The SPEAKER folds her arms)|Mistress Oriel's orders
 
 ### Not in the 'System'?
 
@@ -18923,6 +18965,12 @@
 ### (The SPEAKER sits bound in mysterious ASCII glyphs)|(She is bugged and needs your help to get out)
 
 ### (Unlock her and file a bug report to Ada)
+
+
+
+### (This SPEAKER is a sub, but not YOUR sub!)
+
+
 
 ### (The SPEAKER sits restrained by your own hand.|Only someone with keys can let her out.)
 
@@ -18998,6 +19046,8 @@
 
 ### (Lock yourself inside)
 
+### (Check the occupant)
+
 ### (Try to lock NME into the furniture) (PRCNT% Chance)
 
 ### (You close the furniture around your unfortunate victim!)
@@ -19031,6 +19081,12 @@
 ### Cookie
 
 ### Pizza
+
+### (The table looks remarkably flippable)
+
+### (You knock over the table!)
+
+### (Flip the table)
 
 ### (There is a button on a control panel here.)
 
@@ -19086,7 +19142,7 @@
 
 ### Prerequisite
 
-### Unlocks: 
+### Unlocks:
 
 ### You need to learn REQUIREDSPELL before you can learn this one.
 
@@ -19134,7 +19190,7 @@
 
 ### Your harness projects energy tethers between your cuffs EnemyName activates it!
 
-### Turn Count: 
+### Turn Count:
 
 ### The Shopkeeper leashes you!
 
@@ -19518,7 +19574,9 @@
 
 ### Items on Ground:
 
-### Preloading Character Assets: 
+### Preloading Character Assets:
+
+### Currently Worn
 
 ### Uniforms
 
@@ -19860,11 +19918,13 @@
 
 ### Straight_Overstrap
 
+### Long Straight
+
 ### StraightBangs
 
 ### StraightBangs_Overstrap
 
-### MessyBack
+### Curly Back
 
 ### Messy
 
@@ -19875,8 +19935,6 @@
 ### Underlight
 
 ### CurlyBack
-
-### Curly Back
 
 ### Ponytail
 
@@ -23690,6 +23748,130 @@
 
 ### HeavyMaidKnight
 
+### BlondeFront
+
+### BlondeBangs
+
+### BlondeBack
+
+### FangMouth_Double
+
+### HoodCollar
+
+### BigBallTeethFang
+
+### MilitaryJacket_Sleeveless
+
+### MilitaryUniform_SleeveLeft
+
+### MilitaryUniform_SleeveRight
+
+### MilitaryUniform_Sleeves
+
+### MilitaryJacket
+
+### WhiteGloveLeft
+
+### WhiteGloveRight
+
+### WhiteGloves
+
+### UniformShirt_Sleeveless
+
+### UniformShirt_SleeveLeft
+
+### UniformShirt_SleeveRight
+
+### UniformShirt_Sleeves
+
+### UniformShirt
+
+### MilitaryUniform_Hat
+
+### Hat
+
+### HatRim
+
+### HatCap
+
+### HatGloriousInsignia
+
+### HatGloriousInsigniaHS
+
+### MilitaryUniform_Earphones
+
+### Headgear
+
+### HeadgearUnit
+
+### HeadgearEars
+
+### HeadgearEarsInner
+
+### HeadgearBack
+
+### MilitaryUniform_Searchlight
+
+### SearchlightPouch
+
+### Searchlight
+
+### SearchlightBase
+
+### SearchlightLens
+
+### MilitaryUniform_BeltPouch
+
+### BeltPouch
+
+### BeltPouchRim
+
+### MilitaryUniform_Webbing
+
+### Webbing
+
+### WebbingSide
+
+### WebbingHardware
+
+### WebbingName
+
+### WebbingUnderbust
+
+### WebbingUnderbustHardware
+
+### MilitaryUniform_Skirt
+
+### MilitaryUniform_Shoes
+
+### MilitaryUniform_TightsShorts
+
+### MilitaryUniform_SockLeft
+
+### MilitaryUniform_SockRight
+
+### Tights
+
+### MilitaryUniform_Hairpin
+
+### Hairpin
+
+### MilitaryUniform
+
+### ShirtSleeveLeft
+
+### ShirtForeArmLeft
+
+### ShirtSleeveRight
+
+### ShirtForeArmRight
+
+### ShirtShoulderRight
+
+### ShirtDress
+
+### ShirtDressChest
+
 ### RubyNecklace
 
 ### RubyChain
@@ -23770,8 +23952,6 @@
 
 ### SantaHat
 
-### Hat
-
 ### HatBack
 
 ### Fluff
@@ -23829,6 +24009,768 @@
 ### FashionFestiveHarnessStrap
 
 ### FashionFestiveHarness
+
+### FrillyHeadband
+
+### HeadbandBand
+
+### HeadbandBow
+
+### BowHeadband
+
+### BowHeadbandFrill
+
+### BackHime
+
+### HimeBack
+
+### BackShort
+
+### BackFlat
+
+### Bob
+
+### BobFront
+
+### FrontStraight2
+
+### FrontStraight2_Front
+
+### FrontStraight2_Overstrap
+
+### FrontSwept
+
+### FrontSweptSide
+
+### Vents
+
+### VentL
+
+### VentR
+
+### VentsInnerR
+
+### VentsInnerL
+
+### VentsFront
+
+### BigBraidBack
+
+### CurlyPonytail
+
+### DrillLeft
+
+### DrillRight
+
+### Twindrills
+
+### Twintails
+
+### PointyAhoge
+
+### RoundHat
+
+### HatTop
+
+### TopHatSmall
+
+### TopHatSmallBow
+
+### BlondeFrontM
+
+### BlondeBangsM
+
+### BlondeBackM
+
+### Mascara
+
+### MascaraL
+
+### MascaraR
+
+### Scar
+
+### PointyAntennae
+
+### AnthenaL
+
+### AnthenaR
+
+### PointyHorns
+
+### HornL
+
+### HornR
+
+### PointyTail
+
+### Tail
+
+### WolfEars2
+
+### EarLeft
+
+### EarRight
+
+### HairclipDual
+
+### HairclipLower
+
+### HairclipUpper
+
+### ChainPanties
+
+### PantiesChain
+
+### ChainPanties2
+
+### KittyPetCuffsWristLeft
+
+### KittyPetCuffsWristRight
+
+### KittyPetCuffsWrists
+
+### KittyPetCuffsElbowLeft
+
+### KittyPetCuffsElbowRight
+
+### KittyPetCuffsElbows
+
+### KittyPetCuffsArms
+
+### KittyPetCuffsAnklesLeft
+
+### KittyPetCuffsAnklesRight
+
+### KittyPetCuffsAnkles
+
+### KittyPetCuffsThighLeft
+
+### KittyPetCuffsThighRight
+
+### KittyPetCuffsThigh
+
+### KittyPetCuffsCollar
+
+### FashionKittyPetCuffsCollar
+
+### FashionKittyPetCuffsWristLeft
+
+### FashionKittyPetCuffsWristRight
+
+### FashionKittyPetCuffsWrists
+
+### FashionKittyPetCuffsElbowLeft
+
+### FashionKittyPetCuffsElbowRight
+
+### FashionKittyPetCuffsElbows
+
+### FashionKittyPetCuffsArms
+
+### FashionKittyPetCuffsAnklesLeft
+
+### FashionKittyPetCuffsAnklesRight
+
+### FashionKittyPetCuffsAnkles
+
+### FashionKittyPetCuffsThighLeft
+
+### FashionKittyPetCuffsThighRight
+
+### FashionKittyPetCuffsThigh
+
+### KittyPawCuffsWristLeft
+
+### KittyPawCuffsWristRight
+
+### KittyPawCuffsWrists
+
+### KittyPawCuffsElbowLeft
+
+### KittyPawCuffsElbowRight
+
+### KittyPawCuffsElbows
+
+### KittyPawCuffsArms
+
+### KittyPawCuffsAnklesLeft
+
+### KittyPawCuffsAnklesRight
+
+### KittyPawCuffsAnkles
+
+### KittyPawCuffsThighLeft
+
+### KittyPawCuffsThighRight
+
+### KittyPawCuffsThigh
+
+### FashionKittyPawCuffsWristLeft
+
+### FashionKittyPawCuffsWristRight
+
+### FashionKittyPawCuffsWrists
+
+### FashionKittyPawCuffsElbowLeft
+
+### FashionKittyPawCuffsElbowRight
+
+### FashionKittyPawCuffsElbows
+
+### FashionKittyPawCuffsArms
+
+### FashionKittyPawCuffsAnklesLeft
+
+### FashionKittyPawCuffsAnklesRight
+
+### FashionKittyPawCuffsAnkles
+
+### FashionKittyPawCuffsThighLeft
+
+### FashionKittyPawCuffsThighRight
+
+### FashionKittyPawCuffsThigh
+
+### KittyPetLeotardUnder
+
+### LeotardStripes
+
+### LeotardChestStripes
+
+### KittyPetLeotard
+
+### KittyPetLeotardRestraint
+
+### KittyPetUniformCollar
+
+### LeotardChestCollar
+
+### LeotardChestCollarLeft
+
+### LeotardChestCollarStripes
+
+### LeotardChestCollarStripesLeft
+
+### CollarDecoSymbol
+
+### ShoulderCuffLeft
+
+### ShoulderCuffStripeLeft
+
+### ShoulderCuffRight
+
+### ShoulderCuffStripeRight
+
+### KittyPetTail
+
+### TailStripe
+
+### KittyPetBlindfold
+
+### BlindfoldRim
+
+### BlindfoldBrow
+
+### FashionKittyPetBlindfold
+
+### KittyPetSteelCollar
+
+### FashionKittyPetSteelCollar
+
+### KittyPetMittenLeft
+
+### GloveLeftPaw
+
+### ForeGloveLeftPaw
+
+### KittyPetMittenRight
+
+### GloveRightPaw
+
+### ForeGloveRightPaw
+
+### KittyPetMittens
+
+### FashionKittyPetMittenLeft
+
+### FashionKittyPetMittenRight
+
+### FashionKittyPetMittens
+
+### KittyPetEars1
+
+### Ears1L
+
+### Ears1R
+
+### Ears1InnerL
+
+### Ears1InnerR
+
+### KittyPetEars2
+
+### Ears2L
+
+### Ears2R
+
+### Ears2InnerL
+
+### Ears2InnerR
+
+### KittyPetEarmuffs
+
+### EarmuffersL
+
+### EarmuffersR
+
+### KittyPetEarmuffsRestraint
+
+### KittyPetEars1Restraint
+
+### KittyPetEars2Restraint
+
+### KittyPetGag
+
+### GagCollar
+
+### KittyPetGagSeamless
+
+### GagSeamless
+
+### KittyPetGagMouth
+
+### GagMouth
+
+### KittyPetGagMouthSeamless
+
+### GagMouthSeamless
+
+### FashionKittyPetGag
+
+### FashionKittyPetGagSeamless
+
+### FashionKittyPetGagMouth
+
+### FashionKittyPetGagMouthSeamless
+
+### KittyPetsuit
+
+### ArmsPaws
+
+### LeftLegsPaws
+
+### FootLeftHogtiePaws
+
+### KittyPetSockLeft
+
+### SockLeftPaws
+
+### KittyPetSockRight
+
+### KittyPetSocks
+
+### KittyPetSocksRestraint
+
+### KittyPetPawLeft
+
+### KittyPetPawRight
+
+### KittyPetPaws
+
+### KittyPetPawsRestraint
+
+### KittyPetPawShortLeft
+
+### KittyPetPawShortRight
+
+### KittyPetPawsShort
+
+### KittyPetPawsShortRestraint
+
+### CapeRestraint
+
+### BreastplateRestraint
+
+### PauldronsRestraint
+
+### PauldronLeftRestraint
+
+### PauldronRightRestraint
+
+### PlateBootsRestraint
+
+### GauntletsRestraint
+
+### ChainShirtRestraint
+
+### ChainBikiniRestraint
+
+### ChainSkirt2Restraint
+
+### ChainSkirtRestraint
+
+### ChainPantiesRestraint
+
+### ChainPanties2Restraint
+
+### WarriorBootsRestraint
+
+### BustierChestRim
+
+### WarriorBustierRestraint
+
+### LeatherGlovesRestraint
+
+### RobeSleevesRestraint
+
+### KittyPetTailThin
+
+### Tail2
+
+### Tail2Stripe
+
+### KittyPetBlindfoldStitched
+
+### BlindfoldStich
+
+### KittyPetBlindfoldPanel
+
+### BlindfoldSmall
+
+### BlindfoldSmallStrap
+
+### KittyPetBlindfoldPanelStitched
+
+### FashionKittyPetBlindfoldPanel
+
+### FashionKittyPetBlindfoldStitched
+
+### FashionKittyPetBlindfoldPanelStitched
+
+### KittyPetBlindfoldStrap
+
+### BlindfoldStrap
+
+### FashionKittyPetBlindfoldStrap
+
+### KittyPetHarnessBlindfold
+
+### BlindfoldHarness
+
+### FashionKittyPetHarnessBlindfold
+
+### KittyPetEars3
+
+### Ears3L
+
+### Ears3R
+
+### Ears3InnerL
+
+### Ears3InnerR
+
+### KittyPetEars3Restraint
+
+### KittyPetHarnessGag
+
+### FaceHarness
+
+### FaceHarnessHardware
+
+### FaceHarnessStripe
+
+### KittyPetHarnessGagSeamless
+
+### KittyPetHarnessGagMouth
+
+### KittyPetHarnessGagMouthSeamless
+
+### FashionKittyPetHarnessGag
+
+### FashionKittyPetHarnessGagSeamless
+
+### FashionKittyPetHarnessGagMouth
+
+### FashionKittyPetHarnessGagMouthSeamless
+
+### KittyPetSockShortLeft
+
+### KittyPetSockShortRight
+
+### KittyPetSocksShort
+
+### KittyPetSocksShortRestraint
+
+### HarnessBlindfold
+
+### HarnessBlindfoldHarness
+
+### HarnessBlindfoldHarnessHardware
+
+### HarnessBlindfoldStrap
+
+### HarnessBlindfoldStrapHardware
+
+### FashionHarnessBlindfold
+
+### SideBang
+
+### Sides
+
+### Hair
+
+### Bang
+
+### LeftSideBang
+
+### RightSideBang
+
+### LeftPuff
+
+### RightPuff
+
+### Under
+
+### Highlight
+
+### FrontLeft
+
+### HighlightLeft
+
+### HighlightRight
+
+### EarringLeft
+
+### EarringRight
+
+### Cups
+
+### Seams
+
+### InnerEars
+
+### Tail1
+
+### Bikini
+
+### Insignia
+
+### Rivets
+
+### Ruffle
+
+### RimLeft
+
+### RimRight
+
+### Hardware
+
+### SleeveHems
+
+### BraBase
+
+### BraStripes
+
+### DecoBase
+
+### DecoCrystal
+
+### DecoHardware
+
+### CorsetBust
+
+### RuffleBust
+
+### Trim
+
+### Lace
+
+### Lens
+
+### LensLeft
+
+### LensRight
+
+### BaseMetal
+
+### Tie
+
+### Inner
+
+### LeftButton
+
+### RightButton
+
+### Waistband
+
+### WaistbandBelts
+
+### Mitten
+
+### Paw
+
+### Zipper
+
+### Cap
+
+### Cuff
+
+### Glow
+
+### UpperCuff
+
+### UpperDisplay
+
+### UpperLock
+
+### UpperGlow
+
+### Pins
+
+### Locks
+
+### Shackles
+
+### Runes
+
+### Buckles
+
+### Underskirt
+
+### Lining
+
+### Tag
+
+### Pads
+
+### Bell
+
+### LockPlate
+
+### LockBand
+
+### Shield
+
+### Pin
+
+### LockShackle
+
+### LockHighlight
+
+### Screen
+
+### Tether
+
+### LeotardUpper
+
+### StripesUpper
+
+### CollarRight
+
+### CollarLeft
+
+### StripesRight
+
+### StripesLeft
+
+### Symbol
+
+### LeftShoulder
+
+### LeftShoulderStripe
+
+### RightShoulder
+
+### RightShoulderStripe
+
+### Stitches
+
+### EarmuffL
+
+### EarmuffR
+
+### FeetPaws
+
+### LowerBody
+
+### UpperBody
+
+### Hem
+
+### LockPin
+
+### Binder
+
+### BinderStraps
+
+### BeltsLower
+
+### Lower
+
+### StrapHardware
+
+### Shoe
+
+### Sole
+
+### StrapRivets
+
+### Clips
+
+### Suit
+
+### Loop
+
+### InnerEarsLight
+
+### SkirtHem
+
+### SkirtStripe
+
+### TopRuffles
+
+### TopBelts
+
+### KneepadLeft
+
+### KneepadRight
+
+### JacketBottom
+
+### JacketSleeveLeft
+
+### JacketSleeveRight
+
+### ShirtBottom
+
+### Circle
+
+### Secret
+
+### Unit
+
+### Secret_UnderbustStrap
+
+### Secret_UnderbustHardware
+
+### Secret_Strap
+
+### Secret_Side
+
+### Secret_Hardware
+
+### Name
+
+### Secret_Pouch
+
+### Secret_Light
+
+### Secret_Base
+
+### Secret_Lens
+
+
 
 ### Hide Items
 
@@ -23920,7 +24862,7 @@
 
 ### Now with more leg room.
 
-### Slows you down by 1 level. +120 Block, +30 Physical Armor. Deals crush damage and stuns for 7 turns. Offhand: Slows you and gives the same block and armor bonus. Offhand bonuses from shields do not stack with a currently equipped shield.
+### Makes it slower to turn around. +120 Block, +30 Physical Armor. Deals crush damage and stuns for 7 turns. Offhand: Slows you and gives the same block and armor bonus. Offhand bonuses from shields do not stack with a currently equipped shield.
 
 ### You pick up a metal tower shield.
 
@@ -23942,7 +24884,7 @@
 
 ### Vanish
 
-### Make the targeted creature invisible, making you totally invisible for Duration turns. Attacking and casting spells reveals your presence but you are still harder to see.
+### Make the targeted creature invisible for Duration turns. Attacking and casting spells reveals your presence but you are still harder to see.
 
 ### The slime dissolves your clothing, leaving nothing but rubber against your skin...
 
@@ -24242,7 +25184,7 @@
 
 
 
-### Lower
+
 
 ### Spellbound Rope
 
@@ -24572,7 +25514,7 @@
 
 ### A rubber cylinder without any lewd intentions whatsoever.
 
-### Deals grope damage. 
+### Deals grope damage.
 
 ### You pick up a flexible rubber stick.
 
@@ -25126,7 +26068,7 @@
 
 ### Some say it comes from a bakery in heaven itself. Others say it is simply made from lab-grade materials, and actually tastes awful.
 
-### Unlocks a cursed item and/or removes all curses from one currently worn item of your choice.
+### Purifies and unlocks a cursed item and/or removes all curses from one currently worn item of your choice.
 
 ### Congratulations! Your continued patronage has earned you|one (1) round trip to the nearest affiliated shop!|Simply step into the portal to continue...|(the Goddess is not responsible for any mishaps or fraud pertaining to the use of this portal)
 
@@ -25324,8 +26266,6 @@
 
 ### Hands-Free: Weapon can be used without free hands.
 
-### Shield
-
 ### Shield: This weapon is intended for defensive use.
 
 ### Heavy: This weapon takes +1 turns to switch to. Cannot be reduced to 0 by perks or upgrades.
@@ -25356,7 +26296,7 @@
 
 ### Combat Training
 
-### Your training has granted a number of bonuses:|-Weapon stamina cost is reduced by 1% per 10 current WP, up to a max of 40%.|-Slow effects wear off more quickly.|-While you are above 0 WP you gain 1 slow resist.
+### Your training has granted a number of bonuses:|-Weapon stamina cost is reduced by 1% per 10 current WP, up to a max of 40%.|-Slow effects wear off more quickly.|-While you are above 10 Battle Rhythm you gain 1 slow resist.
 
 ### This is your current offhand weapon.
 
@@ -25458,9 +26398,9 @@
 
 ### Your RestraintName shatters and falls off!
 
-### Load Hotbar 
+### Load Hotbar
 
-### Save Hotbar 
+### Save Hotbar
 
 ### Clear Hotbar
 
@@ -26258,6 +27198,10 @@
 
 ### Infused
 
+### Explosive
+
+### Flaming
+
 ### Focusing
 
 ### of Empowerment
@@ -26486,7 +27430,7 @@
 
 ### Blade Dance
 
-### Costs 60 stamina to dash to an adjacent spot. If you are holding a physical weapon, deals cleave damage to nearby enemies equal to 50% weapon damage. If you have a Light offhand weapon, deal 75% of its damage as well.
+### Spend 30 + weapon SP cost to dash to an adjacent spot. Attacks nearby enemies for 50% damage, or 100% if holding a Light weapon. If holding a Light offhand weapon, attack with that one for another 50% damage.
 
 ### You spin towards a location, slashing at nearby enemies!
 
@@ -26634,7 +27578,7 @@
 
 
 
-### Receive the following restraints: 
+### Receive the following restraints:
 
 ### You will be bound with some form of restraint.
 
@@ -27206,7 +28150,7 @@
 
 ### Select a character to examine
 
-### Former Faction: 
+### Former Faction:
 
 
 
@@ -27358,6 +28302,10 @@
 
 
 
+### More Petsuits
+
+### Petsuits are favored over other heavy bondage.
+
 ### More Armbinders
 
 ### Armbinders are favored over other heavy bondage.
@@ -27400,7 +28348,7 @@
 
 ### You crouch and move slowly.
 
-### Owned by: 
+### Owned by:
 
 ### Warden's Belt
 
@@ -28060,7 +29008,7 @@
 
 ### You retrieve an interesting article dubbed 'the Robe of Chastity.
 
-### Took 
+### Took
 
 ### (As you slay the dragon, it begins shapeshifting into human form!)
 
@@ -28240,6 +29188,8 @@
 
 ### Kocaeli - Doll Storage
 
+### Kocaeli - Factory
+
 ### Kocaeli - AAA
 
 ### Kocaeli - DD
@@ -28254,7 +29204,13 @@
 
 ### Kocaeli - Magic Library
 
+### Kocaeli - Black Cat
+
+### Kocaeli - Black Cat 2
+
 ### Kocaeli - Underground Jungle
+
+### Kocaeli - Untitled
 
 ### Kocaeli - Lost Temple
 
@@ -28634,7 +29590,7 @@
 
 ### Negate Rune
 
-### Removes a rune on the target tile. If cast on self, removes all runes you've created instead. Casting on an enemy rune restores 10 mana instead.
+### Removes a rune on the target tile. If cast on self, removes all runes you've created instead. Casting on an enemy rune restores 10 mana instead. Drains 5 mana if cast on a runeless tile.
 
 ### You scribe a negation rune!
 
@@ -28778,11 +29734,13 @@
 
 ### Layer Bonus
 
-### NoDynamicArmor (0 or 1)
+### NoDynamicArmor (0/1)
 
-### HideOverridden (0 or 1)
+### AddPose
 
-### NoOverride (0 or 1)
+### HideOverridden (0/1)
+
+### NoOverride (0/1)
 
 ### Hide Pose (e.g. Xray)
 
@@ -28793,6 +29751,10 @@
 ### Hide Suffix (e.g TorsoUpper)
 
 ### Protected
+
+### Displace Amount
+
+### Erase Amount
 
 ### Load from File
 
@@ -28940,11 +29902,9 @@
 
 ### Fiber
 
-### Runes
+### Stock:
 
-### Stock: 
-
-### Inputs: 
+### Inputs:
 
 ### You slip off the conveyor!
 
@@ -29010,17 +29970,17 @@
 
 ### Heels
 
-### Equipped: 
+### Equipped:
 
-### Click to Add 
+### Click to Add
 
-### Apply 
+### Apply
 
-### Raw Material: 
+### Raw Material:
 
 ### Free Prisoner
 
-### Perk Unlocked: 
+### Perk Unlocked:
 
 ### Latex Solvent
 
@@ -29050,23 +30010,23 @@
 
 ### Choose Restraint
 
-### Def. Palette: 
+### Def. Palette:
 
 ### Set All Palette
 
 ### Guests
 
-### Assign to 
+### Assign to
 
-### Remove from 
+### Remove from
 
-### Can't assign to 
+### Can't assign to
 
-### Remove from party to assign 
+### Remove from party to assign
 
 ### Imprison
 
-### Opinion: 
+### Opinion:
 
 ### Last Seen on Floor FLR, LOC
 
@@ -29092,17 +30052,17 @@
 
 ### Any
 
-### NPC Opinion: 
+### NPC Opinion:
 
-### NPC Escape Status: 
+### NPC Escape Status:
 
-### NPC Binding: 
+### NPC Binding:
 
-### NPC Availability: 
+### NPC Availability:
 
-### Favorited: 
+### Favorited:
 
-### Rank: 
+### Rank:
 
 ### Minor
 
@@ -29214,7 +30174,7 @@
 
 ### Select a Binding Slot
 
-### Cost: 
+### Cost:
 
 ### Zoom set to PCNT%
 
@@ -29238,7 +30198,7 @@
 
 ### If arm components are unavailable, you can now apply bindings with verbal components only. Increases range of Truss em Up by 2 and all CMD spells by 1
 
-### Save Slot 
+### Save Slot
 
 ### Load Game
 
@@ -29296,11 +30256,11 @@
 
 ### Chaos Route
 
-### Map Seed: 
+### Map Seed:
 
 ### Will Overwrite NME!
 
-### Play Slot 
+### Play Slot
 
 ### Play (NO SLOT!)
 
@@ -29486,7 +30446,7 @@
 
 ### Deposit All
 
-### Auto-loot found 
+### Auto-loot found
 
 ###  (not picked up)
 
@@ -30048,6 +31008,8 @@
 
 ### Mystic wrappings constrict around your body!
 
+### You are slowed! Trying to move will cause you to lose a turn, but you can sprint at 2x SP cost.
+
 ### You'll need a sharp object to cut items. Look for a knife or a piece of scrap on the floor.
 
 ### If you can't get your knife into place, try sitting next to a crack on the wall.
@@ -30060,6 +31022,10 @@
 
 ### You can surrender in the menu if you want to be treated more gently.
 
+### That ghost looks less aggressive than the others. Maybe she can help?
+
+### Need help? Try asking a neutral NPC for assistance!
+
 ### You flanked the enemy! Now attack its weak point for massive damage!
 
 ### Enemies that miss an attack become vulnerable for a turn.
@@ -30068,7 +31034,17 @@
 
 ### before the attack lands! You can tell the difference by the border of the tiles.
 
+### Enemy attacks take time to hit. Make sure to step out of the warning tiles,
+
 ### You can dodge out of the way of most projectiles. Avoid the marked tiles.
+
+### 'Charge' is a unified ammunition for all of your weapons. Recharge it with ancient crystals.
+
+### Spent crystals can slot into some light fixtures to recharge them, but it requires 100 gold.
+
+### There is an elevator in this room, but it won't function until you defeat major enemies on this level.
+
+### If you can't escape from a restraint, try offering gold at a shrine devoted to its goddess.
 
 ### Defeating enemies recovers some willpower.
 
@@ -30417,3 +31393,71 @@
 ### You cast bondage ASCII glyphs!
 
 ### , Floor AMNT
+
+### Recolor
+
+### Only collect notable
+
+### Autorelease escaped
+
+### NME is not notable enough for your collection.
+
+### Auto-released NME due to Escape.
+
+### Your ITMN1 was cursed and transforms into a ITMN2!
+
+### Equipping Restraint...
+
+### Equipping Armor...
+
+### Using Consumable...
+
+### Struggling...
+
+### The ITMN1 is purified and returns to being a ITMN2!
+
+### Reverts if purified with item.
+
+### ...smaller than expected.
+
+### Comes with an artistic flair.
+
+### Set Pivot
+
+### Toggle click & drag
+
+### Settings
+
+### Scroll Controls:
+
+### Layer Text:
+
+### No Actions Available
+
+### Talk
+
+### Move To
+
+### Take Stairs
+
+### Allow Passing
+
+### Tie Up
+
+### Attempt to Tie
+
+### Move Closer to Tie
+
+### Sprint (AMNT)
+
+### Stop Waiting
+
+### (Already slept here)
+
+### (Will not low enough)
+
+### Move closer to interact
+
+### Several poles rise up out of the ground...
+
+### Various Scrolls

@@ -137,7 +137,7 @@ let KDQuests: Record<string, KDQuest> = {
 				else {
 					let point = KinkyDungeonGetRandomEnemyPoint(true);
 					if (point) {
-						let e = KinkyDungeonGetEnemy(["maid", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["maid", "miniboss"], undefined, {"maid": {mult: 4, bonus: 10}});
+						let e = KinkyDungeonGetEnemy(["maid", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["maid", "miniboss"], undefined, {"maid": {mult: 4, bonus: 10}});
 						if (e) {
 							let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 							if (epoint) {
@@ -154,7 +154,7 @@ let KDQuests: Record<string, KDQuest> = {
 						}
 						let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 						for (let i = 0; i < count; i++) {
-							e = KinkyDungeonGetEnemy(["maid"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["maid"], undefined, {"maid": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
+							e = KinkyDungeonGetEnemy(["maid"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["maid"], undefined, {"maid": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
 							let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 							if (e && epoint) {
 								let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
@@ -196,7 +196,7 @@ let KDQuests: Record<string, KDQuest> = {
 			if (KDRandom() < 0.6 && KDGameData.RoomType == "" && !KinkyDungeonBossFloor(MiniGameKinkyDungeonLevel)) {
 				let point = KinkyDungeonGetRandomEnemyPoint(true);
 				if (point) {
-					let e = KinkyDungeonGetEnemy(["wolfgirl", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["wolfgirl", "miniboss"], undefined, {"wolfgirl": {mult: 4, bonus: 10}});
+					let e = KinkyDungeonGetEnemy(["wolfgirl", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["wolfgirl", "miniboss"], undefined, {"wolfgirl": {mult: 4, bonus: 10}});
 					if (e) {
 						let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 						if (epoint) {
@@ -210,7 +210,7 @@ let KDQuests: Record<string, KDQuest> = {
 					}
 					let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 					for (let i = 0; i < count; i++) {
-						e = KinkyDungeonGetEnemy(["nevermere"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+						e = KinkyDungeonGetEnemy(["nevermere"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 						["nevermere"], undefined, {"wolfgirl": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
 						let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 						if (e && epoint) {
@@ -242,7 +242,7 @@ let KDQuests: Record<string, KDQuest> = {
 			if (KDRandom() < 0.6 && KDGameData.RoomType == "" && !KinkyDungeonBossFloor(MiniGameKinkyDungeonLevel)) {
 				let point = KinkyDungeonGetRandomEnemyPoint(true);
 				if (point) {
-					let e = KinkyDungeonGetEnemy(["dressmaker"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["dressmaker"], undefined, {"dressmaker": {mult: 4, bonus: 10}}, ["minor"]);
+					let e = KinkyDungeonGetEnemy(["dressmaker"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["dressmaker"], undefined, {"dressmaker": {mult: 4, bonus: 10}}, ["minor"]);
 					if (e) {
 						let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 						if (epoint) {
@@ -256,7 +256,7 @@ let KDQuests: Record<string, KDQuest> = {
 					}
 					let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 					for (let i = 0; i < count; i++) {
-						e = KinkyDungeonGetEnemy(["dressmaker"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["dressmaker"], undefined, {"dressmaker": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
+						e = KinkyDungeonGetEnemy(["dressmaker"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["dressmaker"], undefined, {"dressmaker": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
 						let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 						if (e && epoint) {
 							let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
@@ -297,7 +297,7 @@ let KDQuests: Record<string, KDQuest> = {
 					KDGameData.QuestData.DirtPiles.quota = KDGameData.QuestData.DirtPiles.pilesTotal;
 					let point = KinkyDungeonGetRandomEnemyPoint(true);
 					if (point) {
-						let e = KinkyDungeonGetEnemy(["maid", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["maid", "miniboss"], undefined, {"maid": {mult: 4, bonus: 10}});
+						let e = KinkyDungeonGetEnemy(["maid", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["maid", "miniboss"], undefined, {"maid": {mult: 4, bonus: 10}});
 						if (e) {
 							let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 							if (epoint) {
@@ -315,7 +315,7 @@ let KDQuests: Record<string, KDQuest> = {
 						}
 						let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 						for (let i = 0; i < count; i++) {
-							e = KinkyDungeonGetEnemy(["maid"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["maid"], undefined, {"maid": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
+							e = KinkyDungeonGetEnemy(["maid"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0', ["maid"], undefined, {"maid": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
 							let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 							if (e && epoint) {
 								let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
@@ -332,7 +332,7 @@ let KDQuests: Record<string, KDQuest> = {
 						}
 					}
 					KinkyDungeonChangeFactionRep("Maidforce", -0.2);
-					KinkyDungeonSendTextMessage(10, TextGet("KDNotEnoughDirtPiles"), "#ff8933", 4);
+					KinkyDungeonSendTextMessage(10, TextGet("KDNotEnoughDirtPiles"), KDBaseOrange, 4);
 				}
 
 
@@ -381,7 +381,7 @@ let KDQuests: Record<string, KDQuest> = {
 						if (point) {
 							let element = CommonRandomItemFromList("", ['fire', 'earth', 'air', 'water', 'ice']);
 
-							let e = KinkyDungeonGetEnemy(["elemental", "miniboss", element], MiniGameKinkyDungeonLevel + 8, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["elemental", element, "miniboss"], undefined, {"elemental": {mult: 4, bonus: 10}}, ["minor"]);
+							let e = KinkyDungeonGetEnemy(["elemental", "miniboss", element], MiniGameKinkyDungeonLevel + 8, KDCurrIndex(), '0', ["elemental", element, "miniboss"], undefined, {"elemental": {mult: 4, bonus: 10}}, ["minor"]);
 							if (e) {
 								let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 								if (epoint) {
@@ -397,7 +397,7 @@ let KDQuests: Record<string, KDQuest> = {
 							}
 							let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 							for (let i = 0; i < count; i++) {
-								e = KinkyDungeonGetEnemy(["elemental", element], MiniGameKinkyDungeonLevel + 4, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0', ["elemental", element], undefined, {"elemental": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
+								e = KinkyDungeonGetEnemy(["elemental", element], MiniGameKinkyDungeonLevel + 4, KDCurrIndex(), '0', ["elemental", element], undefined, {"elemental": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
 								let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
 								if (e && epoint) {
 									let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
@@ -441,10 +441,11 @@ let KDQuests: Record<string, KDQuest> = {
 							}
 						}
 					}
+					let epoint = point;
 					let count = 3 + KDRandom() * Math.min(4, KinkyDungeonDifficulty / 20);
 					for (let i = 0; i < count; i++) {
 						e = KinkyDungeonGetEnemy(["dollsmith"], MiniGameKinkyDungeonLevel + 4, 'bel', '0', ["dollsmith"], undefined, {"dollsmith": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
-						let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+						epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false) || point;
 						if (e && epoint) {
 							let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 							if (ee) {
@@ -594,12 +595,13 @@ let KDQuests: Record<string, KDQuest> = {
 				enemy.AI = "guard";
 			}
 
+			let epoint = point;
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["alchemist", "pink", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["alchemist", "pink", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["pink", "miniboss"], undefined, {"alchemist": {mult: 4, bonus: 10}});
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -609,10 +611,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "looseguard";
 							else ee.AI = KDGetAIOverride(ee, 'looseguard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -621,9 +623,9 @@ let KDQuests: Record<string, KDQuest> = {
 			}
 			count = 3 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["alchemist", "pink"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["alchemist", "pink"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["pink"], undefined, {"alchemist": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false);
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -633,10 +635,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "looseguard";
 						else ee.AI = KDGetAIOverride(ee, 'looseguard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -650,10 +652,11 @@ let KDQuests: Record<string, KDQuest> = {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
 			let count = 4 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
+			let epoint = point;
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["mummy"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["mummy"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["mummy"], undefined, {"mummy": {mult: 2, bonus: 10}}, ["miniboss", "boss", "submissive"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -663,10 +666,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "guard";
 						else ee.AI = KDGetAIOverride(ee, 'guard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -674,9 +677,9 @@ let KDQuests: Record<string, KDQuest> = {
 			}
 			count = 4 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["elf"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["elf"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["elf"], undefined, {"elf": {mult: 2, bonus: 10}}, ["miniboss", "boss", "turret"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -686,10 +689,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "guard";
 						else ee.AI = KDGetAIOverride(ee, 'guard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -706,10 +709,10 @@ let KDQuests: Record<string, KDQuest> = {
 			for (let enemy of e) {
 				KinkyDungeonSetEnemyFlag(enemy, "RopeQuest", -1);
 				KinkyDungeonSetEnemyFlag(enemy, "questtarget", -1);
-				enemy.gxx = point.x;
-				enemy.gyy = point.y;
-				enemy.spawnX = point.x;
-				enemy.spawnY = point.y;
+				enemy.gxx = enemy.x;
+				enemy.gyy = enemy.y;
+				enemy.spawnX = enemy.x;
+				enemy.spawnY = enemy.y;
 				enemy.AI = "looseguard";
 				enemy.homeCoord = KDGetCurrentLocation();
 			}
@@ -719,6 +722,7 @@ let KDQuests: Record<string, KDQuest> = {
 	"LeatherQuest": KDGenQuestTemplate("LeatherQuest", "ChainBeing", "Leather", (_goddess, _flag) => {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
+			let epoint = point;
 			let beings = ["ChainBeing", "CorruptedAdventurer", "ShadowGhast"];
 			let ens = KinkyDungeonSummonEnemy(point.x, point.y, beings[Math.floor(KDRandom() * beings.length)], Math.max(2, Math.min(6, Math.round(KDGetEffLevel()/4))), 2.9);
 			for (let enemy of ens) {
@@ -730,10 +734,10 @@ let KDQuests: Record<string, KDQuest> = {
 
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["dragon", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["dragon", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["dragon", "miniboss"], undefined, {"dragon": {mult: 4, bonus: 10}});
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -742,10 +746,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "looseguard";
 							else ee.AI = KDGetAIOverride(ee, 'looseguard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -755,9 +759,9 @@ let KDQuests: Record<string, KDQuest> = {
 
 			count = 3 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["dragonheart"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["dragonheart"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["dragon"], undefined, {"dragon": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -766,10 +770,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "looseguard";
 						else ee.AI = KDGetAIOverride(ee, 'looseguard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -783,11 +787,12 @@ let KDQuests: Record<string, KDQuest> = {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
+			let epoint = point;
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["oldrobot", "robot", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["oldrobot", "robot", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["robot", "miniboss"], undefined, {"oldrobot": {mult: 2, bonus: 10}}, ["turret"]);
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -797,10 +802,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "looseguard";
 							else ee.AI = KDGetAIOverride(ee, 'looseguard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -810,9 +815,9 @@ let KDQuests: Record<string, KDQuest> = {
 
 			count = 3 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["robot", "oldrobot"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["robot", "oldrobot"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["robot"], undefined, {"oldrobot": {mult: 2, bonus: 10}}, ["miniboss", "boss", "turret"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -822,10 +827,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "looseguard";
 						else ee.AI = KDGetAIOverride(ee, 'looseguard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -839,11 +844,12 @@ let KDQuests: Record<string, KDQuest> = {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
+			let epoint = point;
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["witch", "apprentice", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["witch", "apprentice", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["witch", "miniboss"], undefined, {"witch": {mult: 2, bonus: 10}});
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -853,10 +859,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "guard";
 							else ee.AI = KDGetAIOverride(ee, 'guard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -866,9 +872,9 @@ let KDQuests: Record<string, KDQuest> = {
 
 			count = 3 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["apprentice", "witch"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["apprentice", "witch"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["mage"], undefined, {"witch": {mult: 4, bonus: 10}, "apprentice": {mult: 4, bonus: 10}}, ["miniboss", "boss"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -878,10 +884,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "guard";
 						else ee.AI = KDGetAIOverride(ee, 'guard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -895,11 +901,12 @@ let KDQuests: Record<string, KDQuest> = {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
+			let epoint = point;
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["demon", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["demon", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["demon", "miniboss"], undefined, {"demon": {mult: 2, bonus: 10}});
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -909,10 +916,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "looseguard";
 							else ee.AI = KDGetAIOverride(ee, 'looseguard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -922,9 +929,9 @@ let KDQuests: Record<string, KDQuest> = {
 
 			count = 3 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["demon"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["demon"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["demon"], undefined, {"demon": {mult: 2, bonus: 10}}, ["miniboss", "boss"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -934,10 +941,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "looseguard";
 						else ee.AI = KDGetAIOverride(ee, 'looseguard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -951,11 +958,12 @@ let KDQuests: Record<string, KDQuest> = {
 		let point = KinkyDungeonGetRandomEnemyPoint(true);
 		if (point) {
 			let count = 1 + KDRandom() * Math.min(3, KDGetEffLevel()/3);
+			let epoint = point;
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["shadowclan", "miniboss"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["shadowclan", "miniboss"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["shadowclan", "miniboss"], undefined, {"shadowclan": {mult: 2, bonus: 10}});
 				if (e) {
-					let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+					epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 					if (epoint) {
 						let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 						if (ee) {
@@ -965,10 +973,10 @@ let KDQuests: Record<string, KDQuest> = {
 							if (KDCanOverrideAI(ee))
 								ee.AI = "guard";
 							else ee.AI = KDGetAIOverride(ee, 'guard');
-							ee.gxx = point.x;
-							ee.gyy = point.y;
-							ee.spawnX = point.x;
-							ee.spawnY = point.y;
+							ee.gxx = epoint.x;
+							ee.gyy = epoint.y;
+							ee.spawnX = epoint.x;
+							ee.spawnY = epoint.y;
 							ee.homeCoord = KDGetCurrentLocation();
 							KDRunCreationScript(ee, KDGetCurrentLocation());
 						}
@@ -977,9 +985,9 @@ let KDQuests: Record<string, KDQuest> = {
 			}
 			count = 4 + KDRandom() * Math.min(8, KDGetEffLevel()/3);
 			for (let i = 0; i < count; i++) {
-				let e = KinkyDungeonGetEnemy(["shadowclan"], MiniGameKinkyDungeonLevel + 2, (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), '0',
+				let e = KinkyDungeonGetEnemy(["shadowclan"], MiniGameKinkyDungeonLevel + 2, KDCurrIndex(), '0',
 					["shadowclan"], undefined, {"shadowclan": {mult: 2, bonus: 10}}, ["miniboss", "boss"]);
-				let epoint = KinkyDungeonGetNearbyPoint(point.x, point.y, true, undefined, false);
+				epoint = KinkyDungeonGetNearbyPoint(epoint.x, epoint.y, true, undefined, false) || point;
 				if (e && epoint) {
 					let ee = DialogueCreateEnemy(epoint.x, epoint.y, e.name);
 					if (ee) {
@@ -989,10 +997,10 @@ let KDQuests: Record<string, KDQuest> = {
 						if (KDCanOverrideAI(ee))
 							ee.AI = "guard";
 						else ee.AI = KDGetAIOverride(ee, 'guard');
-						ee.gxx = point.x;
-						ee.gyy = point.y;
-						ee.spawnX = point.x;
-						ee.spawnY = point.y;
+						ee.gxx = epoint.x;
+						ee.gyy = epoint.y;
+						ee.spawnX = epoint.x;
+						ee.spawnY = epoint.y;
 						ee.homeCoord = KDGetCurrentLocation();
 						KDRunCreationScript(ee, KDGetCurrentLocation());
 					}
@@ -1064,7 +1072,7 @@ function KDAddQuest(quest: string) {
 			KDQuests[quest].accept();
 		}
 		KDGameData.Quests.push(quest);
-		KinkyDungeonSendTextMessage(10, TextGet("KDNewQuest"), "#ffffff", 2);
+		KinkyDungeonSendTextMessage(10, TextGet("KDNewQuest"), KDBaseWhite, 2);
 	}
 }
 
@@ -1097,7 +1105,7 @@ function KinkyDungeonDrawQuest() {
 						Top: yStart + (II-KDQuestsIndex)*spacing - 40,
 						Width: width,
 						Height: 80,
-						Color: "#000000",
+						Color: KDBaseBlack,
 						LineWidth: 1,
 						zIndex: -18,
 						alpha: 0.3
@@ -1107,13 +1115,13 @@ function KinkyDungeonDrawQuest() {
 						Top: yStart + (II-KDQuestsIndex)*spacing - 40,
 						Width: width,
 						Height: 80,
-						Color: "#000000",
+						Color: KDBaseBlack,
 						LineWidth: 1,
 						zIndex: -18,
 						alpha: 0.9
 					});
 
-					DrawTextFitKD(TextGet("KDQuest_" + q), xStart + xOffset + 200, yStart + (II-KDQuestsIndex)*spacing, 850, "#ffffff", KDTextGray0, 28, "left");
+					DrawTextFitKD(TextGet("KDQuest_" + q), xStart + xOffset + 200, yStart + (II-KDQuestsIndex)*spacing, 850, KDBaseWhite, KDTextGray0, 28, "left");
 					KDDraw(kdcanvas, kdpixisprites, "kdquest" + q, KinkyDungeonRootDirectory + "Enemies/" + KDQuests[q]?.npc + ".png",
 						xStart + xOffset + 100, yStart + (II-KDQuestsIndex)*spacing - 36, 72, 72);
 					if (DrawButtonKDEx("kdquestquit" + q, (_b) => {
@@ -1121,10 +1129,10 @@ function KinkyDungeonDrawQuest() {
 							KDRemoveQuest(q);
 						return true;
 					}, true, xStart + xOffset + 1200, yStart + (II-KDQuestsIndex)*spacing - 36, 220, 72,
-					TextGet("KDQuestListCancel"), KDQuests[q]?.nocancel ? KDTextGray3 : "#ffffff",
+					TextGet("KDQuestListCancel"), KDQuests[q]?.nocancel ? KDTextGray3 : KDBaseWhite,
 					KinkyDungeonRootDirectory + "UI/X.png", "", false, true, KDButtonColor, undefined, true))
 						DrawTextFitKD(TextGet(KDQuests[q]?.nocancel ? "KDQuestListDescCancelFail" : "KDQuestListDescCancel"),
-							xStart + xOffset + 625, ytt, 1000, "#ffffff", KDTextGray0, 20, "center", 70);
+							xStart + xOffset + 625, ytt, 1000, KDBaseWhite, KDTextGray0, 20, "center", 70);
 				}
 
 				II++;
@@ -1137,20 +1145,20 @@ function KinkyDungeonDrawQuest() {
 	if (KDQuestsVisible == 0) {
 		let x = 1225 + xOffset;
 
-		DrawTextFitKD(TextGet("KDNoQuests"), x, 300, 1050, "#ffffff", KDTextGray0, 24);
+		DrawTextFitKD(TextGet("KDNoQuests"), x, 300, 1050, KDBaseWhite, KDTextGray0, 24);
 		//DrawTextFitKD(TextGet("KDNoQuests"),
-		//xStart + xOffset + 625, ytt, 1000, "#ffffff", KDTextGray0, 20, "center", 70);
+		//xStart + xOffset + 625, ytt, 1000, KDBaseWhite, KDTextGray0, 20, "center", 70);
 	}
 
 	if (KDQuestsVisible > KDMaxQuests) {
 		DrawButtonKDEx("questUp", (_b) => {
 			KDQuestsIndex -= 2;
 			return true;
-		}, true, xStart, yStart - spacing, 90, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Up.png");
+		}, true, xStart, yStart - spacing, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "Up.png");
 		DrawButtonKDEx("questDown", (_b) => {
 			KDQuestsIndex += 2;
 			return true;
-		}, true, xStart, yStart + KDMaxQuests*spacing, 90, 40, "", "#ffffff", KinkyDungeonRootDirectory + "Down.png");
+		}, true, xStart, yStart + KDMaxQuests*spacing, 90, 40, "", KDBaseWhite, KinkyDungeonRootDirectory + "Down.png");
 
 
 		KDQuestsIndex = Math.max(0, Math.min(KDQuestsIndex, KDQuestsVisible - Math.round(KDMaxQuests/2)));
@@ -1220,7 +1228,7 @@ function KDGenQuestTemplate(Name: string, Icon: string, Goddess: string, spawnFu
 			if (KDMapData.RoomType == "PerkRoom") {
 				KDRemoveQuest(Name);
 				KinkyDungeonChangeRep(Goddess, -KDDefaultGoddessQuestRep);
-				KinkyDungeonSendTextMessage(10, TextGet("KDQuestFail_" + Name), "#ffffff", 1);
+				KinkyDungeonSendTextMessage(10, TextGet("KDQuestFail_" + Name), KDBaseWhite, 1);
 				KDPlayerEffectRestrain(undefined, Math.round(restraintsCountMult * (1 + KDGetEffLevel()/3)), restraintsTags, "Goddess", false, true, false, false, false, "Divine", {
 					Progressive: true,
 					DontPreferWill: true,
@@ -1239,16 +1247,16 @@ function KDGenQuestTemplate(Name: string, Icon: string, Goddess: string, spawnFu
 					}
 				}
 				for (let i = 0 ; i < 3; i++) {
-					KinkyDungeonLoot(KDGetEffLevel(), (KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint] || MiniGameKinkyDungeonCheckpoint), Name);
+					KinkyDungeonLoot(KDGetEffLevel(), KDCurrIndex(), Name);
 				}
 				KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/" + "Magic" + ".ogg");
 
 				KinkyDungeonChangeRep(Goddess, (!KinkyDungeonFlags.get("QuestFirstRep")) ? 2.5 + Rep : Rep);
 				KinkyDungeonSetFlag("QuestFirstRep", -1, 1);
-				KinkyDungeonSendTextMessage(10, TextGet("KDQuestSucceed" + (KinkyDungeonGoddessRep.Ghost > 1 ? "Sub" : "") + "_" + Name), "#ffffff", 1);
+				KinkyDungeonSendTextMessage(10, TextGet("KDQuestSucceed" + (KinkyDungeonGoddessRep.Ghost > 1 ? "Sub" : "") + "_" + Name), KDBaseWhite, 1);
 				KDRemoveQuest(Name);
 				for (let inv of KinkyDungeonAllRestraintDynamic()) {
-					if (inv.item.lock == "Divine") KinkyDungeonLock(inv.item, "");
+					if (inv.item.lock == "Divine") KinkyDungeonLock(inv.item, "", false, false, false, false);
 				}
 			}
 		},

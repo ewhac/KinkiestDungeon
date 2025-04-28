@@ -731,10 +731,10 @@ let KDTeaseAttacks: KDTeaseAttacksType = {
 						roll = Math.min(roll, KDRandom());
 					}
 					if (roll < KinkyDungeonTorsoGrabChance + bonus) {
-						KDGameData.MovePoints = Math.min(-1, KDGameData.MovePoints);
+						KDDoSlow(_player, 1);
 						let msg = TextGet("KinkyDungeonTorsoGrab").replace("RestraintName", KDGetItemNameString(harnessRestraintName)).replace("EnemyName", TextGet("Name" + enemy.Enemy.name));
 
-						KinkyDungeonSendTextMessage(5, msg, "#ff8933", 1);
+						KinkyDungeonSendTextMessage(5, msg, KDBaseOrange, 1);
 
 						if (KDRandom() < actionDialogueChance)
 							KinkyDungeonSendDialogue(enemy, TextGet("KinkyDungeonRemindJail" + (KDGetEnemyPlayLine(enemy) ? KDGetEnemyPlayLine(enemy) : "") + "Grab").replace("EnemyName", TextGet("Name" + enemy.Enemy.name)), KDGetColor(enemy), 2, 4);

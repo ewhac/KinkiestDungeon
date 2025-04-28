@@ -11,18 +11,34 @@ let KinkyDungeonConsumables: Record<string, consumable> = {
 	"SmokeBomb" : {name: "SmokeBomb", noHands: true, rarity: 2, costMod: -1, shop: false, noConsumeOnUse: true, type: "targetspell", sfx: "FireSpell", spell: "SmokeBomb"},
 	"FlashBomb" : {name: "FlashBomb", noHands: true, rarity: 3, costMod: -1, shop: false, noConsumeOnUse: true, type: "targetspell", sfx: "FireSpell", spell: "FlashBomb"},
 	"Flashbang" : {name: "Flashbang", noHands: true, rarity: 4, costMod: -1, shop: false, noConsumeOnUse: true, type: "targetspell", sfx: "FireSpell", spell: "Flashbang"},
-	"PotionInvisibility" : {name: "PotionInvisibility", potion: true, rarity: 3, costMod: -1, shop: true, type: "spell", spell: "Invisibility", sfx: "PotionDrink"},
-	"Ectoplasm" : {name: "Ectoplasm", noHands: true, rarity: 1, shop: false, type: "spell", spell: "LesserInvisibility", sfx: "Invis"},
-	"Gunpowder" : {name: "Gunpowder", rarity: 1, shop: true, useQuantity: 1, noConsumeOnUse: true, type: "targetspell", spell: "Gunpowder", sfx: "FireSpell"},
+	"PotionInvisibility" : {name: "PotionInvisibility", potion: true, rarity: 3, costMod: -1, shop: true, type: "spell", gagFloor: 0.5, spell: "Invisibility", sfx: "PotionDrink"},
+
+	"PotionStrength" : {name: "PotionStrength", potion: true, itemEffect: "PotionDrink",
+		contains: "Strength",
+		rarity: 2, shop: true, type: "target", gagFloor: 0.5, sfx: "PotionDrink"},
+
+
+
+
+	"Ectoplasm" : {name: "Ectoplasm", noHands: true,
+		maxInventory: 100,
+		rarity: 1, shop: false, type: "spell", spell: "LesserInvisibility", sfx: "Invis"},
+	"Gunpowder" : {name: "Gunpowder", rarity: 1,
+		maxInventory: 100, shop: true, useQuantity: 1, noConsumeOnUse: true, type: "targetspell", spell: "Gunpowder", sfx: "FireSpell"},
 	"EarthRune" : {name: "EarthRune", rarity: 2, costMod: -1, shop: false, type: "spell", spell: "Earthrune", sfx: "HeavySwing"},
 	"RopeRune" : {name: "RopeRune", rarity: 2, costMod: -1, shop: false, type: "spell", spell: "EnchantRope", sfx: "HeavySwing"},
 	"WaterRune" : {name: "WaterRune", rarity: 2, costMod: -1, shop: false, type: "spell", spell: "WaterRune", sfx: "HeavySwing"},
-	"Bola" : {name: "Bola", rarity: 0, costMod: -1, shop: false, useQuantity: 1, noConsumeOnUse: true, type: "targetspell", spell: "PlayerBola"},
-	"LeashItem" : {name: "LeashItem", rarity: 2, costMod: -2, shop: true, useQuantity: 0, noConsumeOnUse: true, type: "targetspell", spell: "LeashSpell"},
+	"Bola" : {name: "Bola", rarity: 0, costMod: -1,
+		maxInventory: 25, shop: false, useQuantity: 1, noConsumeOnUse: true, type: "targetspell", spell: "PlayerBola"},
+	"LeashItem" : {name: "LeashItem",
+		maxInventory: 5, rarity: 2, costMod: -2, shop: true, useQuantity: 0, noConsumeOnUse: true, type: "targetspell", spell: "LeashSpell"},
 	"IceRune" : {name: "IceRune", rarity: 2, costMod: -1, shop: false, type: "spell", spell: "Icerune", sfx: "Freeze"},
-	"Bomb" : {name: "Bomb", rarity: 1, costMod: -1, shop: false, type: "spell", spell: "BombItem", sfx: "FireSpell"},
+	"Bomb" : {name: "Bomb", rarity: 1, costMod: -1,
+		maxInventory: 25, shop: false, type: "spell", spell: "BombItem", sfx: "FireSpell"},
 	"Dynamite" : {name: "Dynamite", rarity: 2, costMod: -1, shop: false, type: "spell", spell: "DynamiteItem", sfx: "FireSpell"},
-	"C4" : {name: "C4", rarity: 3, costMod: -1, shop: false, type: "spell", spell: "C4Item", sfx: "FireSpell"},
+	"C4" : {name: "C4", rarity: 3,
+		maxInventory: 5,
+		costMod: -1, shop: false, type: "spell", spell: "C4Item", sfx: "FireSpell"},
 	"ElfCrystal" : {name: "ElfCrystal", noHands: true, rarity: 3, costMod: -1, shop: false, type: "spell", spell: "Slippery", sfx: "MagicSlash"},
 	"EnchantedGrinder" : {name: "EnchantedGrinder", noHands: true, rarity: 4, shop: true, type: "spell", spell: "Cutting", sfx: "Laser"},
 	"MistressKey" : {name: "MistressKey", rarity: 8, costMod: -1, shop: false, type: "goldKey"},
@@ -33,18 +49,28 @@ let KinkyDungeonConsumables: Record<string, consumable> = {
 	"ScrollLegs" : {name: "ScrollLegs", sub: 0.25, noHands: true, rarity: 2, costMod: 1, shop: true, type: "buff", buff: "NoLegsComp", duration: 12, power: 1, aura: "#ffaaaa", sfx: "FireSpell"},
 	"ScrollPurity" : {name: "ScrollPurity", isSubby: true, sub: 0.20, noHands: true, rarity: 4, shop: true, type: "shrineRemove", shrine: "Vibes", sfx: "FireSpell"},
 
-	"DollID" : {name: "DollID", rarity: 0, shop: false, type: "dollID", noHands: true, sfx: "FutureLock", noConsumeOnUse: true},
-	"KeyCard" : {name: "KeyCard", rarity: 1, shop: false, type: "KeyCard", noHands: true, sfx: "FutureLock", noConsumeOnUse: true},
-	"CuffKeys" : {name: "CuffKeys", rarity: 1, sub: 0.25, shop: false, type: "CuffKeys", noConsumeOnUse: true},
-	"Pick" : {name: "Pick", sneakChance: 0.15, rarity: 0, sub: 0.25, shop: false, type: "Lockpick", noConsumeOnUse: true},
-	"RedKey" : {name: "RedKey", sneakChance: 0.1, rarity: 1, sub: 0.25, shop: false, type: "RedKey", noConsumeOnUse: true},
+	"DollID" : {name: "DollID", rarity: 0, shop: false,
+		maxInventory: 20, type: "dollID", noHands: true, sfx: "FutureLock", noConsumeOnUse: true},
+	"KeyCard" : {name: "KeyCard", rarity: 1, shop: false,
+		maxInventory: 20, type: "KeyCard", noHands: true, sfx: "FutureLock", noConsumeOnUse: true},
+	"CuffKeys" : {name: "CuffKeys", sneakChance: 0.1, rarity: 1, sub: 0.25, shop: false, type: "CuffKeys", noConsumeOnUse: true},
+	"Pick" : {name: "Pick", sneakChance: 0.15, rarity: 0, sub: 0.25, shop: false,
+		maxInventory: 20,
+		type: "Lockpick", noConsumeOnUse: true},
+	"RedKey" : {name: "RedKey", sneakChance: 0.1, rarity: 1, sub: 0.25,
+		maxInventory: 20,
+		shop: false, type: "RedKey", noConsumeOnUse: true},
 	"BlueKey" : {name: "BlueKey", rarity: 2, costMod: 2, shop: false, type: "BlueKey", noConsumeOnUse: true},
-	"Snuffer" : {name: "Snuffer", rarity: 3, costMod: -1, shop: true, type: "Snuffer", noConsumeOnUse: true},
-	"SackOfSacks" : {name: "SackOfSacks", rarity: 3, costMod: -2, shop: true, type: "SackOfSacks", noConsumeOnUse: true},
-	"DiscPick" : {name: "DiscPick", rarity: 4, costMod: -1, sub: 0.2, shop: true, type: "DiscPick", noConsumeOnUse: true, uniqueTags: ["pick"]},
+	"Snuffer" : {name: "Snuffer", rarity: 3, costMod: -1,
+		maxInventory: 1, shop: true, type: "Snuffer", noConsumeOnUse: true},
+	"SackOfSacks" : {name: "SackOfSacks", rarity: 3,
+		maxInventory: 1, costMod: -2, shop: true, type: "SackOfSacks", noConsumeOnUse: true},
+	"DiscPick" : {name: "DiscPick", rarity: 4, costMod: -1,
+		maxInventory: 5, sub: 0.2, shop: true, type: "DiscPick", noConsumeOnUse: true, uniqueTags: ["pick"]},
 
 	"UniversalSolvent" : {name: "UniversalSolvent", rarity: 5,
-		latexsolvent: 10, shop: true, useQuantity: 1, noConsumeOnUse: true, type: "targetspell", spell: "UniversalSolvent", sfx: "PotionDrink"},
+		latexsolvent: 10, shop: true, useQuantity: 1, noConsumeOnUse: true, type: "targetspell",
+		spell: "UniversalSolvent", sfx: "PotionDrink"},
 
 	"DivineTear" : {name: "DivineTear", rarity: 6, sub: 0.05, shop: true, delay: 3, power: 10, noHands: true, duration: 0, sfx: "Cookie", type: "RemoveCurseOrHex", noConsumeOnUse: true},
 };
@@ -58,6 +84,7 @@ let KDCookies: Record<string, consumable> = {
 		type: "restore", wp_instant: 1.5, wp_gradual: 0, scaleWithMaxWP: true, needMouth: true,
 		delay: 3, gagMax: 0.59, duration: 0, sfx: "Cookie",
 		sideEffects: ["subAdd"],
+		maxInventory: 30,
 		data: {
 			subAdd: 5,
 			subPower: 0.3,
@@ -68,6 +95,13 @@ let KDCookies: Record<string, consumable> = {
 Object.assign(KinkyDungeonConsumables, KDCookies);
 
 let KDRechargeCost = 100;
+
+/** Criteria that must be true for an enemy to sell you an item */
+let KDSellCriteria = {
+	Keyring: (seller: entity) => {
+		return KDMapData.EscapeMethod == "Key";
+	},
+}
 
 let KinkyDungneonBasic = {
 	"Key" : {name: "Key", rarity: 0, shop: false},
@@ -107,7 +141,11 @@ let KinkyDungneonShopRestraints = {
 	"Sunglasses2" : {name: "Sunglasses2", rarity: 2, shop: true, uniqueTags: ["shades"]},
 };
 
-let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity) => void> = {
+let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity, inv: item) => void> = {
+	"target": (c, entity, inv) => {
+		KDTargetConsumable(inv, 1, c.itemEffect);
+		return;
+	},
 	"Snuffer": (_Consumable, entity) => {
 		let tiles = KDGetEffectTiles(entity.x, entity.y);
 		for (let tile of Object.values(tiles)) {
@@ -121,7 +159,7 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 				return;
 			}
 		}
-		KinkyDungeonSendTextMessage(10, TextGet("KDNotSnuffable"), "#ff5555", 3);
+		KinkyDungeonSendTextMessage(10, TextGet("KDNotSnuffable"), KDBaseRed, 3);
 	},
 	"SackOfSacks": (_Consumable, entity) => {
 		let tiles = KDGetEffectTiles(entity.x, entity.y);
@@ -129,7 +167,7 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 			if (tile?.tags?.includes("unsackable")) {
 				tile.duration = 0;
 				KinkyDungeonAdvanceTime(1);
-				KinkyDungeonSendTextMessage(10, TextGet("KDUnbag"), "#ff5555", 3);
+				KinkyDungeonSendTextMessage(10, TextGet("KDUnbag"), KDBaseRed, 3);
 				return;
 			}
 			if (tile?.tags?.includes("sackable")) {
@@ -141,7 +179,7 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 				return;
 			}
 		}
-		KinkyDungeonSendTextMessage(10, TextGet("KDNotBaggable"), "#ff5555", 3);
+		KinkyDungeonSendTextMessage(10, TextGet("KDNotBaggable"), KDBaseRed, 3);
 	},
 	"RemoveCurseOrHex": (Consumable, entity) => {
 		if (!entity?.player) return;
@@ -151,9 +189,9 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 			KDGameData.UsingConsumable = Consumable.name;
 			KinkyDungeonDrawState = "Inventory";
 			KinkyDungeonCurrentFilter = Restraint;
-			KinkyDungeonSendTextMessage(8, TextGet("KDRemoveCurseOrHex"), "#ff5555", 1, true);
+			KinkyDungeonSendTextMessage(8, TextGet("KDRemoveCurseOrHex"), KDBaseRed, 1, true);
 		} else {
-			KinkyDungeonSendTextMessage(8, TextGet("KDRemoveCurseOrHexFail"), "#ff5555", 1, true);
+			KinkyDungeonSendTextMessage(8, TextGet("KDRemoveCurseOrHexFail"), KDBaseRed, 1, true);
 		}
 	},
 	"subAdd": (Consumable, entity) => {
@@ -162,10 +200,12 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 			KinkyDungeonChangeRep("Ghost", amount);
 		} else {
 			let power =
-			KinkyDungeonApplyBuffToEntity(entity, {id: Consumable.name,
-				type: "submissiveness", power: Math.max(0,
-					(Consumable.data.subPower as number) + (KDRandom() * (Consumable.data.subPowerVar as number))
-				), duration: Consumable.data.subDuration});
+			KinkyDungeonApplyBuffToEntity(entity, {
+				id: Consumable.name,
+				type: "submissiveness",
+				power: Math.max(0, (Consumable.data.subPower as number) + (KDRandom() * (Consumable.data.subPowerVar as number))),
+				duration: Consumable.data.subDuration as number,
+			});
 		}
 
 	},
@@ -187,13 +227,8 @@ let KDConsumableEffects: Record<string, (Consumable: consumable, entity: entity)
 			if (Consumable.scaleWithMaxAP) {
 				Distmulti = Math.max(KinkyDungeonStatDistractionMax / KDMaxStatStart);
 			}
-			let gagFloor = Consumable.gagFloor ? Consumable.gagFloor : 0;
-			let gagMult = (Consumable.potion && gagFloor != 1.0) ? Math.max(0, gagFloor + (1 - gagFloor) * (1 - Math.max(0, Math.min(1.0, KinkyDungeonGagTotal(true))))) : 1.0;
-			if (gagMult < 0.999) {
-				KinkyDungeonSendTextMessage(8, TextGet("KinkyDungeonConsumableLessEffective"), "#ff5277", 2);
-			}
+			let {gagFloor, gagMult} = KDGetGagMult(Consumable, entity, true);
 			if (Consumable.mp_instant != undefined) {
-				//let manaAmt = Math.min(KinkyDungeonStatManaMax, KinkyDungeonStatMana + Consumable.mp_instant * Manamulti * gagMult) - KinkyDungeonStatMana;
 				KDChangeMana(Consumable.name, "restore", "consumable", Consumable.mp_instant * Manamulti * gagMult, false, Consumable.mpool_instant * Manamulti * gagMult, false, true);
 			}
 			if (Consumable.wp_instant) KDChangeWill(Consumable.name, "restore", "consumable", Consumable.wp_instant * Willmulti * gagMult);

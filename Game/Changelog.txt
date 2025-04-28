@@ -35,9 +35,191 @@ TODO Add Cuddle play type
 - Mana cost of spells
 - decay per faction
 
-Note to Modders: if your mod alters the function KDFreeNPC you will have to reimplement some new functionality added, to avoid bugs!
+TODO add custom palette
+TODO also I might need to maybe fade out or hide slots that the player doesnt have any equippable restraints in
 
-TODO add ability to recolor own restraints via palette
+
+MODDERS: In 5.4.46 (commit 851e8941e9233ff4ee3952c5aacde7323ff0b0f1) I changed the handling of floor types considerably when passing thru stairs. Please handle accordingly.
+
+5.4.61
+- Unavailable context menu options are now greyed out
+- Added support for colored context menu text
+- Fixed various crashes in wardrobe
+- Added headpats toggle (disabled by default due to bugs)
+- Recolored warden's belt
+- Fixed latex boots never appearing ingame
+
+5.4.60
+- Optimized map generation so map generation is faster
+- Fixed the entire LoadTranslations function for mods missing o.o
+
+5.4.59
+- Click and hold on mobile now should open the context menu
+- Added some variables to help support click and drag development
+- Bugfix: Auto-move doesnt cancel when attacking
+- Bugfix: Punching hostiles in the face made them like you
+- Bugfix: Unidentified items no longer show stats in containers
+- Bugfix: Fix many missing lines caused by text provider rework
+- Bugfix: Fix flickering flirt dialogue
+- Bugfix: Fix wolf panties events not triggering when worn underneath something else
+- Bugfix: Choosing a multiclass option in NG+ actually works now
+- Bugfix: Starting restraints with certain starting perks now follow level restrictions more closely (with a minimum to keep from being trivial)
+
+
+5.4.58
+- Enabled headpats (thanks Enraa!)
+- Can now do selfbondage with rope, slime, and other generic materials
+- Added reinforced links
+- Added Steel cuffs
+- Yokes now prevent you from using hands on any restraints above the lower body
+- Novice pet no longer protects you from knockdowns while petsuited
+- Can now increase difficulty when doing NGP
+
+5.4.57
+- Problem solving now gives flat 20% bonus to bonuses
+- Angel now gives +15% bonus to Struggle
+- Fixed bugs with journey map not working properly
+
+5.4.56
+- Elven soap now boosts Remove, Unlock, and Pick by a lot and Struggle by less
+- Can now right click character portrait to show quick inv
+- Inventory limits are now in play (most consumables max 10). Can be toggled off in game options.
+- Added storage to elevator and perk room
+- allow selling stored items from shoppe
+- Angel now boosts cut by 5% more and remove by 10% more
+- Super strength works a bit differently but should be similar in power level
+- For mods: added restraint flags system
+
+5.4.55
+- added 'Show (mostly) full tooltips' toggle
+- added tutorial message about cycling tooltips
+- fixed bug where Fighter's Break Free and rogue's Hard To Catch were much stronger than intended
+- Basic Leash made more 'stretchy'
+
+5.4.54
+- Fixed highsec collar and blindfold not showing up as outfit options
+- added context menu options for tease, attack, aggro, and capture
+- added experimental context menu to activate weapon special
+
+5.4.53
+- Bugfixes
+
+5.4.52
+- Added latex kitty enemy
+
+5.4.51
+- Added Masterwork Gear enemy
+
+5.4.50
+- KinkyDungeonUpdateTether has been updated (modders beware)
+- Pickaxe buffed to remove 20 armor (and also fixed so it removes armor instead of adding)
+- Rubber locks can now be melted off with latex solvent
+
+
+5.4.49
+- Fixed many bugs
+- Escaping a slow via sprinting now always costs an extra 50 sp instead of 2x
+- Strip search should happen when jailed in more situations
+- Fixed the garters on the hisec corset not connecting to the thighhighs
+- Split corset into hardware layer as well
+
+5.4.48
+- Added HighSec restraints (and fashion restraints)
+
+5.4.47
+- Made some extensive changes to LinkUnder algorithm; hopefully less anomalous activity
+
+5.4.46
+- Fixed some bugs with worldgen
+
+5.4.44, 5.4.55
+- Fixed some memory leaks
+- Added text fading to make it more readable when there are floaters in the way
+- Fixed some bugs with text floaters being erratic
+
+5.4.43
+- Sagitta now tracks the target similar to other delayed spells
+- Added crotch rope versions of military skirt, maid knight heavy, maid knight light dresses and aprons
+- added context menu on right click
+
+5.4.42
+- Tower shield now adds inertia instead of slow level
+- Combat Training only applies at BR > 10
+- Blade Dance reworked to count as an attack. Simply deals bonus damage if holding a light offhand weapon.
+- Unstable magic nerfed to 30%
+- Iron blood nerfed to -30% SP cost and +15% MP cost
+- Precise critical now 25% efficiency, except Light weapons which are 50%
+
+5.4.41
+- New expert tool feature/mod tool: You can add pose "NoSwimsuits"/"NoChestArmor"/etc to prevent certain armor items from adding their models
+- Can now sprint while slowed, but stamina cost is doubled
+- Time passes a bit slower when stunned
+
+5.4.40
+- New hairstyles: "FrontSwept" "CurlyPonytail", "BigBraidBack", "Vents", "BackShort", "FrontStraight2", "BackHime", "Bob", "BackFlat", "TwinDrills"
+- Added RoundHat
+- Added FrillyHeadband and BowHeadband
+- Added TopHatSmall
+- Added functionality from Ilyasnow's Wardrobe Tools mod
+- Reorganized hairs
+- Added 'Currently Worn' category in wardrobe
+
+5.4.39
+- New Experimental Rendering (unsstable) option
+- Added kitty pet leotard
+- Added kitty pet uniform collar
+- Added kitty pet tail
+- Added kitty pet paws, gloves, and socks
+- Added kitty pet headgear and gag (fashion only atm)
+- Hopefully increased variety in restraint types (armbinder, boxbinder, jacket) in jail
+- Optimized RAM usage for displacement maps (hopefully).
+
+TODO
+- Middle mouse button to toggle sprint option
+- middle mouse to toggle passthrough?
+- middle mouse to interact
+- middle mouse to shoot
+- middle mouse to truss
+- middle mouse to cast spell 0/9
+- mouse shortcut menu?
+- pinch self
+- banish horny thoughts
+- tabs for playself
+- Glow around layer affected by current expert tools selection
+
+5.4.38
+- Additional optimizations to rendering
+- hopefully fixed a memory leak
+
+5.4.37
+- Added shibari cursed armor -- adds cosmetic rope when worn, mostly torso chest armor atm
+- Added skimpy cursed armor -- turns into a skimpier version, mostly just chain skirt atm
+- Fixed some bugs
+
+5.4.36
+- Damaging enemies will now slow their struggling temporarily.
+- Damaging enemy shield will pause its regen for 3 turns
+
+5.4.35
+- Some delayed actions like putting on armor can now be interrupted by clicking
+- Cursed armors are now Mimics
+- >they will turn into a restraint if given the chance, while cursed
+- >You have 10 turns before they can transform
+- Putting restraints or armor on can now be interrupted by being attacked
+- Putting on restraints or armor to yourself takes longer while bound
+- Fixed bug involving item duplication (e.g. when ancient ankle cuffs detach/attach)
+- Fixed ancient heels not providing slow reduction always
+
+5.4.34
+- Had to make some tweaks to the military uniform, sorry for inconvenience
+- Added some additional music for the bosses
+
+5.4.33
+- Added military uniform
+- Added pointy antennae, ahoge, horns, and tail
+- Added wolfears2
+- Added mascara, scar
+- various bugfixes
 
 5.4.32
 - Add fangmouth, fangmouth_double, and fanglessmouth version

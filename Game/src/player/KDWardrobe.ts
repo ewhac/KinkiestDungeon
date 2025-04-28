@@ -38,7 +38,7 @@ let KDModelListViewSkip = 7;
 let KDShowCharacterPalette = false;
 
 
-let KDModelList_Categories_index = 0;
+let KDModelList_Categories_index = 1;
 let KDModelList_Categories_viewindex = {index: 0};
 let KDModelList_Categories = [];
 let KDModelList_Toplevel_index = 0;
@@ -52,13 +52,72 @@ let KDModelListFilter = "";
 
 let KDRefreshProps = false;
 
+let KDCategoryFilterSpecial: Record<string, (C: Character, m: Model, stage: number, level: number) => boolean> = {
+	Worn: (C: Character, m: Model, stage: number, level) => {
+		return !!KDCurrentModels.get(C)?.Models?.get(m.Name) && (
+			level == 1
+			? KDModelIsProtected(KDCurrentModels.get(C)?.Models?.get(m.Name))
+			: !KDModelIsProtected(KDCurrentModels.get(C)?.Models?.get(m.Name))
+		);
+	}
+}
+
+let KDCategoryFilterSpecialSubClick: Record<string, (C: Character, en: any, index: number, name: string) => ((_bdata) => boolean)> = {
+
+}
+let KDCategoryFilterSpecialTopClick: Record<string, (C: Character, en: any, index: number, name: string) => ((_bdata) => boolean)> = {
+	Worn: (C, en, index, name) => {
+		return (_bdata: any) => {
+			if (!en) return false;
+
+			let removed = false;
+			for (let appIndex = 0; appIndex < C.Appearance.length; appIndex++) {
+				if (C.Appearance[appIndex]?.Model?.Name == name) {
+					if (KDModelList_Toplevel_index == index) {
+						KDChangeWardrobe(C);
+						C.Appearance.splice(appIndex, 1);
+						KDUpdateChar(C);
+					}
+					removed = true;
+					break;
+				}
+			}
+			if (!removed) {
+				let M = ModelDefs[name];
+				if (M) {
+					KDChangeWardrobe(C);
+					KDAddModel(C, M.Group || M.Name, M, "Default", undefined);
+					KDUpdateChar(C);
+				}
+
+
+			}
+
+
+			KDModelList_Toplevel_index = index;
+			KDCurrentLayer = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
+			KDCurrentLayerOrig = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
+			KDRefreshProps = true;
+			KDUpdateModelList(3, C);
+			if (KDCurrentModels.get(C).Models.has(name)) {
+				KDSelectedModel = C.Appearance.find((value) => {
+					return value.Model.Name == name;
+				})?.Model;
+			} else KDSelectedModel = null;
+			return true;
+		};
+	},
+}
+
+
 let KDWardrobeCategories = [
+	"Worn",
+	"Uniforms",
 	"Hairstyles",
-	"Cosplay",
 	"Face",
 	"Eyes",
 	"Mouth",
-	"Uniforms",
+	"Cosplay",
 	"Suits",
 	"Armor",
 	"Bodysuits",
@@ -82,7 +141,7 @@ let KDWardrobeCategories = [
 
 if (TestMode) KDWardrobeCategories.push("Restraints");
 
-let KDSelectedModel = null;
+let KDSelectedModel: Model = null;
 let KDColorSliders: LayerFilter = {
 	gamma: 1,
 	saturation: 1,
@@ -93,14 +152,15 @@ let KDColorSliders: LayerFilter = {
 	blue: 1,
 	alpha: 1,
 };
-let KDProps: LayerProperties = {
+let KDProps: LayerPropertiesType = {
 };
 let KDColorSliderColor = {
-	red: "#ff5555",
-	green: "#55ff55",
+	red: KDBaseRed,
+	green: KDBaseNeon,
 	blue: "#5555ff",
 };
 let KDCurrentLayer = "";
+let KDCurrentLayerOrig = "";
 
 let KDSavedColorCount = 18;
 let KDSavedColorPerRow = 9;
@@ -231,7 +291,7 @@ function KDDrawSavedColors(X: number, y: number, max: number, C: Character): voi
 				localStorage.setItem("kdcolorfilters", JSON.stringify(KDSavedColors));
 			}
 			return true;
-		}, true, X + spacing * i + 32 - 48, Y + 64, 48, 48, "", "#ffffff", KinkyDungeonRootDirectory + "UI/savedColor_copy.png", undefined, false, true);
+		}, true, X + spacing * i + 32 - 48, Y + 64, 48, 48, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/savedColor_copy.png", undefined, false, true);
 		DrawButtonKDEx("SavedColorPaste" + ii, (_bdata) => {
 			if (filters && KDSelectedModel) {
 				Object.assign(filters, KDSavedColors[ii]);
@@ -241,7 +301,7 @@ function KDDrawSavedColors(X: number, y: number, max: number, C: Character): voi
 				KDCurrentModels.get(C).Models.set(KDSelectedModel.Name, JSON.parse(JSON.stringify(KDSelectedModel)));
 			}
 			return true;
-		}, true, X + spacing * i + 32 + 0, Y + 64, 48, 48, "", "#ffffff", KinkyDungeonRootDirectory + "UI/savedColor_paste.png", undefined, false, true);
+		}, true, X + spacing * i + 32 + 0, Y + 64, 48, 48, "", KDBaseWhite, KinkyDungeonRootDirectory + "UI/savedColor_paste.png", undefined, false, true);
 	}
 }
 
@@ -254,16 +314,20 @@ let KDPropsSlider = false;
  * @param Model
  */
 function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): void {
-	DrawTextFitKD(TextGet("KDFilters"), X - 5 - 245 + 300, 25, 500, "#ffffff", KDTextGray0, undefined, "center");
+	DrawTextFitKD(TextGet("KDFilters"), X - 5 - 245 + 300, 25, 500, KDBaseWhite, KDTextGray0, undefined, "center");
 
 	DrawBoxKD(X, 50, 310, 600, KDButtonColor, true, 0.5, -10);
 	DrawBoxKD(X - 5 - 245, 5, 600, 700, KDButtonColor, false, 0.5, -10);
-	DrawTextFitKD(TextGet("KDLayers"), X - 120, 80, 300, "#ffffff", KDTextGray0, 22, "center");
+	DrawTextFitKD(TextGet("KDLayers"), X - 120, 80, 300, KDBaseWhite, KDTextGray0, 22, "center");
 
 	let YY = Y;
 	let width = 300;
 	let layers = KDGetColorableLayers(Model, KDPropsSlider);
-	if (!KDCurrentLayer) KDCurrentLayer = layers[0] || "";
+	if (!layers[0]) return;
+	if (!KDCurrentLayer) {
+		KDCurrentLayer = layers[0].name || "";
+		KDCurrentLayerOrig = layers[0].layer || "";
+	}
 
 	if (KDPropsSlider) {
 		let Properties = (Model.Properties ? Model.Properties[KDCurrentLayer] : undefined) || KDProps;
@@ -278,7 +342,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 			lastGlobalRefresh = CommonTime() - GlobalRefreshInterval + 10;
 			ForceRefreshModels(C);
 			return true;
-		}, true, X + width/2 + 10, YY, width/2 - 10, 30, TextGet("KDResetLayerProps"), "#ffffff");
+		}, true, X + width/2 + 10, YY, width/2 - 10, 30, TextGet("KDResetLayerProps"), KDBaseWhite);
 
 
 		if (!KDClipboardDisabled) {
@@ -288,16 +352,16 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 						navigator.clipboard.writeText(JSON.stringify(Model.Properties));
 					}
 					return true;
-				}, true, X + width/2 + 10, YY - 40, width/2 - 10, 30, TextGet("KDExportAllProps"), "#88ff88");
+				}, true, X + width/2 + 10, YY - 40, width/2 - 10, 30, TextGet("KDExportAllProps"), KDBaseMint);
 
 			DrawButtonKDEx("KDCopyProps", (_bdata) => {
 				navigator.clipboard.writeText(JSON.stringify(Properties));
 				return true;
-			}, true, X, YY, width/2 - 10, 30, TextGet("KDCopyLayer"), "#ffffff");
+			}, true, X, YY, width/2 - 10, 30, TextGet("KDCopyLayer"), KDBaseWhite);
 			DrawButtonKDEx("KDPasteProps", (_bdata) => {
 				navigator.clipboard.readText()
 					.then(text => {
-						let parsed: LayerProperties = JSON.parse(text);
+						let parsed: LayerPropertiesType = JSON.parse(text);
 						if (parsed) {
 							console.log(Object.assign({}, parsed));
 							KDChangeWardrobe(C);
@@ -310,9 +374,10 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 						}
 					});
 				return true;
-			}, true, X, YY - 40, width/2 - 10, 30, TextGet("KDPasteLayer"), "#ffffff");
+			}, true, X, YY - 40, width/2 - 10, 30, TextGet("KDPasteLayer"), KDBaseWhite);
 		} else {
-			let CF = KDTextField("KDCopyProperties", X, YY - 50, width, 30, undefined, undefined, "300");
+			let CF = KDTextField("KDCopyProperties", X, YY - 50,
+				width, 30, undefined, undefined, "300", 12);
 			if (CF.Created) {
 				CF.Element.oninput = (_event: any) => {
 					let value = ElementValue("KDCopyProperties");
@@ -347,25 +412,10 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		YY += 60;
 
 		/** Property fields */
-		let fields: Record<keyof LayerProperties, string> = {
-			"XOffset": "0",
-			"YOffset": "0",
-			"XPivot": "0",
-			"YPivot": "0",
-			"XScale": "1",
-			"YScale": "1",
-			"Rotation": "0",
-			"LayerBonus": "0",
-			"Protected": "0",
-			"SuppressDynamic": "0",
-			"HideOverridden": "0",
-			"NoOverride": "0",
-			"ExtraHidePoses": ",",
-			"ExtraRequirePoses": ",",
-			ExtraHidePrefixPose: ",",
-			ExtraHidePrefixPoseSuffix: ",",
-			AddPose: ",",
-		};
+		let fields: Record<keyof LayerPropertiesType, string> = KDGetLayerPropFields();
+
+		let XXOff = 0;
+		let dXXOff = width/2;
 
 		if (KDRefreshProps) {
 			KDRefreshProps = false;
@@ -373,16 +423,34 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		} else {
 			let YYold = YY;
 			YY -= 24;
+			let start = true;
+			let lastlong = false;
 			for (let field0 of Object.entries(fields)) {
 
 				let field = field0[0];
 				let deff = field0[1];
+				let long = deff.includes(',');
 
-				DrawTextFitKD(TextGet("KDPropField_" + field), X + width/2 + 10, YY + 10, width, "#ffffff", "#000000", 20);
+				if (!start) {
+					if (!long && !lastlong && XXOff < dXXOff) XXOff += dXXOff;
+					else {
+						XXOff = 0;
+						YY += 30;
+					}
+				} else {
+					start = false;
+				}
 
 
-				let FF = KDTextField("KDPropField" + field, X, YY, width, 20,
-					undefined, undefined, "100", "18");
+
+				DrawTextFitKD(TextGet("KDPropField_" + field),
+				X + (long ? width/2 : width/4) + 10 + XXOff,
+				YY + 10, long ? width : width/2, KDBaseWhite, KDBaseBlack, 20);
+
+
+				let FF = KDTextField("KDPropField" + field, X + XXOff, YY,
+					long ? width : width/2, 20,
+					undefined, undefined, "100", 18);
 				if (FF.Created) {
 					if (Model.Properties && Model.Properties[KDCurrentLayer])
 						ElementValue("KDPropField" + field, Model.Properties[KDCurrentLayer][field]);
@@ -417,8 +485,10 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 				}
 
 
+				if (long) lastlong = true;
+				else lastlong = false;
 
-				YY += 30;
+				//YY += 30;
 			}
 			YY = YYold + 400;
 		}
@@ -439,7 +509,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 			lastGlobalRefresh = CommonTime() - GlobalRefreshInterval + 10;
 			ForceRefreshModels(C);
 			return true;
-		}, true, X + width/2 + 10, YY, width/2 - 10, 30, TextGet("KDResetLayer"), "#ffffff");
+		}, true, X + width/2 + 10, YY, width/2 - 10, 30, TextGet("KDResetLayer"), KDBaseWhite);
 
 
 
@@ -450,12 +520,12 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 						navigator.clipboard.writeText(JSON.stringify(Model.Filters));
 					}
 					return true;
-				}, true, X + width/2 + 10, YY - 40, width/2 - 10, 30, TextGet("KDExportAllLayers"), "#88ff88");
+				}, true, X + width/2 + 10, YY - 40, width/2 - 10, 30, TextGet("KDExportAllLayers"), KDBaseMint);
 
 			DrawButtonKDEx("KDCopyLayer", (_bdata) => {
 				navigator.clipboard.writeText(JSON.stringify(filters));
 				return true;
-			}, true, X, YY, width/2 - 10, 30, TextGet("KDCopyLayer"), "#ffffff");
+			}, true, X, YY, width/2 - 10, 30, TextGet("KDCopyLayer"), KDBaseWhite);
 			DrawButtonKDEx("KDPasteLayer", (_bdata) => {
 				navigator.clipboard.readText()
 					.then(text => {
@@ -469,7 +539,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 						}
 					});
 				return true;
-			}, true, X, YY - 40, width/2 - 10, 30, TextGet("KDPasteLayer"), "#ffffff");
+			}, true, X, YY - 40, width/2 - 10, 30, TextGet("KDPasteLayer"), KDBaseWhite);
 		} else {
 			let CF = KDTextField("KDCopyFilter", X, YY - 50, width, 30, undefined, undefined, "300");
 			if (CF.Created) {
@@ -511,8 +581,8 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		if (KDToggles.SimpleColorPicker) {
 			let force = false;
 			for (let key of ["brightness", "contrast"]) {
-				DrawTextFitKD(TextGet("KDColorSlider" + key) + ": " + (Math.round((key == "brightness" ? KDVisualBrightness : (0.2 * filters[key]))*100)/100), X + width/2, YY, width, "#ffffff", "#000000", 20);
-				KinkyDungeonBar(X, YY - 15, width, 30, Math.min(100, (key == "brightness" ? KDVisualBrightness : (filters[key]/3))*100), KDColorSliderColor[key] || "#ffffff", "#000000");
+				DrawTextFitKD(TextGet("KDColorSlider" + key) + ": " + (Math.round((key == "brightness" ? KDVisualBrightness : (0.2 * filters[key]))*100)/100), X + width/2, YY, width, KDBaseWhite, KDBaseBlack, 20);
+				KinkyDungeonBar(X, YY - 15, width, 30, Math.min(100, (key == "brightness" ? KDVisualBrightness : (filters[key]/3))*100), KDColorSliderColor[key] || KDBaseWhite, KDBaseBlack);
 				if ((mouseDown) && MouseIn(X, YY - 15, width, 30)) {
 					MouseClicked = false;
 					if (CommonTime() > lastFilterUpdate + FilterUpdateInterval) {
@@ -584,7 +654,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 				KDDraw(kdcanvas, kdpixisprites, "colorpickercolor", KinkyDungeonRootDirectory + "Color.png", X - 12 + x + radius, YY - 12 + y + radius, 23, 23, 0,
 					{
 						tint: RegExp.test(value) ?
-							new PIXI.Color(ElementValue("KDSelectedColor")).toNumber() : 0xffffff,
+							new PIXI.Color(ElementValue("KDSelectedColor")).toNumber() : 0xfffafa,
 					});
 			} else {
 				if (ColorPickerFilterCode) {
@@ -665,8 +735,8 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 			YY += 300;
 		} else {
 			for (let key of Object.keys(KDColorSliders)) {
-				DrawTextFitKD(TextGet("KDColorSlider" + key) + ": " + (Math.round(filters[key]*100)/100), X + width/2, YY, width, "#ffffff", "#000000", 20);
-				KinkyDungeonBar(X, YY - 15, width, 30, filters[key]/5*100, KDColorSliderColor[key] || "#ffffff", "#000000");
+				DrawTextFitKD(TextGet("KDColorSlider" + key) + ": " + (Math.round(filters[key]*100)/100), X + width/2, YY, width, KDBaseWhite, KDBaseBlack, 20);
+				KinkyDungeonBar(X, YY - 15, width, 30, filters[key]/5*100, KDColorSliderColor[key] || KDBaseWhite, KDBaseBlack);
 				if ((mouseDown) && MouseIn(X, YY - 15, width, 30)) {
 					MouseClicked = false;
 					if (CommonTime() > lastFilterUpdate + FilterUpdateInterval) {
@@ -700,7 +770,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 
 
 		YY += 70;
-		DrawTextFitKD(TextGet("KDColorHex"),X + width/2, YY - 40, 300, "#ffffff", KDTextGray0, undefined, "center");
+		DrawTextFitKD(TextGet("KDColorHex"),X + width/2, YY - 40, 300, KDBaseWhite, KDTextGray0, undefined, "center");
 		let TF = KDTextField("KDSelectedColor", X - 10, YY - 20, width, 30);
 		if (TF.Created) {
 			TF.Element.oninput = (_event: any) => {
@@ -733,24 +803,25 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		}
 	}
 
+	KDDrawWardrobeToolsButtons(X, Y, C, Model);
 
 
 	DrawButtonKDEx("tab_ColorPickerSimple", (_b) => {
 		KDToggles.SimpleColorPicker = true;
 		KDPropsSlider = false;
 		return true;
-	}, true, X - 240, YY + 40, 190, 30, TextGet("KDColorPickerSimple"), "#ffffff", undefined, undefined, undefined,
+	}, true, X - 240, YY + 40, 190, 30, TextGet("KDColorPickerSimple"), KDBaseWhite, undefined, undefined, undefined,
 	KDPropsSlider || !KDToggles.SimpleColorPicker, KDButtonColor);
 	DrawButtonKDEx("tab_ColorPickerAdvanced", (_b) => {
 		KDToggles.SimpleColorPicker = false;
 		KDPropsSlider = false;
 		return true;
-	}, true, X - 240 + 200, YY + 40, 190, 30, TextGet("KDColorPickerAdvanced"), "#ffffff", undefined, undefined, undefined,
+	}, true, X - 240 + 200, YY + 40, 190, 30, TextGet("KDColorPickerAdvanced"), KDBaseWhite, undefined, undefined, undefined,
 	KDPropsSlider || KDToggles.SimpleColorPicker, KDButtonColor);
 	DrawButtonKDEx("tab_ColorPickerProperties", (_b) => {
 		KDPropsSlider = true;
 		return true;
-	}, true, X - 240 + 400, YY + 40, 190, 30, TextGet("KDColorPickerProperties"), "#ffffff", undefined, undefined, undefined,
+	}, true, X - 240 + 400, YY + 40, 190, 30, TextGet("KDColorPickerProperties"), KDBaseWhite, undefined, undefined, undefined,
 	!KDPropsSlider, KDButtonColor);
 
 
@@ -761,7 +832,18 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 	let buttonSpacing = 30;
 	while (YY < 590) {
 		if (ii >= KDLayerIndex) {
-			let l = layers[ii];
+			let ll = layers[ii];
+			let l = ll?.name || "";
+			let str = "";
+			if (l) {
+				if (!KDPropsSlider || KDWToolsLayerAbbrMode == "Full") {
+					str = TextGet(`m_${Model.Name}_l_${l}`);
+				} else {
+					str = !HasText(`l_${Model.Name}_${l}`) ? KDAbbreviate(l)
+					: KDAbbreviate(TextGet(`m_${Model.Name}_l_${l}`));
+				}
+			}
+
 			DrawButtonKDExScroll("SelectLayer" + YY,
 				(amount) => {
 					KDLayerIndex += Math.min(5, Math.abs(amount)/35) * Math.sign(amount);
@@ -771,11 +853,13 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 				(_bdata) => {
 					if (l) {
 						KDCurrentLayer = l;
+						KDCurrentLayerOrig = ll.layer;
 					}
 					KDRefreshProps = true;
 					return true;
-				}, true, X - 220, YY, 200, buttonSpacing - 1, l ? TextGet(`l_${Model.Name}_${l}`) : "",
-				"#ffffff", undefined, undefined, undefined, KDCurrentLayer != l, KDButtonColor);
+				}, true, X - 220, YY, 200, buttonSpacing - 1,
+				l ? str : "",
+				KDBaseWhite, undefined, undefined, undefined, KDCurrentLayer != l, KDButtonColor);
 			YY += buttonSpacing;
 		}
 		ii += 1;
@@ -787,7 +871,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		return true;
 	}, true, X-220, 620, 200, buttonSpacing - 1,
 	"",
-	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -799,7 +883,7 @@ function KDDrawColorSliders(X: number, Y: number, C: Character, Model: Model): v
 		return true;
 	}, true, X-220, 100, 200, buttonSpacing - 1,
 	"",
-	KDModelList_Toplevel_viewindex.index > 0 ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index > 0 ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -905,8 +989,8 @@ function KDDrawPoseButtons(C: Character, X: number = 960, Y: number = 750, allow
 			true,
 			X + i*buttonSpacing, Y + 120, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseArms[i] + ".png",
-			undefined, false, KDNPCPoses.get(C).CurrentPoseArms != KDWardrobe_PoseArms[i], !AvailableArms.includes(KDWardrobe_PoseArms[i]) ? "#ff5555" : KDButtonColor);
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseArms[i] + ".png",
+			undefined, false, KDNPCPoses.get(C).CurrentPoseArms != KDWardrobe_PoseArms[i], !AvailableArms.includes(KDWardrobe_PoseArms[i]) ? KDBaseRed : KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseLegs.length; i++) {
 		DrawButtonKDEx("PoseLegs" + i,
@@ -914,43 +998,43 @@ function KDDrawPoseButtons(C: Character, X: number = 960, Y: number = 750, allow
 			true,
 			X + xoff + i*buttonSpacing, Y + 180, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseLegs[i] + ".png",
-			undefined, false, KDNPCPoses.get(C).CurrentPoseLegs != KDWardrobe_PoseLegs[i], !AvailableLegs.includes(KDWardrobe_PoseLegs[i]) ? "#ff5555" : KDButtonColor);
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseLegs[i] + ".png",
+			undefined, false, KDNPCPoses.get(C).CurrentPoseLegs != KDWardrobe_PoseLegs[i], !AvailableLegs.includes(KDWardrobe_PoseLegs[i]) ? KDBaseRed : KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseEyes.length; i++) {
 		DrawButtonKDEx("PoseEyes" + i, buttonClick("", "", KDWardrobe_PoseEyes[i]), true, X + i*buttonSpacing, Y, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseEyes[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseEyes[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseEyes != KDWardrobe_PoseEyes[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseEyes.length; i++) {
 		DrawButtonKDEx("PoseEyes2" + i, buttonClick("", "", "", KDWardrobe_PoseEyes2[i]), true, X + i*buttonSpacing, Y + 60, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseEyes2[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseEyes2[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseEyes2 != KDWardrobe_PoseEyes2[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseBrows.length; i++) {
 		DrawButtonKDEx("PoseBrows" + i, buttonClick("", "", "", "", KDWardrobe_PoseBrows[i]), true, X + 400 + i*buttonSpacing, Y, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBrows[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBrows[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseBrows != KDWardrobe_PoseBrows[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseBrows2.length; i++) {
 		DrawButtonKDEx("PoseBrows2" + i, buttonClick("", "", "", "", "", KDWardrobe_PoseBrows2[i]), true, X + 400 + i*buttonSpacing, Y + 60, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBrows2[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBrows2[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseBrows2 != KDWardrobe_PoseBrows2[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseBlush.length; i++) {
 		DrawButtonKDEx("PoseBlush" + i, buttonClick("", "", "", "", "", "", KDWardrobe_PoseBlush[i]), true, X + 400 + i*buttonSpacing, Y + 120, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBlush[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseBlush[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseBlush != KDWardrobe_PoseBlush[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseMouth.length; i++) {
 		DrawButtonKDEx("PoseMouth" + i, buttonClick("", "", "", "", "", "", "", KDWardrobe_PoseMouth[i]), true, X + 400 + i*buttonSpacing, Y + 180, buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseMouth[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseMouth[i] + ".png",
 			undefined, undefined, KDNPCPoses.get(C).CurrentPoseMouth != KDWardrobe_PoseMouth[i], KDButtonColor);
 	}
 	for (let i = 0; i < KDWardrobe_PoseFear.length; i++) {
@@ -961,7 +1045,7 @@ function KDDrawPoseButtons(C: Character, X: number = 960, Y: number = 750, allow
 			Y + 60,
 			buttonWidth, buttonWidth,
 			"",
-			"#ffffff", KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseFear[i] + ".png",
+			KDBaseWhite, KinkyDungeonRootDirectory + "Poses/"+KDWardrobe_PoseFear[i] + ".png",
 			undefined, undefined,
 			KDNPCPoses.get(C).CurrentPoseFear != KDWardrobe_PoseFear[i],
 			KDButtonColor);
@@ -972,10 +1056,11 @@ function KDDrawPoseButtons(C: Character, X: number = 960, Y: number = 750, allow
  * Updates the mopel list, only altering a level if the specified altered level is that low
  * @param level
  */
-function KDUpdateModelList(level: number = 0): void {
+function KDUpdateModelList(level: number = 0, C?: Character): void {
+	if (!C) C = KinkyDungeonPlayer;
 	if (level <= 0) {
 		KDModelList_Categories = [];
-		KDModelList_Categories_index = 0;
+		KDModelList_Categories_index = 1;
 		KDModelList_Categories_viewindex.index = 0;
 		for (let cat of KDWardrobeCategories) {
 			KDModelList_Categories.push(cat);
@@ -988,36 +1073,59 @@ function KDUpdateModelList(level: number = 0): void {
 		KDModelList_Toplevel_index = 0;
 		KDModelList_Toplevel_viewindex.index = 0;
 		for (let model of Object.entries(ModelDefs)) {
-			if (model[1].TopLevel && (KDModelListFilter || model[1].Categories?.includes(category)) && (TestMode || !model[1].Restraint)) {
-				if (!KDModelListFilter || TextGet(model[0]).toLowerCase().includes(KDModelListFilter.toLowerCase()))
+			if ((model[1].TopLevel || KDCategoryFilterSpecial[category]) && (KDModelListFilter ||
+				(KDCategoryFilterSpecial[category] ? KDCategoryFilterSpecial[category](C, model[1], level, 1)
+				: model[1].Categories?.includes(category))) && (TestMode || !model[1].Restraint)) {
+				if (!KDModelListFilter
+					|| TextGet(model[0])?.toLowerCase().includes(KDModelListFilter.toLowerCase()))
 					KDModelList_Toplevel.push(model[0]);
 			}
 		}
 
 	}
-	let toplevel = KDModelList_Toplevel[KDModelList_Toplevel_index];
+	let toplevel: string = KDModelList_Toplevel[KDModelList_Toplevel_index];
 
 	if (level <= 2) {
 		KDModelList_Sublevel = [];
 		KDModelList_Sublevel_index = 0;
 		KDModelList_Sublevel_viewindex.index = 0;
 		if (toplevel) {
+			let already = {};
 			// Put these at the top of the list
-			for (let model of Object.entries(ModelDefs)) {
-				if (model[1].Parent != toplevel && model[0] == toplevel && (TestMode || !model[1].Restraint)) {
-					if (!KDModelListFilter || TextGet(model[1].Parent).toLowerCase().includes(KDModelListFilter.toLowerCase()))
-						KDModelList_Sublevel.push(model[0]);
+			if (KDCategoryFilterSpecial[category]) {
+				for (let model of Object.entries(ModelDefs)) {
+					if (already[model[0]]) continue;
+					if (
+						KDCategoryFilterSpecial[category](C, model[1], level, 2))
+							{already[model[0]] = true; KDModelList_Sublevel.push(model[0]);}
+				}
+			} else {
+				for (let model of Object.entries(ModelDefs)) {
+					if (already[model[0]]) continue;
+					if ((model[1].Parent != toplevel
+						&& (!model[1].Parent2 || !model[1].Parent2.some((p) => {
+							return toplevel == p;
+						}))
+					)
+						 && model[0] == toplevel && (TestMode || !model[1].Restraint)) {
+						if (!KDModelListFilter || TextGet(model[1].Parent)?.toLowerCase().includes(KDModelListFilter.toLowerCase()))
+							{already[model[0]] = true; KDModelList_Sublevel.push(model[0]);}
+					}
+				}
+				for (let model of Object.entries(ModelDefs)) {
+					if (already[model[0]]) continue;
+					if (((model[1].Parent == toplevel
+						|| (model[1].Parent2 && model[1].Parent2.some((p) => {
+							return toplevel == p;
+						}))) || KDModelListFilter) && (TestMode || !model[1].Restraint)) {
+						if (!KDModelListFilter || TextGet(model[1].Name)?.toLowerCase().includes(KDModelListFilter.toLowerCase()))
+							{already[model[0]] = true; KDModelList_Sublevel.push(model[0]);}
+					}
 				}
 			}
-			for (let model of Object.entries(ModelDefs)) {
-				if ((model[1].Parent == toplevel || KDModelListFilter) && (TestMode || !model[1].Restraint)) {
-					if (!KDModelListFilter || TextGet(model[1].Name).toLowerCase().includes(KDModelListFilter.toLowerCase()))
-						KDModelList_Sublevel.push(model[0]);
-				}
-			}
+
+
 		}
-
-
 	}
 }
 
@@ -1040,34 +1148,48 @@ function KDChangeWardrobe(C: Character) {
 function KDDrawModelList(X: number, C: Character) {
 
 
-	let clickCategory = (en: any, index: number) => {
+	let clickCategory = (en: any, index: number, sublevel: any) => {
 		return (_bdata: any) => {
 			if (!en) return false;
 			KDModelList_Categories_index = index;
 			if (KDModelListFilter) {
 				KDModelListFilter = "";
-				KDUpdateModelList(0);
-				KDUpdateModelList(2);
+				KDUpdateModelList(0, C);
+				KDUpdateModelList(2, C);
 			}
-			KDUpdateModelList(1);
+			KDUpdateModelList(1, C);
+			if (sublevel && KDCurrentModels.get(C).Models.has(sublevel)) {
+				KDSelectedModel = C.Appearance.find((value) => {
+					return value.Model.Name == sublevel;
+				})?.Model;
+			} else KDSelectedModel = null;
 			return true;
 		};
 	};
-	let clickToplevel = (en: any, index: number) => {
+	let clickToplevel = (en: any, index: number, sublevel: any) => {
 		return (_bdata: any) => {
 			if (!en) return false;
 			KDModelList_Toplevel_index = index;
 			if (KDModelListFilter) {
 				KDModelListFilter = "";
-				KDUpdateModelList(0);
-				KDUpdateModelList(1);
+				KDUpdateModelList(0, C);
+				KDUpdateModelList(1, C);
 			}
-			KDUpdateModelList(2);
+			KDUpdateModelList(2, C);
 			let name = KDModelList_Sublevel[KDModelList_Sublevel_index] || "";
 			if (name) {
 				KDCurrentLayer = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
-			} else KDCurrentLayer = "";
+				KDCurrentLayerOrig = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
+			} else {
+				KDCurrentLayer = "";
+				KDCurrentLayerOrig = "";
+			}
 			KDRefreshProps = true;
+			if (sublevel && KDCurrentModels.get(C).Models.has(sublevel)) {
+				KDSelectedModel = C.Appearance.find((value) => {
+					return value.Model.Name == sublevel;
+				})?.Model;
+			} else KDSelectedModel = null;
 			return true;
 		};
 	};
@@ -1101,8 +1223,14 @@ function KDDrawModelList(X: number, C: Character) {
 
 			KDModelList_Sublevel_index = index;
 			KDCurrentLayer = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
+			KDCurrentLayerOrig = Object.keys(ModelDefs[name]?.Layers || {})[0] || "";
 			KDRefreshProps = true;
-			KDUpdateModelList(3);
+			KDUpdateModelList(3, C);
+			if (KDCurrentModels.get(C).Models.has(name)) {
+				KDSelectedModel = C.Appearance.find((value) => {
+					return value.Model.Name == name;
+				})?.Model;
+			} else KDSelectedModel = null;
 			return true;
 		};
 	};
@@ -1110,17 +1238,19 @@ function KDDrawModelList(X: number, C: Character) {
 	let buttonHeight = 38;
 	let buttonSpacing = 40;
 
-	DrawTextFitKD(TextGet("KDItemMenu"), X + 10, 25, 220, "#ffffff", KDTextGray0, undefined, "left");
+	DrawTextFitKD(TextGet("KDItemMenu"), X + 10, 25, 220, KDBaseWhite, KDTextGray0, undefined, "left");
 	DrawBoxKD(X - 5, 5, 650, 700, KDButtonColor, false, 0.5, -10);
 
 	let MF = KDTextField("KDModelListFilter", X+220, 10, 400, buttonHeight, undefined, undefined, "30");
 	if (MF.Created) {
 		MF.Element.oninput = (_event: any) => {
 			KDModelListFilter = ElementValue("KDModelListFilter");
-
+			if (KDModelList_Categories_index == 0) {
+				KDModelList_Categories_index = 1;
+			}
 			//KDUpdateModelList(1);
-			KDUpdateModelList(2);
-			KDUpdateModelList(3);
+			KDUpdateModelList(2, C);
+			KDUpdateModelList(3, C);
 		};
 	}
 
@@ -1140,17 +1270,19 @@ function KDDrawModelList(X: number, C: Character) {
 	}
 
 	let faded = "#888888";
-	KDSelectedModel = null;
 	// Draw each row
+	let mainCat = KDModelList_Categories[KDModelList_Categories_index];
 	for (let i = 0; i < KDModelListMax; i++) {
 
 		let index_cat = i + KDModelList_Categories_viewindex.index;
 		let category = KDModelList_Categories[index_cat];
+		let index_sub = i + KDModelList_Sublevel_viewindex.index;
+		let sublevel = KDModelList_Sublevel[index_sub];
 		//if (category)
 		DrawButtonKDExScroll("ClickCategory" + i, (amount) => {KDModelList_Categories_viewindex.index += Math.min(5, Math.abs(amount)/buttonHeight) * Math.sign(amount); cullIndex();},
-			clickCategory(category, index_cat), true, X+0, 100 + buttonSpacing * i, 190, buttonHeight,
+			clickCategory(category, index_cat, sublevel), true, X+0, 100 + buttonSpacing * i, 190, buttonHeight,
 			!category ? "" : TextGet("cat_" + category),
-			hasCategories[category] ? "#ffffff" : faded, "",
+			hasCategories[category] ? KDBaseWhite : faded, "",
 			undefined, undefined, index_cat != KDModelList_Categories_index, KDButtonColor);
 
 
@@ -1158,30 +1290,34 @@ function KDDrawModelList(X: number, C: Character) {
 		let toplevel = KDModelList_Toplevel[index_top];
 		//if (toplevel)
 		DrawButtonKDExScroll("ClickToplevel" + i, (amount) => {KDModelList_Toplevel_viewindex.index += Math.min(5, Math.abs(amount)/buttonHeight) * Math.sign(amount); cullIndex();},
-			clickToplevel(toplevel, index_top), true, X+220, 100 + buttonSpacing * i, 190, buttonHeight,
+			KDCategoryFilterSpecialTopClick[mainCat] ?
+					KDCategoryFilterSpecialTopClick[mainCat](C, toplevel, index_top, toplevel)
+					: clickToplevel(toplevel, index_top, sublevel)
+		, true, X+220, 100 + buttonSpacing * i, 190, buttonHeight,
 			!toplevel ? "" : TextGet("m_" + toplevel),
-			(KDCurrentModels.get(C).Models.has(toplevel) || hasTopLevel[toplevel]) ? "#ffffff" : faded, "",
+			(KDCurrentModels.get(C).Models.has(toplevel) || hasTopLevel[toplevel]) ? KDBaseWhite : faded, "",
 			undefined, undefined, index_top != KDModelList_Toplevel_index, KDButtonColor);
 
 
 
-		let index_sub = i + KDModelList_Sublevel_viewindex.index;
-		let sublevel = KDModelList_Sublevel[index_sub];
 		//if (sublevel) {
 		DrawButtonKDExScroll("ClickSublevel" + i, (amount) => {KDModelList_Sublevel_viewindex.index += Math.min(5, Math.abs(amount)/buttonHeight) * Math.sign(amount); cullIndex();},
-			clickSublevel(sublevel, index_sub, sublevel), true, X+440, 100 + buttonSpacing * i, 190, buttonHeight,
+			KDCategoryFilterSpecialSubClick[mainCat] ?
+					KDCategoryFilterSpecialSubClick[mainCat](C, sublevel, index_sub, sublevel)
+					: clickSublevel(sublevel, index_sub, sublevel), true, X+440, 100 + buttonSpacing * i, 190, buttonHeight,
 			!sublevel ? "" : TextGet("m_" + sublevel),
-			KDCurrentModels.get(C).Models.has(sublevel) ? "#ffffff" : faded, "",
+			KDCurrentModels.get(C).Models.has(sublevel) ? KDBaseWhite : faded, "",
 			undefined, undefined, index_sub != KDModelList_Sublevel_index, KDButtonColor);
-		if (sublevel) {
-			if (index_sub == KDModelList_Sublevel_index && KDCurrentModels.get(C).Models.has(sublevel)) {
+
+
+		if (!KDSelectedModel && sublevel) {
+			if (KDCurrentModels.get(C).Models.has(sublevel)) {
 				KDSelectedModel = C.Appearance.find((value) => {
 					return value.Model.Name == sublevel;
 				})?.Model;
 			}
 		}
-
-		// KDCurrentModels.get(KinkyDungeonPlayer).Models.has(model) ? "#ffffff" : "#888888", "");
+		// KDCurrentModels.get(KinkyDungeonPlayer).Models.has(model) ? KDBaseWhite : "#888888", "");
 	}
 
 	let cullIndex = () => {
@@ -1196,7 +1332,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+220, 100 + buttonSpacing * KDModelListMax, 200, buttonHeight,
 	"",
-	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1207,7 +1343,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+220, 100 + buttonSpacing * -1, 200, buttonHeight,
 	"",
-	KDModelList_Toplevel_viewindex.index > 0 ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index > 0 ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1218,7 +1354,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+440, 100 + buttonSpacing * KDModelListMax, 200, buttonHeight,
 	"",
-	KDModelList_Sublevel_viewindex.index + KDModelListMax < KDModelList_Sublevel_viewindex.index ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
+	KDModelList_Sublevel_viewindex.index + KDModelListMax < KDModelList_Sublevel_viewindex.index ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1228,7 +1364,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+440, 100 + buttonSpacing * -1, 200, buttonHeight,
 	"",
-	KDModelList_Sublevel_viewindex.index > 0 ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
+	KDModelList_Sublevel_viewindex.index > 0 ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1241,7 +1377,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+0, 100 + buttonSpacing * KDModelListMax, 200, buttonHeight,
 	"",
-	(KDModelList_Categories_viewindex.index + KDModelListMax < KDModelList_Categories_viewindex.index) ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
+	(KDModelList_Categories_viewindex.index + KDModelListMax < KDModelList_Categories_viewindex.index) ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1251,7 +1387,7 @@ function KDDrawModelList(X: number, C: Character) {
 		return true;
 	}, true, X+0, 100 + buttonSpacing * -1, 200, buttonHeight,
 	"",
-	KDModelList_Categories_viewindex.index > 0 ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
+	KDModelList_Categories_viewindex.index > 0 ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1293,7 +1429,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 			KinkyDungeonDressPlayer(C);
 			return true;
 		}, true, 800, 250, 64, 64,
-		TextGet("KDVisualOpt_HideArmorWardrobe"), KDToggles.HideArmorWardrobe, false, "#ffffff", undefined, {
+		TextGet("KDVisualOpt_HideArmorWardrobe"), KDToggles.HideArmorWardrobe, false, KDBaseWhite, undefined, {
 			maxWidth: 350,
 			fontSize: 24,
 			scaleImage: true,
@@ -1311,7 +1447,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 	if (KDPlayerSetPose) {
 		KDDrawPoseButtons(C, 1050, undefined, undefined, undefined, KDCanForcePose(C));
 	} else {
-		DrawTextFitKD(TextGet("KDQuickColor"), 1050, 735, 250, "#ffffff", KDTextGray0, undefined, "left");
+		DrawTextFitKD(TextGet("KDQuickColor"), 1050, 735, 250, KDBaseWhite, KDTextGray0, undefined, "left");
 		KDDrawSavedColors(1060, 760, KDSavedColorCount, C);
 	}
 	DrawButtonKDEx("SetPose", (_bdata) => {
@@ -1320,7 +1456,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		KDPlayerSetPose = !KDPlayerSetPose;
 		KDModalArea = false;
 		return true;
-	}, true, 715, 765, 240, 50, TextGet("KDChangePose"), "#ffffff",
+	}, true, 715, 765, 240, 50, TextGet("KDChangePose"), KDBaseWhite,
 	KinkyDungeonRootDirectory + "Poses/SetPose.png", "", false, false,
 		KDPlayerSetPose ? KDTextGray3 : KDButtonColor, undefined, true);
 
@@ -1332,7 +1468,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		KDRefreshCharacter.set(KinkyDungeonPlayer, true);
 		KinkyDungeonDressPlayer(KinkyDungeonPlayer, false, true);
 		return true;
-	}, true, 715, 820, 240, 50, TextGet("KDXRay"), "#ffffff",
+	}, true, 715, 820, 240, 50, TextGet("KDXRay"), KDBaseWhite,
 	KinkyDungeonRootDirectory + "UI/XRay" + KDToggleXRay + ".png", "", false, false,
 		KDToggleXRay ? KDTextGray3 : KDButtonColor, undefined, true);
 
@@ -1352,7 +1488,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 	DrawButtonKDEx("SetPalette", (_bdata) => {
 		KDShowCharacterPalette = !KDShowCharacterPalette;
 		return true;
-	}, true, 715, 875, 240, 50, TextGet("KDSetPalette"), "#ffffff",
+	}, true, 715, 875, 240, 50, TextGet("KDSetPalette"), KDBaseWhite,
 	KinkyDungeonRootDirectory + "UI/SetPalette.png", "", false, false,
 	undefined, undefined, true, o);
 
@@ -1363,14 +1499,14 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 				KDGetCharMetadata(C || KinkyDungeonPlayer)
 			)));
 		return true;
-	}, true, 715, 930, 115, 50, TextGet("KDBackupOutfits"), "#ffffff",
+	}, true, 715, 930, 115, 50, TextGet("KDBackupOutfits"), KDBaseWhite,
 	KinkyDungeonRootDirectory + "UI/Safe.png", "", false, false,
 	undefined, undefined, true);
 
 	DrawButtonKDEx("RestoreOutfit", (_bdata) => {
 		getFileInput(KDLoadOutfitDirect, C);
 		return true;
-	}, true, 835, 930, 115, 50, TextGet("KDLoadOutfits"), "#ffffff",
+	}, true, 835, 930, 115, 50, TextGet("KDLoadOutfits"), KDBaseWhite,
 	KinkyDungeonRootDirectory + "UI/Restore.png", "", false, false,
 	undefined, undefined, true);
 
@@ -1381,6 +1517,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 			KDDrawColorSliders(1625, 100, C, KDSelectedModel);
 		} else {
 			KDCurrentLayer = "";
+			KDCurrentLayerOrig = "";
 			KDRefreshProps = true;
 		}
 	}
@@ -1388,6 +1525,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 	// Return anon function anonymously
 	let clickButton = (index: number) => {
 		return (_bdata: any) => {
+			KDSelectedModel = null;
 			if (C == KinkyDungeonPlayer) {
 				KDOutfitStore[KDCurrentOutfit] = LZString.compressToBase64(CharacterAppearanceStringify(C || KinkyDungeonPlayer,
 					KDGetCharMetadata(C || KinkyDungeonPlayer)
@@ -1435,7 +1573,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		};
 	};
 
-	DrawTextFitKD(TextGet("KDLabelSaved"), 575, 75, 220, "#ffffff", KDTextGray0);
+	DrawTextFitKD(TextGet("KDLabelSaved"), 575, 75, 220, KDBaseWhite, KDTextGray0);
 
 
 	DrawButtonKDEx("KDOutfitSaved_V", (_bdata) => {
@@ -1444,7 +1582,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		return true;
 	}, true, 475, 110 + 50 * (1 + KDMaxOutfitsDisplay), 200, 45,
 	"",
-	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index + KDModelListMax < KDModelList_Toplevel_viewindex.index ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Down.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1455,7 +1593,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		return true;
 	}, true, 475, 90, 200, 45,
 	"",
-	KDModelList_Toplevel_viewindex.index > 0 ? "#ffffff" : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
+	KDModelList_Toplevel_viewindex.index > 0 ? KDBaseWhite : "#888888", KinkyDungeonRootDirectory + "Up.png", undefined, undefined, undefined, undefined,
 	undefined, undefined, {
 		centered: true,
 	});
@@ -1475,20 +1613,21 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 			},
 			clickButton(index), true, 475, 140 + 50 * i, 200, 45,
 			KDOutfitInfo[index] + (((index == KDCurrentOutfit && KDOriginalValue) || KDOutfitOriginalStore[index]) ? "(*)" : ""),
-				index == KDCurrentOutfit ? "#ffffff" : "#888888", "", undefined, undefined, index != KDCurrentOutfit);
+				index == KDCurrentOutfit ? KDBaseWhite : "#888888", "", undefined, undefined, index != KDCurrentOutfit);
 
 	}
 	DrawBoxKD(450, 55, 250, 56 + (2+KDMaxOutfitsDisplay) * 50, KDButtonColor,
 		false, 0.5, -10);
 
 
-	DrawTextFitKD(TextGet("KDManageOutfits"), 445 + 520/2, 740, 260, "#ffffff", KDTextGray0);
+	DrawTextFitKD(TextGet("KDManageOutfits"), 445 + 520/2, 740, 260, KDBaseWhite, KDTextGray0);
 	DrawBoxKD(450, 710, 520, 285, KDButtonColor, false, 0.5, -10);
 
 
 
 	DrawButtonKDEx("StripOutfit", (_bdata) => {
 		if (KDConfirmType == "strip" && KinkyDungeonReplaceConfirm > 0) {
+			KDSelectedModel = null;
 			KDChangeWardrobe(C);
 			CharacterReleaseTotal(C);
 			CharacterNaked(C);
@@ -1514,10 +1653,11 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 	TextGet((KinkyDungeonReplaceConfirm > 0 && KDConfirmType == 'strip') ?
 			"KDConfirmStrip" :
 			"KDDressStrip"),
-	"#ffffff", KinkyDungeonRootDirectory + "UI/X.png", undefined, undefined, undefined,
+	KDBaseWhite, KinkyDungeonRootDirectory + "UI/X.png", undefined, undefined, undefined,
 	undefined, undefined, true);
 	DrawButtonKDEx("LoadFromCode", (_bdata) => {
 		KinkyDungeonState = "LoadOutfit";
+		KDSelectedModel = null;
 
 
 		CharacterReleaseTotal(C || KinkyDungeonPlayer);
@@ -1527,11 +1667,12 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		));
 		return true;
 	}, true,465, 875, 240, 50, TextGet("KinkyDungeonDressPlayerImport"),
-	"#ffffff", KinkyDungeonRootDirectory + "UI/Load.png", undefined, undefined, undefined,
+	KDBaseWhite, KinkyDungeonRootDirectory + "UI/Load.png", undefined, undefined, undefined,
 	undefined, undefined, true);
 
 	DrawButtonKDEx("KDWardrobeCancel", (_bdata) => {
 		if (KDConfirmType == "revert" && KinkyDungeonReplaceConfirm > 0) {
+			KDSelectedModel = null;
 			KinkyDungeonReplaceConfirm = 0;
 
 			if (KDWardrobeRevertCallback) KDWardrobeRevertCallback();
@@ -1547,7 +1688,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 	}, true, 465, 820, 240, 50,
 	TextGet((KinkyDungeonReplaceConfirm > 0 && KDConfirmType == 'revert') ?
 		"KDWardrobeCancelConfirm" :
-		"KDWardrobeCancel"), ((C == KinkyDungeonPlayer && KDOriginalValue) || (KDCanRevertFlag)) ? "#ffffff" : "#888888",
+		"KDWardrobeCancel"), ((C == KinkyDungeonPlayer && KDOriginalValue) || (KDCanRevertFlag)) ? KDBaseWhite : "#888888",
 		KinkyDungeonRootDirectory + "UI/Revert.png", undefined, undefined, undefined,
 		undefined, undefined, true);
 	if (C == KinkyDungeonPlayer) {
@@ -1577,12 +1718,13 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		}, true, 465, 930, 240, 50,
 		TextGet((KinkyDungeonReplaceConfirm > 0 && KDConfirmType == 'save') ?
 			"KDWardrobeSaveOutfitConfirm" :
-			"KDWardrobeSaveOutfit"), KDOriginalValue ? "#ffffff" : "#888888",
+			"KDWardrobeSaveOutfit"), KDOriginalValue ? KDBaseWhite : "#888888",
 			KinkyDungeonRootDirectory + "UI/Floppy.png", undefined, undefined, undefined,
 			undefined, undefined, true);
 	} else {
 		DrawButtonKDEx("ResetOutfit", (_bdata) => {
 			if (KDConfirmType == "reset" && KinkyDungeonReplaceConfirm > 0) {
+				KDSelectedModel = null;
 				if (C == KinkyDungeonPlayer) {
 					KDChangeWardrobe(C);
 					KDGetDressList().Default = KinkyDungeonDefaultDefaultDress;
@@ -1643,7 +1785,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		TextGet((KinkyDungeonReplaceConfirm > 0 && KDConfirmType == 'reset') ?
 				"KinkyDungeonConfirm" :
 				"KinkyDungeonDressPlayerReset"),
-		"#ffffff",
+		KDBaseWhite,
 		KinkyDungeonRootDirectory + "UI/Reset.png", undefined, undefined, undefined,
 		undefined, undefined, true);
 	}
@@ -1654,7 +1796,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 			KDPlayerSetPose = false;
 			KinkyDungeonDressSet();
 			return true;
-		}, true, 20, 940, 400, 50, TextGet("KDWardrobeSave"), "#ffffff", "");
+		}, true, 20, 940, 400, 50, TextGet("KDWardrobeSave"), KDBaseWhite, "");
 	} else {
 		DrawButtonKDEx("KDBackToGame", (_bdata) => {
 			KinkyDungeonState = "Game";
@@ -1663,7 +1805,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 			if (KDWardrobeCallback) KDWardrobeCallback();
 			KinkyDungeonDressSet(C);
 			return true;
-		}, true, 20, 942, 400, 50, TextGet("KDBackToGame"), "#ffffff", "");
+		}, true, 20, 942, 400, 50, TextGet("KDBackToGame"), KDBaseWhite, "");
 
 	}
 
@@ -1678,7 +1820,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 						exportData.push({
 							Item: a.Model.Name,
 							Group: a.Model.Group || a.Model.Name,
-							Color: "#ffffff",
+							Color: KDBaseWhite,
 							Lost: false,
 							Filters: a.Model.Filters,
 							Properties: a.Model.Properties,
@@ -1720,7 +1862,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 						exportData.push({
 							Item: a.Model.Name,
 							Group: a.Model.Group || a.Model.Name,
-							Color: "#ffffff",
+							Color: KDBaseWhite,
 							Lost: false,
 							Filters: a.Model.Filters,
 							Properties: a.Model.Properties,
@@ -1739,7 +1881,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 						exportData.push({
 							Item: a.Model.Name,
 							Group: a.Model.Group || a.Model.Name,
-							Color: "#ffffff",
+							Color: KDBaseWhite,
 							Lost: false,
 							Filters: a.Model.Filters,
 							Properties: a.Model.Properties,
@@ -1758,7 +1900,7 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 						exportData.push({
 							Item: a.Model.Name,
 							Group: a.Model.Group || a.Model.Name,
-							Color: "#ffffff",
+							Color: KDBaseWhite,
 							Lost: false,
 							Filters: a.Model.Filters,
 							Properties: a.Model.Properties,
@@ -1771,7 +1913,12 @@ function KDDrawWardrobe(_screen: string, Character: Character) {
 		TextGet("KDCreateCosplay"), "#99ff99", "");
 	}
 
+	KDWardrobeToolsDraw(Character);
+
 }
+
+let KDToolsDisplayPoses = false;
+
 
 let KDWardrobeCallback = null;
 let KDWardrobeRevertCallback = null;
@@ -1987,4 +2134,541 @@ function KDGetCharMetadata(C: Character): KDOutfitMetadata {
 		name: C.Name,
 		palette: C.Palette,
 	};
+}
+
+
+
+
+function KDDrawWardrobeToolsButtons(X, Y, C, Model) {
+	//Hardocded numbers, check if they've been changed in the future updates in KDDrawColorSliders();
+	let YY = Y;
+	let yOff = KDDebugMode ? -80 : -40;
+	let width = 300;
+	if (Model && KDPropsSlider) {
+		//Pivot-to-Mouse button
+		DrawButtonKDEx("KDWToolsButton1", (bdata) => {
+			KDWToolsPivotAimEnabled = !KDWToolsPivotAimEnabled;
+			KDWToolsPivotAim2 = false;
+			return true;
+			}, true, X + width/2 + 10, YY + yOff, 30, 30, undefined, KDBaseWhite, "Game/UI/Aim.png",
+			undefined, false, false, KDWToolsPivotAimEnabled ? KDBorderColor : KDButtonColor,
+			undefined, undefined, {hotkeyPress: KDHotkeyToText('ControlLeft')});
+		//Grab toggle button
+		DrawButtonKDEx("KDWToolsButton2", (bdata) => {
+			KDWToolsDraggingEnabled = !KDWToolsDraggingEnabled;
+			return true;
+			}, true, X + 3*width/4 - 10, YY + yOff, 30, 30, undefined, KDBaseWhite,
+			"Game/UI/Grab" + (KDWToolsDraggingEnabled ? "Closed" : "Open") + ".png",
+			undefined, false, false, KDWToolsDraggingEnabled ? KDBorderColor : KDButtonColor);
+		//Reserved button
+		DrawButtonKDEx("KDWToolsButton3", (bdata) => {
+			KDWToolsDrawSettingsMenuEnabled = !KDWToolsDrawSettingsMenuEnabled;
+			return true;
+			}, true, X + width - 30, YY + yOff, 30, 30, undefined, KDBaseWhite, "Game/UI/Wrench.png",
+			undefined, false, false, KDWToolsDrawSettingsMenuEnabled ? KDBorderColor : KDButtonColor);
+
+		//Tooltips
+		for (let i = 1; i <= 3; i++)
+			if (MouseInKD("KDWToolsButton" + i))
+				DrawTextFitKD(TextGet("KDWToolsButton" + i), X + 3*width/4 + 5,
+			YY + yOff - 15, width/2 + 50, KDBaseWhite, KDTextGray0);
+
+		//Settings menu
+		if(KDWToolsDrawSettingsMenuEnabled)
+			KDWToolsDrawSettingsMenu(X, Y, C, Model, width);
+	}
+}
+
+
+function KDWardrobeToolsDraw(C: Character) {
+	let Zoom = 1;
+	if (!C) C = KinkyDungeonPlayer;
+
+	if (KDSelectedModel) {
+		if (!KDSelectedModel.Properties) KDSelectedModel.Properties = {};
+		if (!KDSelectedModel.Properties[KDCurrentLayer] &&
+			(KDWToolsDraggingRefresh || KDWToolsPivotAimRefresh)
+		)
+			KDSelectedModel.Properties[KDCurrentLayer] = Object.assign({}, KDProps);
+		let CurrentLayer = KDSelectedModel.Properties[KDCurrentLayer]
+		if (CurrentLayer && KDSelectedModel.Layers[KDCurrentLayerOrig]) {
+			let parent = "";
+			let l = LayerLayer(KDCurrentModels.get(C),
+				KDSelectedModel.Layers[KDCurrentLayerOrig],
+				KDSelectedModel,
+				[]);
+			if (LayerProperties[l]) parent = LayerProperties[l].Parent;
+			else parent = "Torso";
+			if (KDWToolsPivotAimRefresh) {
+
+				CenterPivotToMouse(C, CurrentLayer, parent);
+			}
+			if (KDWToolsDraggingRefresh)
+				ApplyDragDisplacement(C, CurrentLayer, parent);
+
+			KDWToolsDrawPivotPoint(C, CurrentLayer, Zoom, parent);
+			return true;
+		}
+	}
+	KDWToolsPivotAimRefresh = false;
+}
+
+
+//Pivot positioning
+//Two flags are required because the first one is caught by the button itself.
+let KDWToolsPivotAimEnabled = false;
+let KDWToolsPivotAim2 = false;
+let KDWToolsPivotAimRefresh = false;
+
+
+//Set pivot location to the mouse pointer
+function CenterPivotToMouse(C: Character, CurrentLayer: LayerPropertiesType, Parent?: string) {
+	let Zoom = 1;
+	//Translate Mouse coordinates to canvas coordinates
+
+
+	let roundAmt = 100;
+
+	//Round to two decimal places
+	let XScale = Math.round((parseFloat('' + CurrentLayer.XScale) || 1)*roundAmt)/roundAmt;
+	let YScale = Math.round((parseFloat('' + CurrentLayer.YScale) || 1)*roundAmt)/roundAmt;
+	let XOffset = Math.round((parseFloat('' + CurrentLayer.XOffset) || 0)*roundAmt)/roundAmt;
+	let YOffset = Math.round((parseFloat('' + CurrentLayer.YOffset) || 0)*roundAmt)/roundAmt;
+	let XPivot = Math.round((parseFloat('' + CurrentLayer.XPivot) || 0)*roundAmt)/roundAmt;
+	let YPivot = Math.round((parseFloat('' + CurrentLayer.YPivot) || 0)*roundAmt)/roundAmt;
+
+	let Rotation = (Math.PI / 180) *
+		(parseFloat('' + CurrentLayer.Rotation) || 0);
+
+	let X_Pivot = MouseX;
+	let Y_Pivot = MouseY;
+
+	//X_Pivot += pmx * Math.cos(Rotation) - pmy * Math.sin(Rotation);
+	//Y_Pivot += pmy * Math.cos(Rotation) + pmx * Math.sin(Rotation);
+
+	//if (KDToggles.FlipPlayer) X_Pivot = MODELWIDTH - X_Pivot;
+
+	//Consider offsets from poses (like hogtie)
+	/*let {X_Offset, Y_Offset} = ModelGetPoseOffsets(KDCurrentModels.get(C).Poses, KDToggles.FlipPlayer);
+*/
+
+
+	// Do some magical transformation of coordinates
+	// Its now offset
+	//X_Pivot = ox + dox * Math.cos(-Rotation) - doy * Math.sin(-Rotation);
+	//Y_Pivot = oy + doy * Math.cos(-Rotation) + dox * Math.sin(-Rotation);
+
+	let {x, y, angle} = GetModelLocInverse(C, 0, 0, Zoom, {
+		Angle: 0,
+		Parent: Parent || "Torso",
+		X: X_Pivot,
+		Y: Y_Pivot,
+	}, KDToggles.FlipPlayer);
+	let XX_Offset = x;
+	let YY_Offset = y;
+
+	// Rotation mod from poses
+	//let {rotation, X_Anchor, Y_Anchor} = ModelGetPoseRotation(KDCurrentModels.get(C).Poses);
+	// let angle = rotation * Math.PI / 180;
+	// if (KDToggles.FlipPlayer) angle = -angle;
+	// let XX_Pivot =  X_OFFSET_POSE * Math.cos(angle) - Y_OFFSET_POSE * Math.sin(angle);
+	// let YY_Pivot =  Y_OFFSET_POSE * Math.cos(angle) + X_OFFSET_POSE * Math.sin(angle);
+
+
+	KDChangeWardrobe(C);
+
+	let pdx = 1/XScale * (XX_Offset-XOffset);
+	let pdy = 1/YScale * (YY_Offset-YOffset);
+	//Keep relative offsets
+	CurrentLayer.XPivot = Math.round((XPivot +
+		pdx * Math.cos(-Rotation) - pdy * Math.sin(-Rotation)
+	)*roundAmt)/roundAmt;
+	CurrentLayer.YPivot = Math.round((YPivot +
+		pdy * Math.cos(-Rotation) + pdx * Math.sin(-Rotation)
+	)*roundAmt)/roundAmt;
+	CurrentLayer.XOffset = Math.round((XX_Offset)*roundAmt)/roundAmt;;
+	CurrentLayer.YOffset = Math.round((YY_Offset)*roundAmt)/roundAmt;;
+
+	KDCurrentModels.get(C).Models.set(KDSelectedModel.Name, JSON.parse(JSON.stringify(KDSelectedModel)));
+	KDRefreshProps = true;
+
+	UpdateModels(C);
+	lastGlobalRefresh = CommonTime() - GlobalRefreshInterval + 10;
+	ForceRefreshModels(C);
+	KDWToolsPivotAimRefresh = false;
+}
+
+//Draw red circle at the pivot location
+function KDWToolsDrawPivotPoint(C: Character, CurrentLayer: LayerPropertiesType, Zoom: number, Parent: string) {
+	//Transform model coordiantes to screen coordinates
+	if (!CurrentLayer.XPivot || !CurrentLayer.YPivot) return;
+	let X_Pivot = CurrentLayer.XPivot || 0;
+	let Y_Pivot = CurrentLayer.YPivot || 0;
+	let X_Offset = CurrentLayer.XOffset || 0;
+	let Y_Offset = CurrentLayer.YOffset || 0;
+	let Rotation = (Math.PI / 180) *
+		(parseFloat('' + CurrentLayer.Rotation) || 0);
+
+
+	let pox = 0;//Zoom * MODEL_SCALE * (X_Offset - X_Pivot);
+	let poy = 0;//Zoom * MODEL_SCALE * (Y_Offset - Y_Pivot);
+
+	//if (KDToggles.FlipPlayer) X_Pivot = (MODELWIDTH + MODEL_XOFFSET * 2 - X_Pivot);
+
+	//Consider offsets from poses (like hogtie)
+	let {x, y, angle} = GetModelLoc(C, 0, 0, Zoom, {
+		Angle: 0,
+		Parent: Parent || "Torso",
+		X: X_Offset,
+		Y: Y_Offset,
+	}, KDToggles.FlipPlayer);
+
+
+	//let {X_Offset, Y_Offset} = ModelGetPoseOffsets(KDCurrentModels.get(KinkyDungeonPlayer).Poses, KDToggles.FlipPlayer);
+
+	//let XX_Pivot = X_Pivot + MODELWIDTH * X_Offset * MODEL_SCALE * Zoom;
+	//let YY_Pivot = Y_Pivot + MODELHEIGHT * Y_Offset * MODEL_SCALE * Zoom;
+	let XX_Pivot = x + pox * Math.cos(0) - poy * Math.sin(0);
+	let YY_Pivot = y + poy * Math.cos(0) + pox * Math.sin(0);
+
+	//console.log("WardrobeTools.ks - X_Offset: " + X_Offset);
+	//console.log("WardrobeTools.ks - Y_Offset: " + Y_Offset);
+
+	// Rotation mod from poses
+	// let {rotation, X_Anchor, Y_Anchor} = ModelGetPoseRotation(KDCurrentModels.get(KinkyDungeonPlayer).Poses);
+	// let angle = -rotation * Math.PI / 180;
+	// XX_Pivot = X_Pivot * Math.cos(angle) + Y_Pivot * Math.sin(angle);
+	// YY_Pivot = Y_Pivot * Math.cos(angle) + X_Pivot * Math.sin(angle);
+
+	//Draw pivot point for the current model layer
+	let Radius = 4;
+	FillCircleKD(kdcanvas, kdpixisprites, "pivotpoint", {
+		Left: XX_Pivot,
+		Top: YY_Pivot,
+		Radius: Radius,
+		Color: "red",
+		zIndex: 10,
+		alpha: 0.8,
+	});
+	FillCircleKD(kdcanvas, kdpixisprites, "pivotpointbg", {
+		Left: XX_Pivot,
+		Top: YY_Pivot,
+		Radius: Radius + 2,
+		Color: KDBaseWhite,
+		zIndex: 9,
+		alpha: 0.8,
+	});
+}
+
+//Grabbable layers
+let KDWToolsDraggingEnabled = false;
+let KDWToolsIsDraggingNow = false;
+let KDWToolsDraggingDelta = {x: 0, y: 0, Scroll: 0, zIndex: 0};
+let KDWToolsDraggingRefresh = false;
+let KDWToolsDraggingScrollRefresh = false;
+let KDWToolsDraggingShiftKey = false;
+let KDWToolsDraggingCtrlKey = false;
+
+
+window.addEventListener('click', function(event) {
+	if (KinkyDungeonState != 'Wardrobe') return;
+	if (KDWToolsPivotAimEnabled) {
+		if (KDWToolsPivotAim2) {
+			KDWToolsPivotAimRefresh = true;
+			KDWToolsPivotAimEnabled = false;
+			KDWToolsPivotAim2 = false;
+			KDRefreshProps = true;
+		} else KDWToolsPivotAim2 = true;
+	}
+});
+
+window.addEventListener('mousedown', function(event) {
+	if (KinkyDungeonState != 'Wardrobe') return;
+	//console.log("WardrobeTools.ks - KDWToolsDraggingEnabled: "+KDWToolsDraggingEnabled);
+	if (KDWToolsDraggingEnabled && MouseIn(0, 0, 500, 1000) && KDCurrentLayer) {
+		KDWToolsIsDraggingNow = true;
+		KDWToolsDraggingDelta.zIndex = 0;
+	}
+});
+
+window.addEventListener('mousemove', function(event) {
+	if (KinkyDungeonState != 'Wardrobe') return;
+	//console.log("WardrobeTools.ks - KDWToolsIsDraggingNow: "+KDWToolsIsDraggingNow);
+	//console.log("WardrobeTools.ks - KDWToolsDraggingDelta: "+KDWToolsDraggingDelta);
+	if (KDWToolsDraggingEnabled && KDWToolsIsDraggingNow) {
+		//scaled to the window size
+		KDWToolsDraggingDelta.x += event.movementX * CanvasWidth / PIXICanvas.clientWidth;
+		KDWToolsDraggingDelta.y += event.movementY * CanvasHeight / PIXICanvas.clientHeight;
+		KDWToolsDraggingRefresh = true;
+	}
+});
+
+window.addEventListener('mouseup', function(event) {
+	if (KinkyDungeonState != 'Wardrobe') return;
+	//console.log("WardrobeTools.ks - KDWToolsDraggingDelta: "+KDWToolsDraggingDelta);
+	if (KDWToolsDraggingEnabled && KDWToolsIsDraggingNow) {
+		KDWToolsIsDraggingNow = false;
+		KDWToolsDraggingDelta.x = 0;
+		KDWToolsDraggingDelta.y = 0;
+		KDWToolsDraggingLazyRefresh = 0;
+		KDRefreshProps = true;
+	}
+});
+
+
+window.addEventListener('wheel', function(event) {
+	if (KinkyDungeonState != 'Wardrobe') return;
+	if ((MouseOverChar())) {
+		KDWToolsDraggingDelta.Scroll += event.deltaY > 0 ? -1 : event.deltaY < 0 ? 1 : 0;
+		KDWToolsDraggingShiftKey = event.shiftKey;
+		KDWToolsDraggingCtrlKey = event.ctrlKey;
+		KDWToolsDraggingRefresh = true;
+		KDWToolsDraggingScrollRefresh = true;
+	}
+});
+
+let KDWToolsDraggingLazyRefresh = 0;
+
+//Calculations of properties while drag-moving
+function ApplyDragDisplacement(C, CurrentLayer, Parent: string) {
+	let Zoom = 1;
+	let X_OFFSET = (KDToggles.FlipPlayer ? -1 : 1) * (KDWToolsDraggingDelta.x / (MODEL_SCALE * Zoom));
+	let Y_OFFSET = KDWToolsDraggingDelta.y / (MODEL_SCALE * Zoom);
+	//console.log("WardrobeTools.ks - ApplyDragDisplacement");
+
+	//Consider rotation from poses (like hogtie)
+
+	let {x, y, angle} = GetModelLoc(C, 0, 0, Zoom, {
+		Angle: 0,
+		Parent: Parent || "Torso",
+		X: 0,
+		Y: 0,
+	}, false);
+
+	//0  = x=x, y=y
+	//90 = x=-y,y=x
+	//180= x=-x,y=-y
+	//270= x=y, y=-x
+	let XX_OFFSET = X_OFFSET * Math.cos(-angle) - Y_OFFSET * Math.sin(-angle);
+	let YY_OFFSET = Y_OFFSET * Math.cos(-angle) + X_OFFSET * Math.sin(-angle);
+
+	//Round to two decimal places
+	let XOffset = Math.round((parseFloat(CurrentLayer.XOffset) || 0)*100)/100;
+	let YOffset = Math.round((parseFloat(CurrentLayer.YOffset) || 0)*100)/100;
+	let XPivot = Math.round((parseFloat(CurrentLayer.XPivot) || 0)*100)/100;
+	let YPivot = Math.round((parseFloat(CurrentLayer.YPivot) || 0)*100)/100;
+	let XScale = Math.round((parseFloat(CurrentLayer.XScale) || 1)*100)/100;
+	let YScale = Math.round((parseFloat(CurrentLayer.YScale) || 1)*100)/100;
+	let Rotation = Math.round((parseFloat(CurrentLayer.Rotation) || 0)*100)/100;
+	let LayerBonus = Math.round((parseFloat(CurrentLayer.LayerBonus) || 0)*100)/100;
+
+	KDChangeWardrobe(C);
+	if (XX_OFFSET) {
+		CurrentLayer.XOffset = Math.round((XOffset + XX_OFFSET)*100)/100;
+		CurrentLayer.XPivot = XPivot;
+	}
+
+	if (YY_OFFSET) {
+		CurrentLayer.YOffset = Math.round((YOffset + YY_OFFSET)*100)/100;
+		CurrentLayer.YPivot = YPivot;
+	}
+	//CurrentLayer.XPivot = XPivot + X_OFFSET;
+	//CurrentLayer.YPivot = YPivot + Y_OFFSET;
+
+	//console.log("WardrobeTools.ks - KinkyDungeonKeybindingCurrentKey: " + KinkyDungeonKeybindingCurrentKey);
+	//console.log("WardrobeTools.ks - KDWToolsDraggingShiftKey: " + KDWToolsDraggingShiftKey);
+	//console.log("WardrobeTools.ks - KDWToolsDraggingCtrlKey: " + KDWToolsDraggingCtrlKey);
+	if (KDWToolsDraggingDelta.Scroll)
+	{
+		if (KDWToolsToggleScrollMode == "Layer Bonus")
+		{
+			//fine adjustment with Shift
+			if (KDWToolsDraggingShiftKey)
+				CurrentLayer.LayerBonus = LayerBonus + KDWToolsDraggingDelta.Scroll
+			else {
+				//Increment in powers of 10 while keeping the smaller part
+				//10501
+				// let t = (LayerBonus != 0) ? Math.trunc(Math.sign(LayerBonus) * Math.log10(Math.abs(LayerBonus))) : 0; // 4
+				// let tt = (t != 0) ? Math.sign(t) * 10 ** Math.abs(t) : 0 ; // 10000
+				// let buf = (tt != 0) ? LayerBonus % tt : 0; // 501
+				// t = t + KDWToolsDraggingDelta.Scroll; //5
+				// t = (t != 0) ? Math.sign(t) * 10 ** Math.abs(t) : 0 ; // 100000
+				let t = ((LayerBonus != 0) ? (Math.trunc(Math.sign(LayerBonus) * Math.log10(Math.abs(LayerBonus)))) : 0);
+				// In case current LayerBonus is like 9999 we don't skip a 1000.
+				if (Math.abs(LayerBonus) >=  2 * (10 ** Math.abs(t))) t = Math.sign(t) * (Math.abs(t) + 1);
+				t = KDWToolsDraggingDelta.Scroll + t;
+				CurrentLayer.LayerBonus = (t != 0) ? Math.sign(t) * 10 ** Math.abs(t) : 0; // 501 + 100000 = 100501
+			}
+		}
+		else if (KDWToolsToggleScrollMode == "Rotation")
+		{
+			//fine adjustment with Shift and Ctrl
+			let RotationScale = KDWToolsDraggingCtrlKey ? 0.1 : (KDWToolsDraggingShiftKey ? 1 : 5);
+			CurrentLayer.Rotation = Math.round((Rotation + KDWToolsDraggingDelta.Scroll*RotationScale)*100)/100;
+		}
+		else if (KDWToolsToggleScrollMode == "Scale")
+		{
+			let tempXScale;
+			let tempYScale;
+			if (KDWToolsDraggingShiftKey) { 										//floating point hurr durr
+				tempXScale = Math.round((XScale + Math.sign(XScale)*KDWToolsDraggingDelta.Scroll/100)*100)/100;
+				tempYScale = YScale;
+			}
+			else if (KDWToolsDraggingCtrlKey) {
+				tempXScale = XScale;
+				tempYScale = Math.round((YScale + Math.sign(YScale)*KDWToolsDraggingDelta.Scroll/100)*100)/100;
+			}
+			else {
+				tempXScale = Math.round((XScale + Math.sign(XScale)*KDWToolsDraggingDelta.Scroll/100)*100)/100;
+				tempYScale = Math.round((YScale + Math.sign(YScale)*KDWToolsDraggingDelta.Scroll/100)*100)/100;
+			}
+			//Jump over 0 to avoid reset to 1;
+			if (tempXScale == 0) tempXScale = -XScale;
+			if (tempYScale == 0) tempYScale = -YScale;
+			CurrentLayer.XScale = tempXScale;
+			CurrentLayer.YScale = tempYScale;
+		}
+	}
+	KDWToolsDraggingDelta.x = 0;
+	KDWToolsDraggingDelta.y = 0;
+	KDWToolsDraggingDelta.Scroll = 0;
+
+	if (KDWToolsDraggingLazyRefresh++ >= 10 || KDWToolsDraggingScrollRefresh) {
+		KDRefreshProps = true;
+		KDWToolsDraggingLazyRefresh = 0;
+	}
+	lastGlobalRefresh = CommonTime() - GlobalRefreshInterval + 10;
+	KDCurrentModels.get(C).Models.set(KDSelectedModel.Name, JSON.parse(JSON.stringify(KDSelectedModel)));
+	ForceRefreshModels(C);
+	KDWToolsDraggingRefresh = false;
+	KDWToolsDraggingScrollRefresh = false;
+}
+
+let KDWToolsDrawSettingsMenuEnabled = false;
+
+function KDWToolsDrawSettingsMenu(X, Y, C, Model, Width) {
+	Y += 35;
+	let zIndex = 150
+
+	DrawBoxKD(X, Y, Width, 520, "rgba(10, 10, 10, 0.5)",
+		false, 1, zIndex - 10);
+
+	let fields = KDGetLayerPropFields();
+	//Hide property fields
+	for (let field in fields) {
+		let f = document.getElementById("KDPropField"+field);
+		// sudo
+		//@ts-ignore
+		if (f) f.style = "display: none";
+		KDDrawnElements.delete("KDPropField"+field);
+	}
+	let II = 0;
+	KDWToolsDrawOptionEntry(X+5, Y+5 + 45*II++, Width-10, 40, TextGet("KDWToolsToggleScrollModeText") + KDWToolsToggleScrollMode,
+		() => {	KDWToolsToggleScrollModeIndex = (KDWToolsToggleScrollModes.length + KDWToolsToggleScrollModeIndex - 1) % KDWToolsToggleScrollModes.length;
+				KDWToolsToggleScrollMode = KDWToolsToggleScrollModes[KDWToolsToggleScrollModeIndex];
+				localStorage.setItem("WToolsScrollMode", KDWToolsToggleScrollModeIndex + '');
+				//console.log("WardrobeTools.ks - KDWToolsToggleScrollMode: " + KDWToolsToggleScrollMode)
+				return true;
+				},
+		() => {	KDWToolsToggleScrollModeIndex = (KDWToolsToggleScrollModeIndex + 1) % KDWToolsToggleScrollModes.length,
+				KDWToolsToggleScrollMode = KDWToolsToggleScrollModes[KDWToolsToggleScrollModeIndex]
+				localStorage.setItem("WToolsScrollMode", KDWToolsToggleScrollModeIndex + '');
+				return true;
+				//console.log("WardrobeTools.ks - KDWToolsToggleScrollMode: " + KDWToolsToggleScrollMode)
+				},
+		zIndex, 0.5);
+	KDWToolsDrawOptionEntry(X+5, Y+5 + 45*II++, Width-10, 40, TextGet("KDWToolsLayerAbbrText") + KDWToolsLayerAbbrMode,
+		() => {	KDWToolsLayerAbbrModeIndex = (KDWToolsLayerAbbrModes.length + KDWToolsLayerAbbrModeIndex - 1) % KDWToolsLayerAbbrModes.length;
+				KDWToolsLayerAbbrMode = KDWToolsLayerAbbrModes[KDWToolsLayerAbbrModeIndex];
+				localStorage.setItem("WToolsLayerAbbr", KDWToolsLayerAbbrModeIndex + '');
+				//console.log("WardrobeTools.ks - KDWToolsLayerAbbrMode: " + KDWToolsLayerAbbrMode)
+				return true;
+				},
+		() => {	KDWToolsLayerAbbrModeIndex = (KDWToolsLayerAbbrModeIndex + 1) % KDWToolsLayerAbbrModes.length,
+				KDWToolsLayerAbbrMode = KDWToolsLayerAbbrModes[KDWToolsLayerAbbrModeIndex]
+				localStorage.setItem("WToolsLayerAbbr", KDWToolsLayerAbbrModeIndex + '');
+				return true;
+				//console.log("WardrobeTools.ks - KDWToolsLayerAbbrMode: " + KDWToolsLayerAbbrMode)
+				},
+		zIndex, 0.5);
+}
+
+//Draw a horizontal selectable option in the format of "< Label >"
+function KDWToolsDrawOptionEntry(X, Y, Width, Height, Label, funcPrev, funcNext, zIndex = undefined, alpha = 0.5) {
+	let ArrowWidth = Width*0.1; //in % of Width
+
+	DrawBoxKD(X, Y, Width, Height, KDButtonColor, false, undefined, zIndex - 10);
+
+	//DrawButtonKDEx(name, func, enabled, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, options) {
+	DrawButtonKDEx("KDWTools_"+Label+"<", funcPrev, true, X, Y, ArrowWidth, Height, "<", KDBaseWhite,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined, {zIndex: zIndex});
+
+	DrawTextFitKD(Label, X + Width/2, Y + Height/2, Width - ArrowWidth*2, KDBaseWhite, KDBaseBlack, 30, "center", zIndex);
+
+	DrawButtonKDEx("KDWTools_"+Label+">", funcNext, true, X + Width - ArrowWidth, Y, ArrowWidth, Height, ">", KDBaseWhite,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined, {zIndex: zIndex});
+}
+
+
+function KDGetLayerPropFields(): Record<keyof LayerPropertiesType, string> {
+	return {
+		"XOffset": "0",
+		"YOffset": "0",
+		"XPivot": "0",
+		"YPivot": "0",
+		"XScale": "1",
+		"YScale": "1",
+		"Rotation": "0",
+		"LayerBonus": "0",
+		"Protected": "0",
+		"SuppressDynamic": "0",
+		"HideOverridden": "0",
+		"NoOverride": "0",
+		"ExtraHidePoses": ",",
+		"ExtraRequirePoses": ",",
+		ExtraHidePrefixPose: ",",
+		ExtraHidePrefixPoseSuffix: ",",
+		AddPose: ",",
+		DisplaceAmount: "1",
+		EraseAmount: "1",
+	};
+}
+
+/** TODO */
+function KDGetAbbreviations(context?: string) {
+	return {
+		Right: "R",
+		Left: "L",
+		Dress: "Drs.",
+		Spread: "_Sprd",
+		Closed: "_Closed",
+		Hogtie: "_HogT",
+		Kneel: "_Knl",
+		KneelClosed: "_KnlCl",
+		Yoked: "_Yoke",
+		Free: "_Free",
+		Boxtie: "_Box",
+		Wristtie: "_Wrst",
+		Up: "_Up",
+		Crossed: "_Cross",
+		Front: "_Front",
+	}
+}
+
+function KDAbbreviate(str: string, context?: string) {
+	let abbreviations = KDGetAbbreviations(context);
+
+	for (let i = 0; i < 1; i++) {
+		let found = false;
+
+		for (let entry of Object.entries(abbreviations)) {
+			if (str.includes(entry[0])) {
+				found = true;
+				str = str.replace(entry[0], entry[1]);
+			}
+		}
+
+		if (!found) break;
+	}
+	return str;
 }

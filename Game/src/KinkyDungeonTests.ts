@@ -17,7 +17,7 @@ function KDTestMapGen(count: number, Ranges: number[], Checkpoints: string[]): b
 		for (let FloorRange of Ranges)
 			for (let f = FloorRange; f < FloorRange + KDLevelsPerCheckpoint; f++) {
 				console.log(`Testing floor ${f}`);
-				KDSetWorldSlot(0, f);
+				KDSetWorldSlot(0, f, 0, 0);
 				for (let i = 0; i < count; i++) {
 					if (i % (count/KDLevelsPerCheckpoint) == 0)
 						console.log(`Testing iteration ${i} on floor ${MiniGameKinkyDungeonLevel}`);
@@ -38,7 +38,7 @@ function KDTestFullRunthrough(GameLoops: number, Init: boolean, NGP: boolean): b
 	let EnemySpawnData = {};
 	console.log("Testing full runthrough");
 	if (Init) {
-		KDSetWorldSlot(0, 1);
+		KDSetWorldSlot(0, 1, 0, 0);
 		MiniGameKinkyDungeonCheckpoint = "grv";
 		KinkyDungeonInitialize(1);
 		KDInitPerks();
@@ -59,9 +59,9 @@ function KDTestFullRunthrough(GameLoops: number, Init: boolean, NGP: boolean): b
 
 		if (KinkyDungeonState == "End") {
 			if (NGP)
-				KinkyDungeonNewGamePlus();
+				KinkyDungeonNewGamePlus(false);
 			else {
-				KDSetWorldSlot(0, 1);
+				KDSetWorldSlot(0, 0, 0, 0);
 				MiniGameKinkyDungeonCheckpoint = "grv";
 				KinkyDungeonState = "Game";
 			}
@@ -98,25 +98,6 @@ function KDTestjailer(iter: number) {
 	console.log(totals);
 }
 
-async function KDExportTranslationFile(cull: boolean) {
-	await sleep(1000);
-	let file = "";
-	let cache = cull ? {} : undefined;
-	if (cache) {
-		for (let i = 0; i + 1 < Object.values(TranslationCache)[0].length; i++) {
-			cache[Object.values(TranslationCache)[0][i + 1]] = Object.values(TranslationCache)[0][i];
-		}
-	}
-	for (let c of Object.values(TextScreenCache.cache)) {
-		if (!cache || !cache[c]) {
-			file = file + '\n' + c;
-			file = file + '\n ';
-		}
-
-	}
-	navigator.clipboard.writeText(file);
-}
-
 /**
  * Tests the variant item system
  * @param name
@@ -126,8 +107,8 @@ function KDAddTestVariant(name: string): void {
 		events:[
 			{type: "ItemLight", trigger: "getLights", power: 3.5, color: "#ffff55", inheritLinked: true},
 			{trigger: "tick", type: "sneakBuff", power: -1.0, inheritLinked: true},
-			{trigger: "drawSGTooltip", type: "curseInfo", msg: "Illumination", color: "#ff5555", inheritLinked: true},
-			{trigger: "inventoryTooltip", type: "varModifier", msg: "Evasion", power: 50, color: "#88ff88", bgcolor: "#004400"}
+			{trigger: "drawSGTooltip", type: "curseInfo", msg: "Illumination", color: KDBaseRed, inheritLinked: true},
+			{trigger: "inventoryTooltip", type: "varModifier", msg: "Evasion", power: 50, color: KDBaseMint, bgcolor: "#004400"}
 		]};
 	KDEquipInventoryVariant(variant);
 }
@@ -190,6 +171,7 @@ function KDCheckForBadModels() {
 }
 
 
+
 function KDGetMissingSpellNames() {
 	let ret = "";
 
@@ -198,7 +180,7 @@ function KDGetMissingSpellNames() {
 	for (let e of KinkyDungeonEnemies) {
 		if (e.spells) {
 			for (let sp of e.spells) {
-				if (!found[sp] && TextGet("KinkyDungeonSpell" + sp) == "KinkyDungeonSpell" + sp) {
+				if (!found[sp] && !HasText("KinkyDungeonSpell" + sp)) {
 					ret = ret + "\nKinkyDungeonSpell" + sp + ',' + sp;
 				}
 				found[sp] = true;

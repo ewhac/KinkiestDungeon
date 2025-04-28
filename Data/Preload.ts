@@ -140,6 +140,7 @@ let KDOptimizeDisplacementMapInfo: Record<string, {xPad: number, yPad: number}> 
 };
 
 let DisplacementMaps = [
+	/*
 'SovietHatErase.png',
 'SlimeLeftClosed.png',
 'SlimeRightClosed.png',
@@ -378,7 +379,7 @@ let DisplacementMaps = [
 'GuardLeftFree.png',
 'GuardRightFree.png',
 'GuardLeftFront.png',
-'GuardRightFront.png',
+'GuardRightFront.png',*/
 ];
 
 // Scale factor for displacement and erase maps
@@ -390,6 +391,7 @@ let displacementList = [
 
 let linearList = [
 	"TextureAtlas/atlas0.json",
+	"TextureAtlas/displace0.json",
 ];
 
 let nearestList = [
@@ -437,7 +439,19 @@ async function LoadTextureAtlas(list, scale_mode, preload = false) {
 		 : await PIXI.Assets.load(dataFile + buildSuff).then((value) => {
 			for (let s of Object.values(value.linkedSheets)) {
 				for (let t of Object.keys((s as any).textures)) {
-					KDTex(t, scale_mode == PIXI.SCALE_MODES.NEAREST);
+					let tsprite = PIXI.Sprite.from(KDTex(t, scale_mode == PIXI.SCALE_MODES.NEAREST));
+					let rt = PIXI.RenderTexture.create(
+						{ width: 100, height: 100,
+							resolution: 1});
+
+					PIXIapp.renderer.render(tsprite, {
+						//blit: true,
+						clear: true,
+						renderTexture: rt,
+						blit: true,
+					});
+					tsprite.destroy();
+					rt.destroy(true);
 				}
 			}
 
@@ -509,7 +523,7 @@ async function PreloadDisplacement(list) {
 }
 
 KDLoadToggles();
-if (!KDToggles.HighResDisplacement) DisplacementScale = 1/16
+//if (!KDToggles.HighResDisplacement) DisplacementScale = 1/16
 
 
 async function load() {
@@ -544,7 +558,7 @@ async function load() {
 	//KDLoadingMax = 100;
 	await LoadTextureAtlas(nearestList, KDToggles.NearestNeighbor ? PIXI.SCALE_MODES.NEAREST : PIXI.SCALE_MODES.LINEAR);
 	await LoadTextureAtlas(linearList, PIXI.SCALE_MODES.LINEAR);
-	await PreloadDisplacement(displacementList);
+	//await PreloadDisplacement(displacementList);
 	// Load everything twice... for good measure
 
 	setTimeout(() => {

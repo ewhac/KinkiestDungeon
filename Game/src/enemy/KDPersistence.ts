@@ -527,7 +527,7 @@ function KDIsNPCPersistent(id: number): boolean {
 	return KDPersistentNPCs[id] != undefined;
 }
 
-function KDGetPersistentNPC(id: number, entity?: entity, force: boolean = true, location?: WorldCoord): KDPersistentNPC {
+function KDGetPersistentNPC(id: number, entity?: entity, force: boolean = true, location?: WorldCoord, special?: boolean): KDPersistentNPC {
 	let addToParty = 0;
 	let addMember: entity = null;
 	if (!KDPersistentNPCs[id] && force) {
@@ -540,7 +540,7 @@ function KDGetPersistentNPC(id: number, entity?: entity, force: boolean = true, 
 				}
 
 			}
-			let entry = {
+			let entry: KDPersistentNPC = {
 				Name: enemy.CustomName || KDGenEnemyName(enemy),
 				id: enemy.id,
 				entity: enemy,
@@ -559,6 +559,7 @@ function KDGetPersistentNPC(id: number, entity?: entity, force: boolean = true, 
 				facestyle: KDGameData.Collection[enemy.id + ""]?.facestyle,
 				cosplaystyle: KDGameData.Collection[enemy.id + ""]?.cosplaystyle,
 			};
+			if (special || enemy.Enemy?.special) entry.special = true;
 			KDPersistentNPCs[enemy.id] = entry;
 			if (addToParty)
 				addMember = enemy;
@@ -592,9 +593,9 @@ function KDGetNPCLocation(id: number): WorldCoord {
 }
 /** Returns true if they are the same */
 function KDCompareLocation(loc1: WorldCoord, loc2: WorldCoord): boolean {
-	if (loc1.mapX != loc2.mapX) return false;
-	if (loc1.mapY != loc2.mapY) return false;
-	if (loc1.room != loc2.room) return false;
+	if (loc1.mapX !== loc2.mapX) return false;
+	if (loc1.mapY !== loc2.mapY) return false;
+	if (loc1.room !== loc2.room) return false;
 	return true;
 }
 
@@ -619,14 +620,42 @@ function KDRepopulatePersistentNPCs() {
 	}
 
 	let count = 0;
+	let spawned = 0;
+	//let persistentNPCsToMove: number[] = [];
 	let maxCount = jailPoints.length * 0.7;
 	for (let point of jailPoints) {
 		if (KDRandom() < 0.7) {
-			SetpieceSpawnPrisoner(point.x, point.y, true);
+			let result = SetpieceSpawnPrisoner(point.x, point.y, true);
+			if (result.success) spawned++;
 			count++;
 			if (count >= maxCount) break;
 		}
 	}
+	// If we can't possibly spawn prisoners then we chuck a few of them randomly
+	if (jailPoints.length == 0) {
+		let capturedPersistent = KDGetCapturedPersistent(
+			MiniGameKinkyDungeonLevel,
+			KDGameData.RoomType,
+			KDGameData.MapMod,
+			KDMapData.MapFaction, true).filter(
+				(en) => {
+					return !en.entity?.Enemy?.tags?.noPrisoner;
+				}
+			);
+		let amountToSpawn = Math.min(8, capturedPersistent.length || 0);
+		// If we can't possibly spawn prisoners then we chuck a few of them randomly
+		for (let i = 0; i < amountToSpawn; i++) {
+			let point = KinkyDungeonGetRandomEnemyPoint(true, false, undefined, undefined, undefined,
+				false, undefined
+			);
+			if (point) {
+				let result = SetpieceSpawnPrisoner(point.x, point.y, true, undefined, undefined, true);
+				if (result.success) spawned++;
+			}
+		}
+	}
+
+	console.log("Spawned " + spawned + " npcs")
 }
 
 
@@ -727,14 +756,17 @@ function KDWanderPersistentNPCs(coord: WorldCoord, searchEntities: boolean): num
 }
 
 /** Captured by NOT PLAYER */
-function KDGetCapturedPersistent(Level: number, RoomType: string, MapMod: string, faction: string): KDPersistentNPC[] {
+function KDGetCapturedPersistent(Level: number, RoomType: string, MapMod: string, faction: string, sameLocation: boolean = false): KDPersistentNPC[] {
 	let altType = KDGetAltType(Level, MapMod, RoomType);
 	let mapFaction = faction || altType?.faction || KDMapMods[MapMod ? MapMod : KDGameData.MapMod]?.faction;
 
 	if (!mapFaction) mapFaction = ""; // Default to no faction
 
 	let capturedPersistent = Object.values(KDPersistentNPCs).filter((npc) => {
-		return npc.captured && !npc.jailed && !npc.collect;
+		return npc.captured && KDCapturable(npc.entity) && ((!sameLocation && !npc.jailed && !npc.collect) || (
+			npc.jailed && KDCompareLocation(KDGetNPCLocation(npc.id), KDGetCurrentLocation())
+			&& !KinkyDungeonFindID(npc.id)
+		));
 	});
 	let eligible: KDPersistentNPC[] = [];
 	let eligible_faction: KDPersistentNPC[] = [];

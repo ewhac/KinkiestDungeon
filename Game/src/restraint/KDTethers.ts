@@ -21,6 +21,26 @@ let KDLeashablePersonalities = {
 	},
 };
 
+// true = cancel the leash
+let KDLeashTick : {[_: string]: (delta: number, entity: entity, leasher: entity) => boolean} = {
+	LeashBolt: (delta, entity, leasher) => {
+		return KDLeashTick.Retracting(delta, entity, leasher);
+	},
+	Retracting: (delta, entity, leasher) => {
+		let x = leasher?.x ||  entity.leash.x;
+		let y = leasher?.y ||  entity.leash.y;
+		let currLen = entity.leash.length;
+		let dd = KDistChebyshev(x - entity.x, y - entity.y);
+
+		if (dd < currLen && currLen > 1.9) {
+			entity.leash.length -= 1;
+			KinkyDungeonSendTextMessage(10,TextGet("KDLeashRatchet"), KDBaseRed, 2);
+			KinkyDungeonMakeNoise(1.5, entity.x, entity.y);
+		}
+		return false;
+	},
+}
+
 let KDLeashReason : {[_: string]: (entity: entity) => boolean} = {
 	ShadowTether: (entity) => {
 		if (!(entity.leash.entity && KinkyDungeonFindID(entity.leash.entity)?.Enemy?.tags?.shadow))
@@ -33,6 +53,14 @@ let KDLeashReason : {[_: string]: (entity: entity) => boolean} = {
 			return KDBoundEffects(entity) > 1 && !KDIsImprisoned(entity);
 		}
 	},
+	LeashBolt: (entity) => {
+		if (!(entity.leash.entity || !KinkyDungeonFindID(entity.leash.entity)))
+			return false;
+		if (entity.leash.entity && KinkyDungeonFindID(entity.leash.entity)
+			&& KinkyDungeonIsDisabled(KinkyDungeonFindID(entity.leash.entity))) return false;
+		return KDLeashReason.Default(entity);
+	},
+
 	PlayerLeash: (entity) => {
 		//if (!KinkyDungeonInventoryGetConsumable("LeashItem") && !KDHasSpell("LeashSkill")) return false;
 		if (entity
@@ -190,6 +218,9 @@ function KDIsPlayerTetheredToEntity(player: entity, entity: entity) {
 function KDBreakTether(player: entity): boolean {
 	if (player?.leash) {
 		delete player.leash;
+		if (KinkyDungeonAutoWait) {
+			KDUpdateWaitTime(KDDelayWaitTime());
+		}
 		return true;
 	}
 	return false;
@@ -246,12 +277,15 @@ function KDBreakAllLeashedTo(entity: entity, reason?: string) {
 	}
 }
 
-function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yTo?: number): boolean {
+function KinkyDungeonUpdateTether(delta: number, Msg: boolean, Entity: entity, xTo?: number, yTo?: number): boolean {
 
 	if (Entity.player && KinkyDungeonFlags.get("pulled")) return false;
 	else if (KDEnemyHasFlag(Entity, "pulled")) return false;
 
 	KDUpdateLeashCondition(Entity, false);
+	if (Entity.leash && KDLeashTick[Entity.leash.reason]) {
+		KDLeashTick[Entity.leash.reason](delta, Entity, Entity.leash.entity ? KinkyDungeonFindID(Entity.leash.entity) : undefined);
+	}
 
 	if (Entity.leash) {
 		let exceeded = false;
@@ -289,13 +323,16 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 		}
 
 		if (xTo || yTo) {// This means we are trying to move
-			let pathToTether = KinkyDungeonFindPath(xTo, yTo, leash.x, leash.y, false, !Entity.player, false, KinkyDungeonMovableTilesSmartEnemy);
+			let pathToTether = KinkyDungeonFindPath(xTo, yTo, leash.x, leash.y, false, !Entity.player,
+				 false, KinkyDungeonMovableTilesSmartEnemy, undefined, undefined, undefined,
+				 undefined, undefined, undefined,
+				 undefined, undefined, undefined, true);
 			let playerDist = Math.max(pathToTether?.length || 0, KDistChebyshev(xTo-leash.x, yTo-leash.y));
 			// Fallback
 			if (playerDist > tether && KDistEuclidean(xTo-leash.x, yTo-leash.y) > KDistEuclidean(Entity.x-leash.x, Entity.y-leash.y)) {
 				if (Msg && leash.restraintID) {
 					if (restraint) {
-						KinkyDungeonSendActionMessage(10, TextGet("KinkyDungeonTetherTooShort").replace("TETHER", KDGetItemName(restraint.item)), "#ff5277", 2, true);
+						KinkyDungeonSendActionMessage(10, TextGet("KinkyDungeonTetherTooShort").replace("TETHER", KDGetItemName(restraint.item)), KDBaseRed, 2, true);
 					}
 				}
 				if (Entity.player) {
@@ -315,7 +352,11 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 		}
 		for (let i = 0; i < 10; i++) {
 			// Distance is in pathing units
-			let pathToTether = KinkyDungeonFindPath(Entity.x, Entity.y, leash.x, leash.y, KDIDHasFlag(Entity.id, "blocked"), !Entity.player, false, KinkyDungeonMovableTilesSmartEnemy);
+			let pathToTether = KinkyDungeonFindPath(Entity.x, Entity.y, leash.x, leash.y,
+				KDIDHasFlag(Entity.id, "blocked"), !Entity.player, false,
+				KinkyDungeonMovableTilesSmartEnemy,undefined, undefined, undefined,
+				undefined, undefined, undefined,
+				undefined, undefined, undefined, true);
 			let playerDist = pathToTether?.length;
 			// Fallback
 			if (!pathToTether) playerDist = KDistChebyshev(Entity.x-leash.x, Entity.y-leash.y);
@@ -325,7 +366,11 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 					&& pathToTether?.length > 0
 					&& (
 						KDistEuclidean(pathToTether[0].x - leash.x, pathToTether[0].y - leash.y) > -0.01 + KDistEuclidean(Entity.x - leash.x, Entity.y - leash.y)
-						|| KinkyDungeonFindPath(pathToTether[0].x, pathToTether[0].y, leash.x, leash.y, false, !Entity.player, false, KinkyDungeonMovableTilesSmartEnemy)?.length < pathToTether.length
+						|| KinkyDungeonFindPath(pathToTether[0].x, pathToTether[0].y, leash.x, leash.y,
+							false, !Entity.player, false,
+							KinkyDungeonMovableTilesSmartEnemy, undefined, undefined, undefined,
+							undefined, undefined, undefined,
+							undefined, undefined, undefined, true)?.length < pathToTether.length
 					) && KDistChebyshev(pathToTether[0].x - Entity.x, pathToTether[0].y - Entity.y) < 1.5) {
 					slot = pathToTether[0];
 					if (slot && KinkyDungeonEntityAt(slot.x, slot.y) && KDIsImmobile(KinkyDungeonEntityAt(slot.x, slot.y), true)) {
@@ -335,15 +380,15 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 				}
 
 				if (!slot) {
-					let mindist = playerDist;
+					let mindist = playerDist*playerDist;
 					for (let X = Entity.x-1; X <= Entity.x+1; X++) {
 						for (let Y = Entity.y-1; Y <= Entity.y+1; Y++) {
 							if ((X !=  Entity.x || Y != Entity.y)
 								&& KinkyDungeonMovableTilesEnemy.includes(KinkyDungeonMapGet(X, Y))
-								&& KDistEuclidean(X-leash.x, Y-leash.y) < mindist
+								&& KDistEuclideanSquared(X-leash.x, Y-leash.y) < mindist
 								&& !(KinkyDungeonEntityAt(X-leash.x, Y-leash.y)
 								&& KDIsImmobile(KinkyDungeonEntityAt(X-leash.x, Y-leash.y), true))) {
-								mindist = KDistEuclidean(X-leash.x, Y-leash.y);
+								mindist = KDistEuclideanSquared(X-leash.x, Y-leash.y);
 								slot = {x:X, y:Y};
 							}
 						}
@@ -359,14 +404,14 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 					let enemy = KinkyDungeonEntityAt(slot.x, slot.y);
 					if (enemy && !enemy.player) { //  && !KDHostile(Entity, enemy)
 						let slot2 = null;
-						let mindist2 = playerDist;
+						let mindist2 = playerDist*playerDist;
 						for (let X = enemy.x-1; X <= enemy.x+1; X++) {
 							for (let Y = enemy.y-1; Y <= enemy.y+1; Y++) {
 								if ((X !=  enemy.x || Y != enemy.y)
 									&& !KinkyDungeonEntityAt(X, Y)
 									&& KinkyDungeonMovableTilesEnemy.includes(KinkyDungeonMapGet(X, Y))
-									&& KDistEuclidean(X-Entity.x, Y-Entity.y) < mindist2) {
-									mindist2 = KDistEuclidean(X-Entity.x, Y-Entity.y);
+									&& KDistEuclideanSquared(X-Entity.x, Y-Entity.y) < mindist2) {
+									mindist2 = KDistEuclideanSquared(X-Entity.x, Y-Entity.y);
 									slot2 = {x:X, y:Y};
 								}
 							}
@@ -401,7 +446,7 @@ function KinkyDungeonUpdateTether(Msg: boolean, Entity: entity, xTo?: number, yT
 						if (KinkyDungeonLeashingEnemy()) {
 							KinkyDungeonSetEnemyFlag(KinkyDungeonLeashingEnemy(), "harshpull", 5);
 						}
-						if (Msg && restraint) KinkyDungeonSendActionMessage(9, TextGet("KinkyDungeonTetherPull").replace("TETHER", KDGetItemName(restraint.item)), "#ff5277", 2, true);
+						if (Msg && restraint) KinkyDungeonSendActionMessage(9, TextGet("KinkyDungeonTetherPull").replace("TETHER", KDGetItemName(restraint.item)), KDBaseRed, 2, true);
 
 					}
 				}
