@@ -44,13 +44,23 @@ function KDCanSleepTooltip() {
 /**
  * Set state required for player to sleep
  */
-function KDSleep() {
-	KinkyDungeonSetFlag("slept", -1); // prevent sleeping again on this floor
-	if (KinkyDungeonPlayerInCell(true) && KDGameData.PrisonerState == 'jail') {
-		KinkyDungeonChangeRep("Ghost", KinkyDungeonIsArmsBound() ? 5 : 2);
+function KDSleep(entity?: entity, amount: number = 0) {
+	if (!entity) entity = KDPlayer();
+	if (!amount) amount = KinkyDungeonSleepTurnsMax;
+	let data = {
+		amount: amount,
+		entity: entity,
+		cancelSleep: false,
 	}
-	KDGameData.SleepTurns = KinkyDungeonSleepTurnsMax; // sleep for this number of turns
-	KDChangeMana("player","sleep", "tick", KinkyDungeonStatManaMax, false, 0, false, true); // restore full mana instantly
+	KinkyDungeonSendEvent("sleep", data);
+	if (!data.cancelSleep) {
+		KinkyDungeonSetFlag("slept", -1); // prevent sleeping again on this floor
+		if (KinkyDungeonPlayerInCell(true) && KDGameData.PrisonerState == 'jail' && amount >= KinkyDungeonSleepTurnsMax) {
+			KinkyDungeonChangeRep("Ghost", KinkyDungeonIsArmsBound() ? 5 : 2);
+		}
+		KDGameData.SleepTurns = data.amount; // sleep for this number of turns
+		KDChangeMana("player","sleep", "tick", KinkyDungeonStatManaMax, false, 0, false, true); // restore full mana instantly
+	}
 }
 
 /**
@@ -1415,6 +1425,7 @@ function KinkyDungeonCanUseWeapon(NoOverride?: boolean, e?: boolean, weapon?: we
 		clumsy: weapon?.clumsy,
 		weapon: weapon,
 		treatAsHandsBound: false,
+		treatAsArmsBound: false,
 	};
 	if (!NoOverride)
 		KinkyDungeonSendEvent("getWeapon", {event: e, flags: flags});
@@ -1422,7 +1433,8 @@ function KinkyDungeonCanUseWeapon(NoOverride?: boolean, e?: boolean, weapon?: we
 		|| weapon?.noHands
 		|| (!(flags.treatAsHandsBound || KinkyDungeonIsHandsBound(false, true))
 			&& ((!KinkyDungeonStatsChoice.get("WeakGrip") && !flags.clumsy)
-			|| !(flags.treatAsHandsBound || KinkyDungeonIsHandsBound(false, true))));
+				|| !(flags.treatAsArmsBound
+					|| KinkyDungeonIsArmsBound(false, true))));
 }
 
 let KDBlindnessCap = 0;

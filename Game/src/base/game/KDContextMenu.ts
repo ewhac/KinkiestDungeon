@@ -238,7 +238,7 @@ function KDGetGameContextActionsVanilla(
 		optionImages.Inventory = "Inventory";
 		optionActions.Inventory = () => {
 			KDContextMenu = false;
-			KinkyDungeonDrawState = "Inventory";
+			KDShowInventory(null);
 			KDRefreshCharacter.set(KinkyDungeonPlayer, true);
 			KinkyDungeonDressPlayer();
 		}
@@ -260,7 +260,7 @@ function KDGetGameContextActionsVanilla(
 		}
 	}
 
-	if (tile?.Type) {
+	if (tile?.Type || KDTileInteract[tileType]) {
 		// Interact
 		options.push("Interact");
 		optionImages.Interact = "Interact";
@@ -348,4 +348,11 @@ function KDContextMenuWeaponSpecialSuff(special: KDWeaponSpecial) {
 	: ((special.type == "attack") ? "attack"
 	: ((special.type == "ignite") ? "ignite"
 	: ""))));
+}
+
+function KDShowInventory(container: string[]) {
+	KinkyDungeonDrawState = "Inventory";
+	KDGameData.InventoryActionContainer = container || [];
+	if (container?.length > 0)
+		KDGameData.InventoryAction = container[0];
 }

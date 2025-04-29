@@ -980,6 +980,7 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 				}
 				let selection = KDGetByWeight(KinkyDungeonGetHexByListWeighted(data.hexlist || listname, KDRestraint(item).name, false, data.hexlevelmin || 0, data.hexlevelmax || 10));
 				let curse = KDGetByWeight(KinkyDungeonGetCurseByListWeighted([data.curselist || listname], KDRestraint(item).name, false, 0, 1000));
+				let oldRestraint = KDRestraint(data.item);
 
 				// Load the current inventory variant
 				let newvariant: KDRestraintVariant = JSON.parse(JSON.stringify(KinkyDungeonRestraintVariants[item.inventoryVariant || item.name] || {}));
@@ -1001,6 +1002,7 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 				}
 				newvariant.events = [...(newvariant.events || [])];
 				// Trim off the transformation...
+				//newvariant.events = KDSwapEvents(newvariant, oldRestraint, newRestraint);
 				if (!data.trimTrigger)
 					newvariant.events = newvariant.events.filter((event) => { return event.trigger != "CurseTransform"; });
 				newvariant.events = [...newvariant.events, ...KDEventHexModular[selection].events({ variant: newvariant })];
@@ -1022,7 +1024,7 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 						KDBaseWhite, 2);
 				}
 				KDUpdateItemEventCache = true;
-				KDMorphToInventoryVariant(item, newvariant, "", curse);
+				KDMorphToInventoryVariant(item, newvariant, "", curse, !newRestraint);
 
 			}
 		},
@@ -1037,6 +1039,36 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 				}
 			}
 			KinkyDungeonSendEvent("CurseTransform", { curseditem: item, newRestraintTags: e.tags, forceItems: [itemsEligible[Math.floor(KDRandom() * itemsEligible.length)]], trimTrigger: e.trim, msg: e.msg, ...data });
+		},
+	},
+	"launchBullet": {
+		ProjectileDamageBoost:  (_e, item, data: LaunchBulletData) => {
+			let id = "ev_" + _e.type + _e.original + item.id;
+			if (data.bullet
+				&& (data.b.vx || data.b.vy) // only moving projectiles
+				&& data.bullet.source == -1 && (!_e.original || !KDBulletHasFlag(data.b, id))) {
+				KDSetBulletInheritedFlag(data.b, id, true);
+				if (data.bullet.damage) {
+					data.b.bullet.damage.damage *= 1 + _e.power; // multiplies damage
+				} else {
+					if (data.b.bullet.dmgMult == undefined) data.b.bullet.dmgMult = 1;
+					data.b.bullet.dmgMult *= 1 + _e.power; // multiplies damage
+				}
+			}
+		},
+		StaticDamageBoost:  (_e, item, data: LaunchBulletData) => {
+			let id = "ev_" + _e.type + _e.original + item.id;
+			if (data.bullet
+				&& (!data.b.vx && !data.b.vy) // only static projectiles
+				&& data.bullet.source == -1 && (!_e.original || !KDBulletHasFlag(data.b, id))) {
+				KDSetBulletInheritedFlag(data.b, id, true);
+				if (data.bullet.damage) {
+					data.b.bullet.damage.damage *= 1 + _e.power; // multiplies damage
+				} else {
+					if (data.b.bullet.dmgMult == undefined) data.b.bullet.dmgMult = 1;
+					data.b.bullet.dmgMult *= 1 + _e.power; // multiplies damage
+				}
+			}
 		},
 	},
 	"cleanse": {
@@ -1102,6 +1134,7 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 					let tags = _e.tags || KDGetCursedTags(item);
 					let lock = item.lock || "Purple";
 					let curse = item.curse;
+					let oldRestraint = KDRestraint(item);
 					let restraintAdd = KinkyDungeonGetRestraint({ tags: [...tags] },
 						KDGetEffLevel(),
 						(KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]
@@ -1158,9 +1191,12 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 								KDBaseYellow, 2);
 						let variant = KinkyDungeonRestraintVariants[item.inventoryVariant || item.name];
 						if (variant) {
+							// remove the original restraints
+							KDSwapEvents(variant.events, 
+								oldRestraint, restraintAdd);
 							variant.events = variant.events.filter((e) => {
 								return e.type != _e.type || e.trigger != _e.trigger;
-							})
+							});
 							variant.template = restraintAdd.name;
 							KDEquipInventoryVariant(variant,
 								variant.prefix,
@@ -2615,6 +2651,23 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 		},
 	},
 	"playerAttack": {
+		LatexKittyCurse: (e, _item, data) => {
+			if (data.enemy && !data.miss && !data.disarm) {
+				if ((!e.chance || KDRandom() < e.chance) && data.enemy.hp > 0 && !KDHelpless(data.enemy)) {
+					if (!e.prereq || KDCheckPrereq(data.enemy, e.prereq)) {
+						KinkyDungeonDamageEnemy(data.enemy, {
+							type: e.damage,
+							damage: e.power,
+							time: e.time,
+							bind: e.bind,
+							distract: e.distract,
+							addBind: e.addBind,
+							bindType: e.bindType,
+						}, false, e.power <= 0.1, undefined, undefined, KinkyDungeonPlayerEntity, undefined, undefined, data.vulnConsumed);
+					}
+				}
+			}
+		},
 
 		"DestroyDirt": (e, _item, data) => {
 			if (data.enemy && !data.miss && !data.disarm && data.enemy.Enemy?.tags?.dirt) {
@@ -5348,9 +5401,10 @@ let KDEventMapSpell: Record<string, Record<string, (e: KinkyDungeonEvent, spell:
 
 
 				if (buff?.power > 0) {
-					let amt = e.power;
-					buff.power = Math.max(0, buff.power - data.delta * amt);
+					let amt = data.delta * e.power;
 					KDChangeWill("trainee", "regen", "tick", Math.min(amt, buff.power), false);
+
+					buff.power = Math.max(0, buff.power - amt);
 					if (buff.power <= 0) buff.duration = 0;
 					buff.text = Math.round(10 * KDEntityBuffedStat(player, "RallyWill"));
 				}
@@ -6896,7 +6950,7 @@ let KDEventMapSpell: Record<string, Record<string, (e: KinkyDungeonEvent, spell:
 				KDGameData.InventoryAction = "Offhand";
 				KDGameData.Offhand = "";
 				KDGameData.OffhandOld = "";
-				KinkyDungeonDrawState = "Inventory";
+				KDShowInventory(null);
 				KinkyDungeonCurrentFilter = Weapon;
 			}
 		},
@@ -6905,7 +6959,7 @@ let KDEventMapSpell: Record<string, Record<string, (e: KinkyDungeonEvent, spell:
 				KinkyDungeonSpellChoicesToggle[data.index] = false;
 
 				KDGameData.InventoryAction = "Attach";
-				KinkyDungeonDrawState = "Inventory";
+				KDShowInventory(null);
 				KinkyDungeonCurrentFilter = Weapon;
 				KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Tape.ogg");
 			}
@@ -9184,24 +9238,24 @@ let KDEventMapBullet: Record<string, Record<string, (e: KinkyDungeonEvent, b: KD
 			if (enemy.attackPoints > 0) return;
 			let target = null;
 			if (b.bullet.faction) {
-				let minDist = 1000000;
+				let minDistSQ = 1000*1000;
 				let entity = null;
-				let playerDist = 1000000;
+				let playerDistSQ = 1000*1000;
 				if (KDFactionHostile(b.bullet.faction, "Player")) {
-					playerDist = KDistEuclideanSquared(KinkyDungeonPlayerEntity.x - b.bullet.targetX, KinkyDungeonPlayerEntity.y - b.bullet.targetY);
-					if (playerDist <= e.aoe*e.aoe) {
+					playerDistSQ = KDistEuclideanSquared(KinkyDungeonPlayerEntity.x - b.bullet.targetX, KinkyDungeonPlayerEntity.y - b.bullet.targetY);
+					if (playerDistSQ <= e.aoe*e.aoe) {
 						entity = KinkyDungeonPlayerEntity;
-						minDist = playerDist;
+						minDistSQ = playerDistSQ;
 					}
 				}
 
 				let enemies = KDNearbyEnemies(b.bullet.targetX, b.bullet.targetY, e.aoe);
 				for (let en of enemies) {
 					if (!KDHelpless(en) && KDFactionHostile(b.bullet.faction, en)) {
-						playerDist = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
-						if (playerDist < minDist) {
+						playerDistSQ = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
+						if (playerDistSQ < minDistSQ) {
 							entity = en;
-							minDist = playerDist;
+							minDistSQ = playerDistSQ;
 						}
 					}
 				}
@@ -9214,14 +9268,15 @@ let KDEventMapBullet: Record<string, Record<string, (e: KinkyDungeonEvent, b: KD
 
 			let bullets = KDMapData.Bullets.filter((bb) => { return bb.bullet?.spell?.name == "ShadowShroud"; });
 			let nearest = null;
-			let nearestDist = 10000;
+			let nearestDistSQ = 100*100;
 			for (let bb of bullets) {
 				if (KinkyDungeonMovableTilesEnemy.includes(KinkyDungeonMapGet(bb.x, bb.y))) {
-					let dist = KDistEuclideanSquared(b.x - bb.x, b.y - bb.y);
-					let distplayer = KDistEuclideanSquared(target.x - bb.x, target.y - bb.y);
-					if (dist <= e.aoe*e.aoe && distplayer < nearestDist
-						&& distplayer < KDistEuclideanSquared(target.x - enemy.x, target.y - enemy.y)) {
-						nearestDist = distplayer;
+					let distSQ = KDistEuclideanSquared(b.x - bb.x, b.y - bb.y);
+					let distplayerSQ = KDistEuclideanSquared(target.x - bb.x, target.y - bb.y);
+					if (distSQ <= e.aoe*e.aoe && distplayerSQ < nearestDistSQ
+						&& distplayerSQ < KDistEuclideanSquared(target.x - enemy.x, target.y - enemy.y))
+					{
+						nearestDistSQ = distplayerSQ;
 						nearest = bb;
 					}
 				}
@@ -9252,24 +9307,24 @@ let KDEventMapBullet: Record<string, Record<string, (e: KinkyDungeonEvent, b: KD
 			if (enemy.attackPoints > 0) return;
 			let target = null;
 			if (b.bullet.faction) {
-				let minDist = 1000000;
+				let minDistSQ = 1000*1000;
 				let entity = null;
-				let playerDist = 1000000;
+				let playerDistSQ = 1000*1000;
 				if (KDFactionHostile(b.bullet.faction, "Player")) {
-					playerDist = KDistEuclideanSquared(KinkyDungeonPlayerEntity.x - b.bullet.targetX, KinkyDungeonPlayerEntity.y - b.bullet.targetY);
-					if (playerDist <= e.aoe*e.aoe) {
+					playerDistSQ = KDistEuclideanSquared(KinkyDungeonPlayerEntity.x - b.bullet.targetX, KinkyDungeonPlayerEntity.y - b.bullet.targetY);
+					if (playerDistSQ <= e.aoe*e.aoe) {
 						entity = KinkyDungeonPlayerEntity;
-						minDist = playerDist;
+						minDistSQ = playerDistSQ;
 					}
 				}
 
 				let enemies = KDNearbyEnemies(b.bullet.targetX, b.bullet.targetY, e.aoe);
 				for (let en of enemies) {
 					if (!KDHelpless(en) && KDFactionHostile(b.bullet.faction, en)) {
-						playerDist = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
-						if (playerDist < minDist) {
+						playerDistSQ = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
+						if (playerDistSQ < minDistSQ) {
 							entity = en;
-							minDist = playerDist;
+							minDistSQ = playerDistSQ;
 						}
 					}
 				}
@@ -9657,24 +9712,24 @@ let KDEventMapBullet: Record<string, Record<string, (e: KinkyDungeonEvent, b: KD
 			if (data.delta > 0 && b.bullet.targetX != undefined && b.bullet.targetY != undefined) {
 				// Scan for targets near the target location
 				if (b.bullet.faction && !(e.kind == "dumb")) {
-					let minDist = 1000000;
+					let minDistSQ = 1000*1000;
 					let entity = null;
-					let playerDist = 1000000;
+					let playerDistSQ = 1000*1000;
 					if (KDFactionHostile(b.bullet.faction, "Player")) {
-						playerDist = KDistEuclideanSquared(KDPlayer().x - b.bullet.targetX, KDPlayer().y - b.bullet.targetY);
-						if (playerDist <= e.dist * e.dist) {
+						playerDistSQ = KDistEuclideanSquared(KDPlayer().x - b.bullet.targetX, KDPlayer().y - b.bullet.targetY);
+						if (playerDistSQ <= e.dist * e.dist) {
 							entity = KDPlayer();
-							minDist = playerDist;
+							minDistSQ = playerDistSQ;
 						}
 					}
 
 					let enemies = KDNearbyEnemies(b.bullet.targetX, b.bullet.targetY, e.dist);
 					for (let en of enemies) {
 						if (!KDHelpless(en) && KDFactionHostile(b.bullet.faction, en)) {
-							playerDist = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
-							if (playerDist < minDist) {
+							playerDistSQ = KDistEuclideanSquared(en.x - b.bullet.targetX, en.y - b.bullet.targetY);
+							if (playerDistSQ < minDistSQ) {
 								entity = en;
-								minDist = playerDist;
+								minDistSQ = playerDistSQ;
 							}
 						}
 					}
@@ -11978,7 +12033,7 @@ let KDEventMapGeneric: Record<string, Record<string, (e: string, data: any) => v
 			if (KinkyDungeonStatsChoice.has("NovicePet")) {
 
 				let amount = 0;
-				if (!(KDGameData.KneelTurns >= 1)) {
+				if (!(KDGameData.KneelTurns > 1)) {
 					if (KinkyDungeonFlags.get("NovicePet1")) amount += 1;
 					if (KinkyDungeonFlags.get("NovicePet2")) amount += 1;
 					if (KinkyDungeonFlags.get("NovicePet3")) amount += 1;
@@ -12610,6 +12665,7 @@ let KDHardModeReplace = {
 	"Apprentice2": "Conjurer",
 	"HighWizard": "Fungal",
 	"Dressmaker": "Librarian",
+	"Mummy": "ClericHigh",
 	"Cleric": "Mummy",
 	"BlindZombie": "NawashiZombie",
 	"FastZombie": "SamuraiZombie",

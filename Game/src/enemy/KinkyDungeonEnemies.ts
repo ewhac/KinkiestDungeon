@@ -2845,7 +2845,7 @@ function KDDrawEnemyTooltip(enemy: entity, offset: number, showExtra: boolean): 
 		//}
 	}
 	if (showExtra) {
-		if (TooltipList.length + extraList.length >(KDToggles.ExtraTooltipHeight ? KDTooltipListExtraCutoffHigh : KDTooltipListExtraCutoff)  && extraList.length > 0) {
+		if (TooltipList.length + extraList.length >(KDToggles.ExtraTooltipHeight ? KDTooltipListExtraCutoffHigh : KDTooltipListExtraCutoff) && extraList.length > 0) {
 			KDShowExtraTooltipMaxCycle = Math.ceil(extraList.length / KDTooltipListExtraPage);
 			if (KinkyDungeonInspect) {
 
@@ -5095,7 +5095,15 @@ function KinkyDungeonEnemyLoop(enemy: entity, player: any, delta: number, vision
 	AIData.range = (enemy.Enemy.attackRange == 1 ? 1.5 : enemy.Enemy.attackRange) + KinkyDungeonGetBuffedStat(enemy.buffs, "AttackRange");
 	AIData.width = enemy.Enemy.attackWidth + KinkyDungeonGetBuffedStat(enemy.buffs, "AttackWidth");
 	AIData.bindLevel = KDBoundEffects(enemy);
-	AIData.accuracy = KDEnemyAccuracy(enemy, player);
+	let accData = {
+		accuracy: KDEnemyAccuracy(enemy, KDPlayer()),
+		attacker: enemy,
+		target: KDPlayer(),
+		origAccuracy: 0,
+	}
+	accData.origAccuracy = accData.accuracy;
+	KinkyDungeonSendEvent("calcEnemyAccuracy", accData);
+	AIData.accuracy = accData.accuracy;
 
 	AIData.vibe = false;
 	AIData.damage = enemy.Enemy.dmgType;
@@ -6095,7 +6103,7 @@ function KinkyDungeonEnemyLoop(enemy: entity, player: any, delta: number, vision
 											} else if (KDRandom() < cohesion) {
 												let minDist = enemy.Enemy.cohesionRange ? enemy.Enemy.cohesionRange : AIData.visionRadius;
 												let ent = KDNearbyEnemies(enemy.x, enemy.y, minDist);
-												minDist *= minDist;
+												let minDistSQ = minDist * minDist;
 												for (let e of ent) {
 													if (e == enemy) continue;
 													if (['guard', 'ambush', 'looseguard'].includes(KDGetAI(enemy))) continue;
@@ -6106,9 +6114,9 @@ function KinkyDungeonEnemyLoop(enemy: entity, player: any, delta: number, vision
 													)) continue;
 													if (KDGetFaction(e) != KDGetFaction(enemy)) continue;
 													if (KinkyDungeonTilesGet(e.x + "," + e.y) && KinkyDungeonTilesGet(e.x + "," + e.y).OL) continue;
-													let dist = KDistEuclideanSquared(e.x - enemy.x, e.y - enemy.y);
-													if (dist < minDist) {
-														minDist = dist;
+													let distSQ = KDistEuclideanSquared(e.x - enemy.x, e.y - enemy.y);
+													if (distSQ < minDistSQ) {
+														minDistSQ = distSQ;
 														let ePoint = KinkyDungeonGetNearbyPoint(ex, ey, false);
 														if (ePoint) {
 															ex = ePoint.x;
@@ -8821,7 +8829,7 @@ function KDGetHighSecLoc(enemy: entity, fromHere?: boolean): KDPoint {
 
 		let pos = KDGetShortcutPosition(outpost || jailroom, enemy.x, enemy.y, KDMapData);
 
-		if (!pos) pos = (altRoom?.nostartstairs && !altRoom?.startatstartpos) ? KDMapData.StartPosition : KDMapData.EndPosition;
+		if (!pos) pos = KDGetFallbackJailPoint(0);
 		return pos;
 	}
 	let lairType = KDLairTypes[jailroom];
@@ -8846,8 +8854,17 @@ function KDGetHighSecLoc(enemy: entity, fromHere?: boolean): KDPoint {
 
 	let pos = KDGetShortcutPosition(outpost || jailroom, enemy.x, enemy.y, KDMapData);
 
-	if (!pos) pos = (altRoom?.nostartstairs && !altRoom?.startatstartpos) ? KDMapData.StartPosition : KDMapData.EndPosition;
+	if (!pos) pos = KDGetFallbackJailPoint(0);//(altRoom?.nostartstairs && !altRoom?.startatstartpos) ? KDMapData.StartPosition : KDMapData.EndPosition;
 	return pos;
+}
+
+function KDGetFallbackJailPoint(direction: number) {
+	let altRoom = KDGetAltType(MiniGameKinkyDungeonLevel);
+	if (direction > 1) {
+		return (!altRoom?.nostartstairs && altRoom?.startatstartpos) ? KDMapData.StartPosition : KDMapData.EndPosition;
+	} else {
+		return (altRoom?.nostartstairs && !altRoom?.startatstartpos) ? KDMapData.EndPosition : KDMapData.StartPosition;
+	}
 }
 
 /**
@@ -8856,7 +8873,12 @@ function KDGetHighSecLoc(enemy: entity, fromHere?: boolean): KDPoint {
  */
 function KDSelfishLeash(enemy: entity): boolean {
 	if (enemy.faction == "Ambush") return false;
-	return KDEnemyUnfriendlyToMainFaction(enemy) || KDFactionRelation(KDGetFaction(enemy), "Jail") < -0.2;
+	return KDEnemyUnfriendlyToMainFaction(enemy) || (
+		(KDGetMainFaction() != (
+			KDFactionProperties[KDGetFaction(enemy)]?.jailFaction
+				|| KDGetFaction(enemy)
+		))
+		&& (KDFactionRelation(KDGetFaction(enemy), "Jail") < -0.2));
 }
 
 /**
@@ -10270,7 +10292,7 @@ function KDEnemyAccuracy(enemy: entity, player: entity): number {
 	let accuracy = enemy.Enemy.accuracy ? enemy.Enemy.accuracy : 1.0;
 	if (enemy.distraction) accuracy = accuracy / (1 + 1.5 * enemy.distraction / enemy.Enemy.maxhp);
 	if (enemy.boundLevel) accuracy = accuracy / (1 + 0.5 * enemy.boundLevel / enemy.Enemy.maxhp);
-	if (enemy.blind > 0) accuracy = AIData.playerDist > 1.5 ? 0 : accuracy * 0.5;
+	if (enemy.blind > 0) accuracy = KDistChebyshev(enemy.x-player.x, enemy.y-player.y) > 1.5 ? 0 : accuracy * 0.5;
 
 	if (player?.player) {
 		if (accuracy < 1 && KDistChebyshev(enemy.x - player.x, enemy.y - player.y) < 1.5) {

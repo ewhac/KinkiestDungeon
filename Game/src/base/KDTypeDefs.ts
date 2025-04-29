@@ -1614,6 +1614,7 @@ interface KinkyDungeonEvent {
 	original?: string;
 	variance?: number;
 	damage?: string;
+	element?: string;
 	buffTypes?: string[];
 	damageTrigger?: string;
 	dist?: number;
@@ -2204,6 +2205,8 @@ interface spell {
 	effectTileDistDoT?: number,
 	effectTileDurationModDoT?: number,
 	effectTileDensityDoT?: number,
+	/** DensityDoT is 100% if the tile is empty */
+	effectTileDensityFullIfEmpty?: boolean,
 	effectTileDensity?: number,
 
 	/** Hides this spell in the spell screen */
@@ -2959,6 +2962,8 @@ interface KDBullet {
 	faction?: string,
 }
 interface KDBulletData {
+	inheritedflags?: any,
+	flags?: any,
 	name: string,
 	width: number,
 	height: number,
@@ -2973,6 +2978,10 @@ interface KDBulletData {
 	hit?: string,
 	trail?: boolean,
 	source?: number,
+	/** multiplies dmg after creation */
+	dmgMult?: number,
+	/** adds dmg after creation before mult */
+	dmgBoost?: number,
 	bulletSpin?: number,
 	hitevents?: KinkyDungeonEvent[],
 	effectTile?: effectTileRef,
@@ -3012,6 +3021,12 @@ interface KDBulletData {
 	aoetype?: string,
 }
 
+interface shrineListing {
+	type: string,
+	quest: string,
+	x: number,
+	y: number,
+}
 
 interface KDMapDataType {
 	RespawnQueue: {faction: string, enemy: string}[],
@@ -3026,6 +3041,8 @@ interface KDMapDataType {
 	ExpStair: Record<string, number>,
 	PrisonStateStack: string[],
 	PrisonType: string,
+
+	ShrineList: shrineListing[],
 
 	LairsToPlace: string[],
 	PotentialEntrances: LairEntrance[],
@@ -3555,11 +3572,11 @@ interface KDDelayedAction {
 }
 
 interface KDBondageMachineFunc {
-	eligible_player: (tile, x, y, entity) => boolean;
-	eligible_enemy: (tile, x, y, entity) => boolean;
+	eligible_player: (tile, x: number, y: number, entity: entity) => boolean;
+	eligible_enemy: (tile, x: number, y: number, entity: entity) => boolean;
 
-	function_player: (tile, delta, x, y, entity) => boolean;
-	function_enemy: (tile, delta, x, y, entity) => boolean;
+	function_player: (tile, delta: number, x: number, y: number, entity: entity) => boolean;
+	function_enemy: (tile, delta: number, x: number, y: number, entity: entity) => boolean;
 }
 
 interface KDDroppedItemProp {
@@ -3953,6 +3970,7 @@ interface KDEnchantment {
 
 interface KDModifierConditionData {
 	element?: string,
+	elementdmg?: string,
 	Loot: string,
 	curse: string,
 	primaryEnchantment: string,

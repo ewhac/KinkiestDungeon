@@ -167,7 +167,7 @@ const KinkyDungeonRestraints: restraint[] = [
 	//region Charms
 	// Not super punishing but would be hard to apply IRL
 	{inventory: true, name: "CharmRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		Group: "ItemDevices", power: 1, weight: -1000,
@@ -178,7 +178,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		},
 		minLevel: 0, allFloors: true, shrine: ["Charms", "Tape", "Raw"]},
 	{inventory: true, name: "DuctTapeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -352,7 +352,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		events: [{trigger: "tick", type: "livingRestraints", tags: ["mummyRestraints"], cloneTags: [], inheritLinked: true, frequencyMax: 60, frequencyMin: 10, frequencyStep: 0.8, count: 4}]
 	},
 	{inventory: true, name: "MysticDuctTapeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		Group: "ItemDevices", power: 1, weight: -1000,
@@ -456,7 +456,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		events: [{trigger: "tick", type: "livingRestraints", tags: ["autoTape"], cloneTags: [], inheritLinked: true, frequencyMax: 60, frequencyMin: 10, frequencyStep: 0.8, count: 4}]
 	},
 	{inventory: true, name: "AutoTapeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -553,7 +553,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		events: [{trigger: "tick", type: "livingRestraints", tags: ["vinylTape"], cloneTags: [], inheritLinked: true, frequencyMax: 60, frequencyMin: 10, frequencyStep: 0.8, count: 4}]
 	},
 	{inventory: true, name: "VinylTapeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -903,7 +903,9 @@ const KinkyDungeonRestraints: restraint[] = [
 		maxwill: 0.25, enemyTags: {"livingCollar":10}, playerTags: {"ItemNeckFull":-2}, minLevel: 0, allFloors: true, shrine: ["Collars","Latex","Rubber"],
 		events: [{trigger: "tick", type: "livingRestraints", tags: ["latexEncase"], kind: "Rubber", cloneTags: [], inheritLinked: true, frequencyMax: 60, frequencyMin: 10, frequencyStep: 0.8, count: 4}]
 	},
-	{inventory: true, unlimited: true, removePrison: true, name: "HardSlimeBoots", debris: "Slime", linkCategory: "SlimeBoots", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "ToeTape", Type: "Full", Color: "#9B49BD", Group: "ItemBoots", blockfeet: true, addTag: ["FeetLinked"],power: 5, weight: 0,
+	{inventory: true, unlimited: true, removePrison: true, name: "HardSlimeBoots", debris: "Slime",
+		linkCategory: "SlimeBoots", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink],
+		inaccessible: true, Group: "ItemBoots", blockfeet: true, addTag: ["FeetLinked"],power: 5, weight: 0,
 		escapeChance: {"Struggle": 0, "Cut": 0.1, "Remove": 0}, failSuffix: {"Remove": "SlimeHard"},
 		affinity: {Struggle: ["Sharp",], Remove: ["Hook"],},
 		factionColor: [[], [0]],
@@ -918,7 +920,9 @@ const KinkyDungeonRestraints: restraint[] = [
 		addPoseIfTopLevel: ["ItemBootsRubberOver"],
 		enemyTags: {"latexEncase":100, "latexEncaseRandom":103}, playerTags: {},
 		minLevel: 0, allFloors: true, shrine: ["Latex", "Encase", "SlimeHard", "Rubber"]},
-	{inventory: true, unlimited: true, removePrison: true, name: "HardSlimeFeet", debris: "Slime", linkCategory: "SlimeFeet", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "DuctTape", Type: "CompleteFeet", OverridePriority: 24, Color: "#9B49BD", Group: "ItemFeet", blockfeet: true, addTag: ["FeetLinked"],power: 6, weight: -100,
+	{inventory: true, unlimited: true, removePrison: true, name: "HardSlimeFeet", debris: "Slime", linkCategory: "SlimeFeet",
+		linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink],
+		inaccessible: true, Group: "ItemFeet", blockfeet: true, addTag: ["FeetLinked"], power: 6, weight: -100,
 		escapeChance: {"Struggle": 0.0, "Cut": 0.1, "Remove": 0}, failSuffix: {"Remove": "SlimeHard"},
 		affinity: {Struggle: ["Sharp",], Remove: ["Hook"],},
 		factionColor: [[], [0]],
@@ -1011,7 +1015,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		minLevel: 0, allFloors: true, shrine: ["Latex", "Encase", "Block_ItemMouth", "Encase", "SlimeHard", "Rubber"]},
 
 	{inventory: true, name: "HardSlimeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -1022,7 +1026,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		enemyTags: {}, playerTags: {},
 		minLevel: 0, allFloors: true, shrine: ["Rubber", "Latex", "Raw"]},
 	{inventory: true, name: "SlimeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -2693,7 +2697,7 @@ const KinkyDungeonRestraints: restraint[] = [
 	// Future Box
 	{removePrison: true, name: "FutureBox", Asset: "Cage", Color: ['Default', 'Default', '#000000'], Group: "ItemDevices", power: 8, weight: 1,
 		Model: "FutureBox",
-		DefaultLock: "Red",
+		DefaultLock: "Cyber",
 		addTag: ["NoHogtie"],
 		tightType: "Secure",
 		factionFilters: {
@@ -3276,7 +3280,8 @@ const KinkyDungeonRestraints: restraint[] = [
 		restriction: 10,
 		Color: "Default", bindarms: true, restricthands: 0.85, power: 6, weight: 0, DefaultLock: "Red",
 		escapeChance: {"Struggle": -0.5, "Cut": -0.5, "Remove": 10, "Pick": -0.15, "Unlock": -0.15},
-		helpChance: {"Pick": 0.5, "Unlock": 1.0}, enemyTags: {"trap":9, "yokeSpell": 10, "Unchained": -9, "steelbondage": 10}, playerTags: {}, minLevel: 0, allFloors: true, shrine: ["Metal", "Yokes", "Yoked"]},
+		helpChance: {"Pick": 0.5, "Unlock": 1.0}, enemyTags: {"trap":9, "yokeSpell": 10, "Unchained": -9, "steelbondage": 10},
+		playerTags: {}, minLevel: 0, allFloors: true, shrine: ["Metal", "Yokes", "Yoked"]},
 	{inventory: true, trappable: true, name: "HeavyYoke", Asset: "Yoke", accessible: true, Group: "ItemArms",
 		Model: "HeavyYoke",
 		playerTagsMult: {
@@ -5617,7 +5622,7 @@ const KinkyDungeonRestraints: restraint[] = [
 	},
 
 	{inventory: true, name: "RibbonRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -5725,7 +5730,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		events: [{trigger: "tick", type: "livingRestraints", tags: ["ropeRestraints", "ropeRestraints2", "ropeRestraintsWrist"], cloneTags: [], inheritLinked: true, frequencyMax: 60, frequencyMin: 10, frequencyStep: 0.9, count: 8}]
 	},
 	{inventory: true, name: "RopeSnakeRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -6092,7 +6097,7 @@ const KinkyDungeonRestraints: restraint[] = [
 	},
 
 	{inventory: true, name: "NeoLinkRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {
@@ -6863,7 +6868,7 @@ const KinkyDungeonRestraints: restraint[] = [
 	//region Chain
 
 	{inventory: true, name: "ChainRaw",
-		noRecycle: true,
+		//noRecycle: true,
 		requireSingleTagToEquip: ["Impossible"],
 		Asset: "", Color: "",
 		recycleresource: {

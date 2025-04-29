@@ -4,7 +4,7 @@ let KDDialogueParams = {
 	ShopkeeperHelpFee: 230,
 	ShopkeeperHelpFeePerLevel: 70,
 	ShopkeeperHelpFeePerPower: 10,
-	ShopkeeperHelpFeeFreebiePower: 20,
+	ShopkeeperHelpFeeFreebiePower: 50,
 	ShopkeeperFee: 900,
 	ShopkeeperFeePerLevel: 100,
 	ShopkeeperFeePunishThresh: 2500,
@@ -265,6 +265,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									ModelDefs[d.Item]?.Categories.includes("Bras")
 									|| ModelDefs[d.Item]?.Categories.includes("Panties")
 								)) continue;
+								if (d.Properties && Object.values(d.Properties).some((p) => {return p.NoLoss;})) continue;
 								d.Lost = true;
 							}
 							KinkyDungeonCheckClothesLoss = true;
@@ -2962,7 +2963,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 					KDGameData.CurrentDialogMsgData.RESTRAINTNAME_Catsuit = KinkyDungeonGetRestraint({tags: ['shopCatsuit']}, 10, 'grv', true, undefined, undefined, undefined, false)?.name;
 
 					if (KDGetTotalRestraintPower(
-						KinkyDungeonPlayerEntity, ["Leather", "Latex", "Rope", "Metal"], [], true, false) > KDDialogueParams.ShopkeeperHelpFeeFreebiePower
+						KinkyDungeonPlayerEntity, ["Leather", "Latex", "Rope", "Metal"], [], true, false, undefined, false) > KDDialogueParams.ShopkeeperHelpFeeFreebiePower
 						|| KinkyDungeonFlags.get("Collateral") || !(
 						KDGameData.CurrentDialogMsgData.RESTRAINTNAME_Armor
 						|| KDGameData.CurrentDialogMsgData.RESTRAINTNAME_Restraint
@@ -3242,7 +3243,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 						clickFunction: (_gagged, _player) => {
 							KDGameData.InventoryAction = "Sell";
 							KDGameData.SellMarkup = 0.7;
-							KinkyDungeonDrawState = "Inventory";
+							KDShowInventory(null);
 							KinkyDungeonCurrentFilter = Weapon;
 							return false;
 						},
@@ -3253,8 +3254,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 						clickFunction: (_gagged, _player) => {
 							KDGameData.InventoryAction = "Sell";
 							KDGameData.SellMarkup = 0.7;
-							KinkyDungeonDrawState = "Inventory";
-							KDGameData.InventoryActionContainer = ["Sell", "PlayerChest"];
+							KDShowInventory(["Sell", "PlayerChest"]);
 							KinkyDungeonCurrentFilter = Consumable;
 							return false;
 						},
@@ -3265,7 +3265,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 						clickFunction: (_gagged, _player) => {
 							KDGameData.InventoryAction = "SellBulk";
 							KDGameData.SellMarkup = 0.7;
-							KinkyDungeonDrawState = "Inventory";
+							KDShowInventory(null);
 							KinkyDungeonCurrentFilter = Weapon;
 							return false;
 						},
@@ -3354,7 +3354,7 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 			let e = KDGetSpeaker();
 			if (e) {
 				e.hp = 0;
-				let en = DialogueCreateEnemy(e.x, e.y, "Mummy");
+				let en = DialogueCreateEnemy(e.x, e.y, KDGetEffLevel() > 4 ? "ClericHigh" : "Mummy");
 				en.hostile = 9999;
 				en.faction = "Enemy";
 				en.aware = true;
@@ -3390,6 +3390,46 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 			"Leave": {
 				playertext: "Leave", response: "Default",
 				exitDialogue: true,
+			},
+		}
+	},
+
+
+	"ResistanceDrone": {
+		response: "Default",
+		options: {
+			"Neutral": {
+				gag: true,
+				playertext: "Default",
+				response: "Default",
+				options: {
+					"Leave": {
+						playertext: "Leave", response: "Default",
+						exitDialogue: true,
+					},
+				}
+			},
+			"Negative": {
+				gag: true,
+				playertext: "Default",
+				response: "Default",
+				options: {
+					"Leave": {
+						playertext: "Leave", response: "Default",
+						exitDialogue: true,
+					},
+				}
+			},
+			"Steal": {
+				gag: false,
+				playertext: "Default",
+				response: "Default",
+				options: {
+					"Leave": {
+						playertext: "Leave", response: "Default",
+						exitDialogue: true,
+					},
+				}
 			},
 		}
 	},
@@ -3596,9 +3636,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 									KDGameData.CurrentDialogMsg = "PrisonerJailUnlockSlow";
 								} else {
-									KDGameData.CurrentDialogMsg = "PrisonerJailUnlock";
+									KDGameData.CurrentDialogMsg = "PrisonerJailUnlock" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerJailUnlockGagged";
 									}
 								}
 								KDAddToParty(e);
@@ -3651,9 +3691,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 											KinkyDungeonChangeFactionRep(faction, 0.015);
 									}
 									KinkyDungeonChangeRep("Prisoner", 0.5);
-									KDGameData.CurrentDialogMsg = "PrisonerJailPick";
+									KDGameData.CurrentDialogMsg = "PrisonerJailPick" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerJailPickGagged";
 									}
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 									KDAddToParty(e);
@@ -3727,9 +3767,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 									KDGameData.CurrentDialogMsg = "PrisonerLatexUnlockSlow";
 								} else {
-									KDGameData.CurrentDialogMsg = "PrisonerLatexUnlock";
+									KDGameData.CurrentDialogMsg = "PrisonerJailUnlock" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerJailUnlockGagged";
 									}
 								}
 								KDAddToParty(e);
@@ -3780,9 +3820,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 									KDGameData.CurrentDialogMsg = "PrisonerLatexCutSlow";
 								} else {
-									KDGameData.CurrentDialogMsg = "PrisonerLatexCut";
+									KDGameData.CurrentDialogMsg = "PrisonerLatexCut" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerLatexCutGagged";
 									}
 								}
 								KDAddToParty(e);
@@ -3877,9 +3917,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 									KDGameData.CurrentDialogMsg = "PrisonerJailUnlockSlow";
 								} else {
-									KDGameData.CurrentDialogMsg = "PrisonerJailUnlock";
+									KDGameData.CurrentDialogMsg = "PrisonerJailUnlockOwn" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerJailUnlockOwnGagged";
 									}
 								}
 							}
@@ -3977,9 +4017,9 @@ let KDDialogue: Record<string, KinkyDialogue> = {
 									KDFreeNPC(e, false);
 									KDDefectIfPossible(e);
 									if (e.specialdialogue == "PrisonerJailOwn") delete e.specialdialogue;
-									KDGameData.CurrentDialogMsg = "PrisonerJailPick";
+									KDGameData.CurrentDialogMsg = "PrisonerJailPick" + KDJailPersonality(e);
 									if (e.Enemy.tags.gagged) {
-										KDGameData.CurrentDialogMsg = KDGameData.CurrentDialogMsg + "Gagged";
+										KDGameData.CurrentDialogMsg = "PrisonerJailPickGagged";
 									}
 									DialogueBringNearbyEnemy(player.x, player.y, 8, true);
 								}

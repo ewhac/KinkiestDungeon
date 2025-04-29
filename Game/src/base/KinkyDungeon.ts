@@ -7139,12 +7139,20 @@ function sfc32(a: number, b: number, c: number, d: number) {
 
 let kdSoundCache: Map<string, HTMLAudioElement> = new Map();
 
+function GetNewAudio() {
+	if (OGVSupported) {
+		return new OGVPlayer();
+	} else {
+		return new Audio();
+	}
+}
+
 function AudioPlayInstantSoundKD(Path: string, volume?: number) {
 	if (!KDSoundEnabled()) return false;
 	const vol = KDSfxVolume * (typeof volume != 'undefined' ? volume : 1);
 	if (vol > 0) {
 		let src = KDModFiles[Path] || Path;
-		let audio = kdSoundCache.has(src) ? kdSoundCache.get(src) : new Audio();
+		let audio = kdSoundCache.has(src) ? kdSoundCache.get(src) : GetNewAudio();
 		if (!kdSoundCache.has(src))  {
 			audio.src = src;
 			kdSoundCache.set(src, audio);
@@ -7440,4 +7448,46 @@ function KDNonContextActions(mobile: boolean, textArea: boolean): boolean {
 		return true;
 	}
 	return false;
+}
+
+// Get the canvas offset with respect to the game window.
+// x and y are pixel offsets from the edge of the window to the edge of the game canvas.
+// width and height are window.innerWidth and window.innerHeight respectively.
+// widthscale and heightscale are float values as a % of the game canvas size. These will currently always be the same.
+//     -> For example, window width 1500 should return a scale of 0.75 because the base canvas is 2000x1000 at this writing.
+// When referencing something such as hardpoints, use this scale to get actual pixel offsets.
+// canvaswidth and canvasheight are the current actual width and height of the canvas.
+// Returns { x, y, width, height, widthscale, heightscale, canvaswidth, canvasheight }
+function KDGetWindowCanvasOffset() {
+	let windowwidth = window.innerWidth;
+	let windowheight = window.innerHeight;
+
+	// Determine the ratio of the width x height and height x width
+	let canvaswidth = KinkyDungeonGetCanvas("MainCanvas").width
+	let canvasheight = KinkyDungeonGetCanvas("MainCanvas").height
+	let canvasratio = canvaswidth / canvasheight
+	let canvasratioinvert = Math.pow(canvasratio, -1)
+
+	let offsetobject = { x: 0, y: 0, width: windowwidth, height: windowheight, widthscale: 1.0, heightscale: 1.0, canvaswidth: KinkyDungeonCanvas.width, canvasheight: KinkyDungeonCanvas.height }
+
+	// The window has black bars on top and bottom
+	if ((windowwidth / windowheight) < canvasratio) {
+		offsetobject.y = (windowheight - (windowwidth * canvasratioinvert)) / 2
+		let newscale = windowwidth / KinkyDungeonCanvas.width
+		offsetobject.widthscale = newscale;
+		offsetobject.heightscale = newscale;
+		offsetobject.canvaswidth = KinkyDungeonCanvas.width * newscale
+		offsetobject.canvasheight = KinkyDungeonCanvas.height * newscale
+	}
+	// The window has black bars on left and right
+	if ((windowheight / windowwidth) < canvasratioinvert) {
+		offsetobject.x = (windowwidth - (windowheight * canvasratio)) / 2
+		let newscale = windowheight / KinkyDungeonCanvas.height
+		offsetobject.widthscale = newscale;
+		offsetobject.heightscale = newscale;
+		offsetobject.canvaswidth = KinkyDungeonCanvas.width * newscale
+		offsetobject.canvasheight = KinkyDungeonCanvas.height * newscale
+	}
+
+	return offsetobject
 }

@@ -9216,7 +9216,7 @@ Upcast de hechizo
 Resistencia Mental
 ### +100 Psychic and Charm Resist. You can no longer let go involuntarily while your WP is above 10% or you are shielded, and willpower drains 70% slower while edged. (click the buff to toggle)
 
-### Mental Resistance: You cannot orgasm except by choice or below 25% WP. Click to toggle.
+### Mental Resistance: You cannot orgasm except by choice or below 10% WP. Click to toggle.
 
 ### Mental Resistance: You are allowing yourself to let go. Click to toggle.
 
@@ -12424,7 +12424,7 @@ Por 3 repeticiones la diosa te otorgará una llave.
 
 - For 3 rep the goddess
 Por 3 rep la diosa
-- For 3 rep the goddess 
+- For 3 rep the goddess
 Por 3 rep la diosa
 
 
@@ -21006,7 +21006,7 @@ No tengo más remedio que presentar.
 (El fabricante de muñecas se hunde en un charco de baba y emerge cerca)|(¡Brazos robóticos brotan de su espalda mientras se precipita hacia ti!)
 
 
-- (The Dollmaker concedes defeat)|You have defeated me.|I... I... will let you pass.|(The door exit door unlocks with an audible click)
+- (The Dollmaker concedes defeat)|You have defeated me.|I... I... will let you pass.|(The exit door unlocks with an audible click)
 (El fabricante de muñecas reconoce la derrota)|Me has derrotado.|Yo... yo... te dejaré pasar.|(La puerta de salida se abre con un clic audible)
 - (SPEAKER looks confused)|What are you... Okay, you can have it...
 (EL SPEAKER se ve confundido)|¿Qué estás... Vale, puedes quedártelo...

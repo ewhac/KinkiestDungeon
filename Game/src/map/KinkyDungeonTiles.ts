@@ -309,9 +309,8 @@ function KDGoThruTile(x: number, y: number, suppressCheckPoint: boolean, force: 
 					if (KDGameData.PriorJailbreaks > 0) KDGameData.PriorJailbreaksDecay = (KDGameData.PriorJailbreaksDecay + 1) || 1;
 
 					if (MiniGameKinkyDungeonLevel > 1) {
+						
 						KDAdvanceTraining();
-						// Reduce security level when entering a new area
-						KinkyDungeonChangeRep("Prisoner", -5);
 
 						if (KinkyDungeonStatsChoice.get("Trespasser")) {
 							KinkyDungeonChangeRep("Rope", -1);
@@ -322,6 +321,16 @@ function KDGoThruTile(x: number, y: number, suppressCheckPoint: boolean, force: 
 							KinkyDungeonChangeRep("Elements", -1);
 							KinkyDungeonChangeRep("Conjure", -1);
 							KinkyDungeonChangeRep("Illusion", -1);
+						}
+						
+						if (KDGameData.PrisonerState == "jail") {
+							KDGameData.PrisonerState = "";
+							// Reduce security level when entering a new area
+							KinkyDungeonChangeRep("Prisoner", 10);
+						} else {
+							// Reduce security level when entering a new area
+							KinkyDungeonChangeRep("Prisoner", -5);
+
 						}
 					}
 
@@ -350,6 +359,7 @@ function KDGoThruTile(x: number, y: number, suppressCheckPoint: boolean, force: 
 			}
 			KDGameData.HighestLevelCurrent = Math.max(KDGameData.HighestLevelCurrent || 1, MiniGameKinkyDungeonLevel);
 			KDGameData.HighestLevel = Math.max(KDGameData.HighestLevel || 1, MiniGameKinkyDungeonLevel);
+			
 
 			//if (KinkyDungeonTilesGet(KinkyDungeonPlayerEntity.x + "," + KinkyDungeonPlayerEntity.y)) {
 			let MapMod = data.mapMod;
@@ -1049,7 +1059,6 @@ function KDAdvanceLevel(data: any, closeConnections: boolean = true, query: bool
 			KDGameData.JourneyX = JourneyTarget;
 			KDGameData.JourneyY = MiniGameKinkyDungeonLevel;
 			KDGameData.JourneyTarget = null;
-
 			KDGameData.UseJourneyTarget = false;
 		}
 		if (currentSlot && closeConnections) {

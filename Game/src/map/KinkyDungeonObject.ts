@@ -1,5 +1,42 @@
 "use strict";
 
+/** For stuff like traps */
+let TileTypeTooltipOverride = {
+	Trap: {
+		DisplayStandTrap: "Furniture",
+		DisplayTrap: "Furniture",
+		CageTrap: "Furniture",
+		FutureBoxTrap: "Furniture",
+		DisplayEgyptianTrap: "Furniture",
+		BedTrap: "Bed",
+	},
+	Furniture: {
+		LatexDisplayStand: "LatexDisplayStand",
+		DisplayStand: "DisplayStand",
+		DisplayEgyptian: "DisplayStand",
+		Cage: "Cage",
+		Barrel: "Barrel",
+		Bed: "Bed",
+		FutureBox: "FutureBox",
+		Sarcophagus: "Sarcophagus",
+		IceBase: "IceBase",
+		CrystalBase: "CrystalBase",
+		ShadowBase: "ShadowBase",
+		VineBase: "VineBase",
+	},
+}
+/** For stuff like traps */
+let ObjectTypeTooltipOverride = {
+	Trap: {
+		DisplayStandTrap: "Furniture",
+		DisplayTrap: "Furniture",
+		CageTrap: "Furniture",
+		FutureBoxTrap: "Furniture",
+		DisplayEgyptianTrap: "Furniture",
+		BedTrap: "Bed",
+	},
+}
+
 /**
  * Script happens when you display an object message
  */
@@ -160,7 +197,7 @@ let KDObjectInteract: Record<string, (x: number, y: number, dist?: number) => bo
 let KDTileInteract: Record<string, (x: number, y: number, dist?: number) => boolean> = {
 	'B': (x, y, dist) => {
 		// "nobed" flag is to prevent interacting with the bed during combat, because it's annoying if it keeps popping up every turn
-		if (dist != undefined ? dist : KDistChebyshev(x - KDPlayer().x, y - KDPlayer().y) < 1.5 && !KinkyDungeonFlags.get("nobed")) {
+		if ((dist != undefined ? dist : KDistChebyshev(x - KDPlayer().x, y - KDPlayer().y)) < 1.5) {
 			KDGameData.InteractTargetX = x;
 			KDGameData.InteractTargetY = y;
 			KDStartDialog("Bed", "", true);
@@ -169,7 +206,7 @@ let KDTileInteract: Record<string, (x: number, y: number, dist?: number) => bool
 		return false;
 	},
 	'c': (x, y, dist) => {
-		if (dist != undefined ? dist : KDistChebyshev(x - KDPlayer().x, y - KDPlayer().y) < 1.5)
+		if ((dist != undefined ? dist : KDistChebyshev(x - KDPlayer().x, y - KDPlayer().y)) < 1.5)
 			KDGameData.InteractTargetX = x;
 			KDGameData.InteractTargetY = y;
 			// Open container

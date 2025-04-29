@@ -31,7 +31,7 @@ RestartNeededRU,"Restart required!"
 
 KDVersion,"Version"
 KinkyDungeon,"Kinky Dungeon"
-KDVersionStr,"5.4.61"
+KDVersionStr,"5.4.67"
 KDLogo2,"By Ada18980"
 Intro,"You are an adventurer descending into an ancient underground city of magic."
 Intro2,"Beneath its depths lies the Mistress' Staff, an artifact of untold power."
@@ -680,6 +680,7 @@ KinkyDungeonStatWeakGrip,"Weak Grip"
 KinkyDungeonStatDescWeakGrip,"Having arms bound prevents you from holding weapons or potions."
 
 KinkyDungeonCantUsePotionsKneel,You kneel down so you can reach the potion with your mouth...
+KinkyDungeonCantUsePotionsKneelNoMouth,"Without hands, and with your mouth occupied, you cannot drink the potion."
 
 KinkyDungeonStatIncantation,"Can't Hear You!"
 KinkyDungeonStatDescIncantation,"Being gagged blocks you from casting verbal spells regardless of gag power."
@@ -1234,7 +1235,7 @@ KinkyDungeonRarity8,Mythic
 KinkyDungeonRarity9,Angelic
 KinkyDungeonRarity10,Divine
 
-KinkyDungeonConsumableQuantity,Quantity:
+KinkyDungeonConsumableQuantity,"Qty: "
 KinkyDungeonConsume,Use One
 
 KinkyDungeonInventoryItemnull,way of the fist
@@ -1248,6 +1249,10 @@ KinkyDungeonInventoryItemDefaultDesc2,"Your original outfit. No bonuses, no pena
 KinkyDungeonInventoryItemBountyhunter,Tactical Catsuit
 KinkyDungeonInventoryItemBountyhunterDesc,"A sleek catsuit worn by stealth operatives. No frills, no nonsense."
 KinkyDungeonInventoryItemBountyhunterDesc2,Increases stealth by 10% in the dark.
+
+KinkyDungeonInventoryItemBindingDress,Shoppe Uniform
+KinkyDungeonInventoryItemBindingDressDesc,"A dress worn by 'employees' of a certain establishment."
+KinkyDungeonInventoryItemBindingDressDesc2,Your outfit from your time at the doll shoppe.
 
 KinkyDungeonInventoryItemJailUniform,Jail Uniform
 KinkyDungeonInventoryItemJailUniformDesc,The prisoners are kept in revealing outfits to keep them from hiding things.
@@ -3489,7 +3494,18 @@ KinkyDungeonPayShrineBuffElements,"The goddess of SCHOOL grants you destructive 
 KinkyDungeonPayShrineBuffIllusion,"The goddess of SCHOOL grants you invisibility on attacks!"
 KinkyDungeonPayShrineBuffConjure,"The goddess of SCHOOL grants you protection and retaliation!"
 KinkyDungeonPayShrineCommerce,"You leave the coins on the altar and they transform into a ItemBought!"
-KinkyDungeonObject,"object"
+
+
+KDEffectTileTooltipBarrel,Barrel
+KDEffectTileTooltipDisplayStand,Display Stand
+KDEffectTileTooltipCage,Cage
+KDEffectTileTooltipIceBase,Icy Platform
+KDEffectTileTooltipCrystalBase,Crystal Dais
+KDEffectTileTooltipShadowBase,Shadow Rift
+KDEffectTileTooltipVineBase,Vines
+KDEffectTileTooltipFutureBox,Doll Storage Unit
+KDEffectTileTooltipSarcophagus,Sarcophagus
+KDEffectTileTooltipWrapping,Wrapping
 
 KinkyDungeonObjectCharger,"It appears to be a receptacle for an ancient crystal."
 KinkyDungeonObjectChargerDestroyed,"It's a pile of slag emitting a strange magic smoke..."
@@ -3497,6 +3513,13 @@ KinkyDungeonObjectLock,"That object is locked with a LKTP."
 KinkyDungeonObjectShrine,"A shrine to the goddess of TYPE."
 KinkyDungeonObjectShrineCommerce,"A shrine to the goddess of TYPE."
 KinkyDungeonObjectDoor,"That door is open. Do you want to close it?"
+KinkyDungeonObjectFurniture,"Just a normal piece of furniture."
+KinkyDungeonObjectTrap,"Nothing to see here."
+KinkyDungeonObject,"Nothing to see here."
+KinkyDungeonObjectChest,"Chest"
+
+
+
 KinkyDungeonCloseDoorDone,"You slam the door and jam it shut!"
 KinkyDungeonShrinePassion,"Passion"
 KinkyDungeonShrineFrustration,"Frustration"
@@ -3673,6 +3696,8 @@ RestraintDisplayTrapDesc,"A display stand, fit for only the prettiest of trophie
 RestraintDisplayTrapDesc2,"Your arms are pinned behind your back and you can barely move!"
 KDCageTrap,"You hear a click as the door shuts behind you..."
 KDDisplayTrap,"The display stand suddenly locks into place around you!"
+KDDisplayEgyptianTrap,"The display stand suddenly locks into place around you!"
+KDFutureBoxTrap,The storage unit beeps and closes behind you!
 
 RestraintDollStand,Doll Stand
 RestraintDollStandDesc,"A mobile display stand for dolls to keep them in place."
@@ -5659,8 +5684,9 @@ KinkyDungeonUnEquip,"Unequip"
 KinkyDungeonEquip,"Equip"
 KinkyDungeonEquipped,"Equipped"
 
-KDEffectTileTooltipT,
+KDEffectTileTooltipT,""
 KDEffectTileTooltipTDesc,""
+
 
 KDTileTooltipFlippedTable,Flipped Table
 KDEffectTileTooltipFlippedTableDesc,"Relieved some stress."
@@ -5835,6 +5861,7 @@ KinkyDungeonColumnUnique,"Unique"
 KinkyDungeonColumnActive,"Active"
 KinkyDungeonColumnUpgrades,"Upgrades"
 
+
 KinkyDungeonFilterlearnable,Learnable
 KinkyDungeonFilterunlearned,Unlearned
 KinkyDungeonFilterlearned,Learned
@@ -5881,6 +5908,7 @@ KinkyDungeonFilterstamina,Stamina
 KinkyDungeonFiltermana,Magic
 KinkyDungeonFilterdamage,Damage
 KinkyDungeonFilterdistract,Distraction
+KinkyDungeonFilterranged,Ranged
 
 
 KDSpellEmpower,Empower to upcast spells
@@ -5983,7 +6011,7 @@ KinkyDungeonSpellDescriptionOrgasmFrequency2,"You are quite difficult to satisfy
 
 KinkyDungeonSpellOrgasmResist,Mental Resistance
 KinkyDungeonSpellDescriptionOrgasmResist,"+100 Psychic and Charm Resist. You can no longer let go involuntarily while your WP is above 10% or you are shielded, and willpower drains 70% slower while edged. (click the buff to toggle)"
-KinkyDungeonBuffe_OrgasmResist,"Mental Resistance: You cannot orgasm except by choice or below 25% WP. Click to toggle."
+KinkyDungeonBuffe_OrgasmResist,"Mental Resistance: You cannot orgasm except by choice or below 10% WP. Click to toggle."
 KinkyDungeonBuffd_OrgasmResist,"Mental Resistance: You are allowing yourself to let go. Click to toggle."
 
 
@@ -6109,7 +6137,7 @@ KinkyDungeonSpellCastIceOrb,You a hurl a frigid orb!
 KinkyDungeonSpellTargetIceOrb,Choose aim direction
 
 KinkyDungeonSpellFreeze,Freeze
-KinkyDungeonSpellDescriptionFreeze,Chill an adjacent target for DamageDealt ice damage and slows for Duration turns. Freezes if already slowed or drenched.
+KinkyDungeonSpellDescriptionFreeze,Chill an adjacent target for DamageDealt ice damage and slows for Duration turns. Freezes if already slowed or drenched. Can be dodged by enemies as if it were an attack.
 KinkyDungeonSpellCastFreeze,You utter dark words of ice-cold truths.
 KinkyDungeonSpellTargetFreeze,Choose a target to freeze
 
@@ -13545,12 +13573,27 @@ rPrisonerJail,"(The SPEAKER sits bound in high-security manacles.|You'll need to
 rPrisonerJailNoKeys,"(You don't have any keys that work on the lock)"
 rPrisonerJailUnlockHandsBound,"(You can't help her, bound as tightly as you are...)"
 rPrisonerJailUnlockSlow,"(You unlock her, fumbling around for a while with your bound hands)"
-rPrisonerJailUnlock,"(You unlock the SPEAKER)|Thank you!|Let's get out of here!"
+rPrisonerJailUnlockDom,"(You unlock the SPEAKER)|Thank you!|Let's get out of here!"
+rPrisonerJailUnlockBrat,"(You unlock the SPEAKER)|...thanks.|No, I wasn't enjoying it or anything..."
+rPrisonerJailUnlock,"(You unlock the SPEAKER)|Appreciate the rescue!|'twas fun while it lasted..."
+rPrisonerJailUnlockSub,"(You unlock the SPEAKER)|Thank you miss!"
+rPrisonerJailUnlockOwnDom,"(You unlock your SPEAKER)|...at your command."
+rPrisonerJailUnlockOwnBrat,"(You unlock your SPEAKER)|Hmmpf... are you letting me go?"
+rPrisonerJailUnlockOwn,"(You unlock your SPEAKER)|Oh? So soon?"
+rPrisonerJailUnlockOwnSub,"(You unlock your SPEAKER)|Time to get to work~!"
+rPrisonerJailUnlocOwnGagged,"(You unlock your SPEAKER)|Mmmmph!|(She wants to keep her gag...)"
 rPrisonerJailUnlockGagged,"(You unlock the SPEAKER)|Mmmmph!|(She wants to keep her gag...)"
+rPrisonerLatexCutDom,"(After a while, you free the SPEAKER)|That was quite tight... thanks for the rescue."
+rPrisonerLatexCutBrat,"(After a while, you free the SPEAKER)|That was fun!|Er--|Thanks, I mean!"
+rPrisonerLatexCutSub,"(After a while, you free the SPEAKER)|Mmph... thank you miss!"
+rPrisonerLatexCut,"(After a while, you free the SPEAKER)|Thank you!|Let's get moving!"
 rPrisonerJailNoPick,"(You don't have any lockpicks)"
 rPrisonerJailPickJam,"(You try to pick the lock...)|(Click! A safety shield locks securely into place!)|(Looks like the SPEAKER will be staying here for a while...)"
 rPrisonerJailPickHandsBound,"(You can't pick the lock with your hands bound)"
-rPrisonerJailPick,"(After a while, you free the SPEAKER)|Thank you!|Let's get moving!"
+rPrisonerJailPickDom,"(After a while, you free the SPEAKER)|For a moment there I thought it was too much for you~"
+rPrisonerJailPickSub,"(After a while, you free the SPEAKER)|Thank you miss!|Your lockpicking skills are impeccable!"
+rPrisonerJailPickBrat,"(After a while, you free the SPEAKER)|Mmph, that took forever~"
+rPrisonerJailPick,"(After a while, you free the SPEAKER)|Are you supposed to be here?|(She giggles)"
 rPrisonerJailPickGagged,"(After a while, you free the SPEAKER)|Mmmmph!|(She shakes her head when you go for her gag...)"
 rPrisonerJailWordNoMana,"(You don't have enough mana for a command word)"
 rPrisonerJailWordNoSpeak,"(Try as you might, your mouth is sealed tight)"
@@ -13812,7 +13855,7 @@ rDollmakerLoseFinish,"(The Dollmaker places her visor over your face)|(With a cl
 rDollmakerStage2,"(The Dollmaker suddenly teleports away)|Hmmph. Looks like I will have to use my heavy firepower."
 rDollmakerStage3,"(The Dollmaker sinks into a puddle of slime and emerges nearby)|(Robotic arms sprout from her back as she storms toward you!)"
 
-rDollmakerWin,"(The Dollmaker concedes defeat)|You have defeated me.|I... I... will let you pass.|(The door exit door unlocks with an audible click)"
+rDollmakerWin,"(The Dollmaker concedes defeat)|You have defeated me.|I... I... will let you pass.|(The exit door unlocks with an audible click)"
 rDollmakerWinAccept,"(SPEAKER looks confused)|What are you... Okay, you can have it..."
 dDollmakerWin_Accept,"(Wear a doll visor)"
 rDollmakerWinAccept2,"(SPEAKER looks confused)|What are you... Okay, you can have it..."
@@ -27671,6 +27714,8 @@ KDVariableModifier_ElementalEcho,"Infuse weapon AMNT% TYPE"
 KDVariableModifier_ElementalDmg,"AMNT TYPE on attack"
 KDVariableModifier_ManaCost,"AMNT Mana Efficiency"
 KDVariableModifier_ManaCostSpecific,"AMNT TYPE Mana Efficiency"
+KDVariableModifier_ProjectileDamage,"AMNT% Projectile Damage"
+KDVariableModifier_StaticDamage,"AMNT% Static AoE Damage"
 KDVariableModifier_ManaRegen,"AMNT% regen from mana pool"
 KDVariableModifier_ManaRegenOnKill,"AMNT mana pool on capture"
 KDVariableModifier_Sneak,"AMNT% Visibility Reduction"
@@ -27732,6 +27777,7 @@ KinkyDungeonCurseUnlockCursedDamage,"The cursed seal on the RestraintName vanish
 KinkyDungeonCurseInfoCursedDamage,"Take AMNT damage to weaken the curse. Excludes shadow, psychic, charm, or damage taken at 0 WP."
 KinkyDungeonCurseStruggleCursedDamage,"You struggle uselessly, sealed in your fate."
 KDcurseDamageDamage,"You feel your restraints starting to weaken..."
+
 
 KinkyDungeonCurseUnlockCursedCollar,"The cursed collar falls off, awaiting its next victim..."
 KinkyDungeonCurseInfoCursedCollar,"You must remove all other Star Cursed items before removing the collar."
@@ -28770,6 +28816,8 @@ KDVarSuffDamageResist,of Resistance
 KDVarSuffDamageBuff,of Power
 KDVarPrefManaCost,Arcane
 KDVarPrefManaCostSpecific,Entuned
+KDVarPrefProjectileDamage,Deadeye
+KDVarPrefStaticDamage,Blasting
 KDVarPrefManaRegenOnKill,Draining
 KDVarSuffElementalEcho,of Echoes
 KDVarPrefElementalDmg,Infused
@@ -30198,7 +30246,7 @@ RestraintNeoLinkThighsDesc,"High-security cables connecting your belt to your th
 RestraintNeoLinkThighsDesc2,It's made of steel and secured with a lock. Unlocking the lock will cause it to fall loose.
 
 RestraintNeoLinkArms,Waist Links (Arms)
-RestraintNeoLinkArmsDesc,"High-security cables connecting your belt to your wrist cuffs. They reduce your desterity, making it harder to reach your neck and mouth, reducing Accuracy by 25%, and preventing the use of two-handed weapons."
+RestraintNeoLinkArmsDesc,"High-security cables connecting your belt to your wrist cuffs. They reduce your dexterity, making it harder to reach your neck and mouth, reducing Accuracy by 25%, and preventing the use of two-handed weapons."
 RestraintNeoLinkArmsDesc2,It's made of steel and secured with a lock. Unlocking the lock will cause it to fall loose.
 
 
@@ -30290,6 +30338,7 @@ AREA4-MAGICLIBRARY.ogg,Kocaeli - Magic Library
 black_cat.ogg,Kocaeli - Black Cat
 black_cat_angry.ogg,Kocaeli - Black Cat 2
 AREA5-UNDERGROUNDJUNGLE.ogg,Kocaeli - Underground Jungle
+AREA6-CRYSTALCAVE.ogg,Kocaeli - Crystal Cave
 UntitledRobot.ogg,Kocaeli - Untitled
 AREA7-LOSTTEMPLE.ogg,Kocaeli - Lost Temple
 AREA8-ORRERY.ogg,Kocaeli - Orrery
@@ -30709,6 +30758,8 @@ KDPropField_ExtraHidePrefixPoseSuffix,Hide Suffix (e.g TorsoUpper)
 KDPropField_Protected,Protected
 KDPropField_DisplaceAmount,Displace Amount
 KDPropField_EraseAmount,Erase Amount
+KDPropField_NoLoss,NoLoss
+KDPropField_HideRestraintTags,HideRestraintTags
 
 KinkyDungeonLoadFromFile,Load from File
 KinkyDungeonSaveToFile,Save to File
@@ -30726,7 +30777,7 @@ KinkyDungeonStatDescFreeBoob2,"Chastity bras are much rarer."
 
 KDFacilitiesLocked,Find an elevator to the Summit in order to access facilities.
 KDFacilityLocal,Visit the Summit to allow additional interactions with this facility.
-KDFacilityLocal2,Must visit the Summit or be in a perk shrine to recycle restraints.
+KDFacilityLocal2,Must visit the Summit or be in a perk shrine to recycle from inventory.
 
 KDFacilityInfo_Training,"+AMNT% Training/Tick"
 KDFacilityInfo_Opinion,"+AMNT% Opinion/Tick"
@@ -30749,7 +30800,8 @@ KDFacilityDesc_CuddleLounge,"Assign prisoners to the lounge in order to improve 
 KDFacility_Warden,Warden
 KDFacilityDesc_Warden,"Appoint a warden to keep prisoners in check and automatically bind using restraints from storage."
 
-KDRecycleButton,Recycle Restraints
+KDRecycleButton,Recycle Items
+KDRecycleButtonStorage,Recycle (Storage)
 
 KDInventoryActionRecycle,Recycle One
 KDInventoryActionRecycleBulk,Recycle ALL!
@@ -31184,7 +31236,6 @@ KDBindType_Tape,Tape
 KDBindType_Vine,Vine
 KDBindType_Ice,Ice
 KDBindType_Furniture,Furniture
-KDBindType_Wrapping,Wrapping
 
 KDSaving,Saving...
 KDSaved,Game Saved
@@ -31219,6 +31270,7 @@ KDTakeAll1,Take ALL-1 ITMN
 KDAddAllExcess,Store Excess ITMN
 KDRefill,Refill ITMN
 KDMaxNum,(Max: ${Num})
+KDMaxNumMinimal,(max ${Num})
 KDTakeEverything,Take Everything
 KDTakeEverythingExcess,Refill
 KDDepositEverything,Deposit All
@@ -31757,7 +31809,6 @@ rPrisonerLatexUnlockGagged,"(You rescue the SPEAKER)|Mmmmph!|(She wants to keep 
 rPrisonerLatexNoCut,"(You are not holding a cutting tool)"
 rPrisonerLatexCutHandsBound,"(You can't pick the lock with your hands bound)"
 rPrisonerLatexCutSlow,"(You cut her restraints, fumbling around for a while with your bound hands)"
-rPrisonerLatexCut,"(After a while, you free the SPEAKER)|Thank you!|Let's get moving!"
 rPrisonerLatexCutGagged,"(After a while, you free the SPEAKER)|Mmmmph!|(She shakes her head when you go for her gag...)"
 rPrisonerLatexWordNoMana,"(You don't have enough mana for Remove Slime)"
 rPrisonerLatexWordNoSpeak,"(Try as you might, your mouth is sealed tight)"
@@ -32026,10 +32077,10 @@ rAdaMasterworkUnlockSuccess,"(SPEAKER smiles as she unlocks your restraints with
 KDSummonLatexKitty,The chest contained an angry latex kitty!
 
 NameLatexKitty,Latex Kitty
-KillLatexKitty,The latex kitty
+KillLatexKitty,The latex kitty lies down and meows.
 AttackLatexKitty,The latex kitty rubs against you seductively!
-AttackLatexKittyBind,The latex kitty's rubbery coating spreads to you!
-AttackLatexKittyLock,The latex kitty's rubbery coating casts itself into locks!
+AttackLatexKittyBind,"The latex kitty's rubbery coating spreads to you!"
+AttackLatexKittyLock,"The latex kitty's rubbery coating casts itself into locks!"
 
 KDTooltipCycleClick,Click to show more info...
 KDTooltipCycleClickNeg,Click to hide info...
@@ -32066,3 +32117,43 @@ KDMulticlass2,"Class upgrades and skills for additional classes cost 2x as many 
 
 KDClickedHeadpat,"Your headpatting restored your willpower slightly!"
 KDClickedHeadpatNoWill,"Your headpatting feels nice!"
+
+KDIsImmune,${EnemyName} is immune to ${Type}!
+
+NameResistanceDrone,Hoverbot
+KillResistanceDrone,The hoverbot emits a loud 'failsafe engaged' and explodes.
+rResistanceRobot,(The EnemyName scans a beam across your body and beeps sharply)| |//CONTACT UNKNOWN|>explain intent
+dResistanceRobotNeutral,Just wandering around.
+dResistanceRobotNeutralGag,(Tilt your head)
+rResistanceRobotNeutral,(The EnemyName sounds a klaxon)| |>leave no witness
+dResistanceRobotNegative,None of your business.
+dResistanceRobotNegativeGag,(Shake your head)
+rResistanceRobotNegative,(The EnemyName sounds a klaxon)| |>hostility detected
+dResistanceRobotSteal,"To find some loot, of course!"
+rResistanceRobotSteal,(The EnemyName sounds a klaxon)| |>AGARTHA will be free
+dResistanceRobotSecret,"To bring down Sariel Vinlaga and her empire."
+rResistanceRobotSecret,(The EnemyName emits a pleasant chime)| |//CONTACT FRIENDLY|>you may proceed
+ 
+KDResistanceRobotAngered,Angered the resistance...?
+KDResistanceRobotPleased,Pleased the resistance...?
+
+KDTookDamage,${EnemyName} took ${Amount} ${Type} damage.
+KDTookDamageMissed,${EnemyName} avoided ${Amount} ${Type} damage.
+KDDodged,${EnemyName} dodged.
+KDDodgedToken,${EnemyName} spent a token to dodge.
+KDBlocked,${EnemyName} spent a token to block ${Amount} ${Type} damage.
+
+
+
+KDSummonLatexKittyCursed,The chest contained a cursed latex kitty!
+
+NameLatexKittyCursed,Cursed Latex Kitty
+KillLatexKittyCursed,The cursed latex kitty lies down and relaxes.
+AttackLatexKittyCursed,The cursed latex kitty rubs against you seductively!
+AttackLatexKittyCursedBind,"The cursed latex kitty's rubbery curse spreads to you!"
+AttackLatexKittyCursedLock,"The cursed latex kitty's rubbery coating casts itself into locks!"
+
+KinkyDungeonCurseUnlockLatexKittyCurse,"The Latex Kitty curse on the RestraintName relaxes and releases you."
+KinkyDungeonCurseInfoLatexKittyCurse,"The curse's strength is AMNT. Deal glue damage via unarmed attacks to weaken the curse."
+KinkyDungeonCurseStruggleLatexKittyCurse,"The Curse of the Latex Kitty keeps this tightly wrapped around you."
+KDLatexKittyCurseEffect,"You transfer some of your curse to the ${Target}."

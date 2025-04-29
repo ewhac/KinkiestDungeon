@@ -151,7 +151,7 @@ let KDExpressions: Record<string, KDExpression> = {
 				Brows2Pose: "",
 				BlushPose: "BlushHigh",
 				MouthPose: C == KinkyDungeonPlayer ?
-					(KinkyDungeonGoddessRep.Passion - KinkyDungeonGoddessRep.Frustration > 25 ? "MouthSmile" : (KinkyDungeonGoddessRep.Passion - KinkyDungeonGoddessRep.Frustration > -25 ? "MouthEmbarrassed" : "MouthPout"))
+					(KinkyDungeonStatStamina > 5 ? "MouthDazed" : (KinkyDungeonGoddessRep.Passion - KinkyDungeonGoddessRep.Frustration > 25 ? "MouthSmile" : (KinkyDungeonGoddessRep.Passion - KinkyDungeonGoddessRep.Frustration > -25 ? "MouthEmbarrassed" : "MouthPout")))
 					: "MouthEmbarrassed",
 			};
 		},
@@ -171,7 +171,7 @@ let KDExpressions: Record<string, KDExpression> = {
 				BrowsPose: "BrowsSurprised",
 				Brows2Pose: "Brows2Surprised",
 				BlushPose: "BlushExtreme",
-				MouthPose: "MouthDazed",
+				MouthPose: "MouthDistracted",
 			};
 		},
 	},
@@ -190,7 +190,7 @@ let KDExpressions: Record<string, KDExpression> = {
 				BrowsPose: "BrowsAnnoyed",
 				Brows2Pose: "Brows2Annoyed",
 				BlushPose: "BlushExtreme",
-				MouthPose: "MouthDazed",
+				MouthPose: "MouthDistracted",
 			};
 		},
 	},
@@ -288,7 +288,7 @@ let KDExpressions: Record<string, KDExpression> = {
 		},
 	},
 	"ClickHeadpat": {
-		priority: 1.5,
+		priority: 15,
 		criteria: (C, flags) => {
 			if (flags.get("clickheadpatted_recently")) {
 				return true;
@@ -594,7 +594,7 @@ let KDExpressions: Record<string, KDExpression> = {
 		criteria: (C, flags) => {
 			let entity = KDGetCharacterEntity(C);
 			if (entity && !entity.player) return entity.distraction > 0.9 * entity.Enemy.maxhp;
-			return (C == KinkyDungeonPlayer && KinkyDungeonGoddessRep.Frustration > 0 && KDIsEdged(C));
+			return (C == KinkyDungeonPlayer && KinkyDungeonGoddessRep.Frustration > 0 && (entity && KDIsEdged(entity)));
 		},
 		expression: (C, flags) => {
 			return {
@@ -611,7 +611,8 @@ let KDExpressions: Record<string, KDExpression> = {
 		stackable: true,
 		priority: 7,
 		criteria: (C, flags) => {
-			return (C == KinkyDungeonPlayer && KDIsEdged(C) && KinkyDungeonVibeLevel > 2);
+			let entity = KDGetCharacterEntity(C);
+			return (C == KinkyDungeonPlayer && entity && KDIsEdged(entity) && KinkyDungeonVibeLevel > 2);
 		},
 		expression: (C, flags) => {
 			return {
@@ -813,7 +814,7 @@ let KDExpressions: Record<string, KDExpression> = {
 				BrowsPose: "",
 				Brows2Pose: "",
 				BlushPose: "BlushHigh",
-				MouthPose: "MouthDistracted",
+				MouthPose: "",
 			};
 		},
 	},
@@ -830,7 +831,7 @@ let KDExpressions: Record<string, KDExpression> = {
 				BrowsPose: "",
 				Brows2Pose: "",
 				BlushPose: "BlushExtreme",
-				MouthPose: "MouthDistracted",
+				MouthPose: "",
 			};
 		},
 	},

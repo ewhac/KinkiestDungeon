@@ -41,6 +41,63 @@ TODO also I might need to maybe fade out or hide slots that the player doesnt ha
 
 MODDERS: In 5.4.46 (commit 851e8941e9233ff4ee3952c5aacde7323ff0b0f1) I changed the handling of floor types considerably when passing thru stairs. Please handle accordingly.
 
+
+5.5.68
+- Added Projectile Damage and Static AoE damage enchantments
+- Fix issue with transforming restraints not getting their effects changed
+- Added .ogg sound support for safari browser; should not affect anything other than safari
+- Fixed some parts of the cyber petsuit not showing over some corsets
+- fix missing sock when kneeling in kitty pet suit
+- Increased threshold for "curse testing" at shopkeeper
+- Added big red message when a target is immune to your attack
+- Made spell cast message happen before the spell is cast chronologically
+- Advancing a floor now clears the prisoner condition
+
+5.5.67
+- Added Kjus eyes 5
+- Reduced the incidence of the "distracted" mouth, especially when highly distracted
+- Bugfix: Fix wrong name when viewing enchanted items in containers
+- Bugfix: Fix issue where rarely wrong jail faction assigned when jailed via dialogue
+- Bugfix: Fix servers and other enemies spawning on conveyors and bondage machines
+- Bugfix: Missing descriptions
+- Bugfix: Right clicking on bed didnt show interaction option
+- Bugfix: Cant use bed if already on it
+- Bugfix: Animated masterworks appearing as regular spawns
+
+5.5.66
+- Fixed a crash when opening some chests
+
+5.4.65
+- Fixed sleep event not registering properly for modders
+
+5.4.64
+- Can now recycle items from the automated storage system
+- Made dragon lairs more open
+- Fix crash on selling all of a certain item
+- Fix inventory stuck in player storage after selling items to shopkeeper
+- Fix recycler not working in perk shrine
+- Fix some expressions not properly showing
+- Fixed bug where weak grip still allowed holding weapons
+- Fixed a bug where quest shrines and/or PoI entrances are inaccessible
+- Made infinite burning vine less likely to happen
+- Fixed bug with certain machines in the factory getting blocked
+
+
+5.4.63
+- Added names to furniture tooltips
+- Added max inventory storage value to consumable quantity
+- Fixed a bug where wearing a swimsuit that doesn't get drawn still hides other clothes
+- Fixed a bug where having any slime at all removes your clothes
+- Fixed a bug where WP would be lost-in-transit while regenerating with Mental Defiance
+- Fixed a bug where a restraint shrine wouldn't properly remove items if the top level item was unremovable
+- Fixed a bug where selfish leashers would shove you into the wall instead of the exit stairs
+- Fixed an issue where selfish leashers would leash you repeatedly between multiple stairs for funzies
+- Fixed issue where interacting with furniture traps doesn't show what kind of furniture
+- Fixed an issue where favoriting an item you are wearing favorites the mundane version
+
+5.4.62
+- Fixed bug where some player tags for the character didn't get added to the paperdoll model
+
 5.4.61
 - Unavailable context menu options are now greyed out
 - Added support for colored context menu text
