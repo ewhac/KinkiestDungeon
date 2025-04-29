@@ -2651,19 +2651,55 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 		},
 	},
 	"playerAttack": {
-		LatexKittyCurse: (e, _item, data) => {
+		LatexKittyCurse: (e, item, data) => {
 			if (data.enemy && !data.miss && !data.disarm) {
 				if ((!e.chance || KDRandom() < e.chance) && data.enemy.hp > 0 && !KDHelpless(data.enemy)) {
-					if (!e.prereq || KDCheckPrereq(data.enemy, e.prereq)) {
-						KinkyDungeonDamageEnemy(data.enemy, {
-							type: e.damage,
-							damage: e.power,
-							time: e.time,
-							bind: e.bind,
-							distract: e.distract,
-							addBind: e.addBind,
-							bindType: e.bindType,
-						}, false, e.power <= 0.1, undefined, undefined, KinkyDungeonPlayerEntity, undefined, undefined, data.vulnConsumed);
+					
+					if ((!e.prereq || KDCheckPrereq(data.enemy, e.prereq))) {
+						if ((KDItemDataQuery(item, "LatexKittyCurseHP") || 0) > 0) {
+							if (KinkyDungeonFlags.get("latexkittycurse_full") > 0) return;
+							KinkyDungeonSetFlag("latexkittycurse_full", 1);
+							let dmgDealt = Math.max(e.power,
+								KinkyDungeonDamageEnemy(data.enemy, {
+									type: e.damage,
+									damage: e.power,
+									time: e.time,
+									bind: e.bind,
+									distract: e.distract,
+									addBind: e.addBind,
+									bindType: e.bindType,
+								}, false, e.power <= 0.1, undefined, undefined, KinkyDungeonPlayerEntity, undefined, undefined, data.vulnConsumed));
+							KDItemDataSet(item, "LatexKittyCurseHP", 
+								Math.max(0, KDItemDataQuery(item, "LatexKittyCurseHP") - dmgDealt));
+							let msg = "KDLatexKittyCurseEffect";
+							let full = (KDItemDataQuery(item, "LatexKittyCurseHP") || 0) <= 0;
+							if (full) {
+								msg = "KDLatexKittyCurseEffectFull";
+								KinkyDungeonSendTextMessage(7, TextGet(
+									"KDLatexKittyCurseEffectFull2"
+								), KDBaseBaby, 1);
+							}
+							KinkyDungeonSendTextMessage(full ? 7 : 3, TextGet(msg, {
+								Item: KDGetItemName(item),
+								Target: KDGetEnemyTypeName(data.enemy)
+							}), KDBaseBaby, 1, !full);
+						} else {
+							
+							if (KinkyDungeonFlags.get("latexkittycurse_par") > 0) return;
+							KinkyDungeonSetFlag("latexkittycurse_par", 1);
+							Math.max(e.power,
+								KinkyDungeonDamageEnemy(data.enemy, {
+									type: e.damage,
+									damage: e.power * 0.25,
+									time: e.time,
+									bind: e.bind,
+									distract: e.distract,
+									addBind: e.addBind,
+									bindType: e.bindType,
+								}, false, true, undefined, undefined, KinkyDungeonPlayerEntity, undefined, undefined, data.vulnConsumed));
+						}
+						
+
 					}
 				}
 			}
@@ -5614,17 +5650,17 @@ let KDEventMapSpell: Record<string, Record<string, (e: KinkyDungeonEvent, spell:
 			}
 		},
 		"Parry": (e, spell, _data) => {
-			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands) {
+			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !isUnarmedUnlessBrawler(KinkyDungeonPlayerDamage)) {
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: e.power, duration: 2, });
 			}
 		},
 		"WillParry": (e, spell, _data) => {
-			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !KinkyDungeonPlayerDamage.light) {
+			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !isUnarmedUnlessBrawler(KinkyDungeonPlayerDamage) && !KinkyDungeonPlayerDamage.light) {
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: e.mult * KinkyDungeonStatWillMax, duration: 2, });
 			}
 		},
 		"SteelParry": (e, spell, _data) => {
-			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && KinkyDungeonMeleeDamageTypes.includes(KinkyDungeonPlayerDamage.type)) {
+			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !isUnarmedUnlessBrawler(KinkyDungeonPlayerDamage) && KinkyDungeonMeleeDamageTypes.includes(KinkyDungeonPlayerDamage.type)) {
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: e.mult * KinkyDungeonStatWillMax, duration: 2, });
 			}
 		},
@@ -5632,12 +5668,12 @@ let KDEventMapSpell: Record<string, Record<string, (e: KinkyDungeonEvent, spell:
 			KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: .15 + 0.15 * KinkyDungeonStatWill / KinkyDungeonStatWillMax, duration: 2, });
 		},
 		"DaggerParry": (e, spell, _data) => {
-			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && KinkyDungeonPlayerDamage.light) {
+			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !isUnarmedUnlessBrawler(KinkyDungeonPlayerDamage) && KinkyDungeonPlayerDamage.light) {
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: e.power, duration: 2, });
 			}
 		},
 		"ClaymoreParry": (e, spell, _data) => {
-			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && KinkyDungeonPlayerDamage.heavy) {
+			if (KinkyDungeonPlayerDamage && !KinkyDungeonPlayerDamage.noHands && !isUnarmedUnlessBrawler(KinkyDungeonPlayerDamage) && KinkyDungeonPlayerDamage.heavy) {
 				KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, { id: spell.name + "Block", type: "Block", power: e.power, duration: 2, });
 			}
 		},
