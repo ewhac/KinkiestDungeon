@@ -22,7 +22,7 @@ function KDGetSleepWillRegenHealthTo() {
  */
 function KDCanSleep() {
 	let willUnderTreshold = KinkyDungeonStatWill < KDGetSleepWillRegenHealthTo();
-	let jailedOrNotSleptOnLevel = KinkyDungeonPlayerInCell() || !KinkyDungeonFlags.get('slept');
+	let jailedOrNotSleptOnLevel = (KinkyDungeonPlayerInCell() && KDGameData.PrisonerState == "jail") || !KinkyDungeonFlags.get('slept');
 	return willUnderTreshold && jailedOrNotSleptOnLevel;
 }
 
@@ -30,7 +30,7 @@ function KDCanSleep() {
  * @returns Tooltip why player is unable to sleep at bed
  */
 function KDCanSleepTooltip() {
-	if(KinkyDungeonFlags.get('slept') && !KinkyDungeonPlayerInCell()) {
+	if(KinkyDungeonFlags.get('slept') && !(KinkyDungeonPlayerInCell() && KDGameData.PrisonerState == "jail")) {
 		return "KDBedSleptLevel";
 	}
 	if(KinkyDungeonStatWill >= KDGetSleepWillRegenHealthTo()) {
@@ -61,6 +61,7 @@ function KDSleep(entity?: entity, amount: number = 0) {
 		KDGameData.SleepTurns = data.amount; // sleep for this number of turns
 		KDChangeMana("player","sleep", "tick", KinkyDungeonStatManaMax, false, 0, false, true); // restore full mana instantly
 	}
+	KinkyDungeonSendEvent("sleepStart", data);
 }
 
 /**
@@ -135,6 +136,7 @@ let KinkyDungeonStatStaminaRegenWait = 0.5;
 let KinkyDungeoNStatStaminaLow = 4;
 let KDSprintCostBase = 1.5; // Cost of sprinting
 let KDSprintCostSlowLevel = [0.5, 1.0, 0.0, 0.5, 1.0]; // Extra cost per slow level
+let KDSprintAdjustSlowed = 1.5; // this is added on if slow level > 1
 let KinkyDungeonStatWillMax = KDMaxStatStart;
 let KinkyDungeonStatWill = KinkyDungeonStatWillMax;
 let KinkyDungeonStatWillRate = 0;
@@ -447,13 +449,19 @@ function KDDisableAutoWait() {
 }
 
 function KinkyDungeonInterruptSleep() {
+	if (KDGameData.SleepTurns  > 0) {
+		let data = {
+			interrupt: true,
+		};
+		KinkyDungeonSendEvent("sleepEnd", data);
+	}
 	KDGameData.SleepTurns = 0;
 	KDGameData.PlaySelfTurns = 0;
 	if (KinkyDungeonTempWait && !KDGameData.KinkyDungeonLeashedPlayer && !KinkyDungeonGetRestraintItem("ItemDevices") && !KinkyDungeonFlags.get("ZeroResistance")) {
 		KDAutoWaitDelayed = false;
 		KinkyDungeonAutoWait = false;
 	}
-	if (KinkyDungeonInDanger()) KinkyDungeonAutoWaitStruggle = false;
+	if (KinkyDungeonInDanger()) KinkyDungeonAutoWaitStruggle = false;	
 }
 
 let KDBaseDamageTypes = {

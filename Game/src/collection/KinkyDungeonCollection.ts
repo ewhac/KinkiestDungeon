@@ -495,17 +495,27 @@ function KDDrawSelectedCollectionMember(value: KDCollectionEntry, x: number, y: 
 		KDOriginalValue = "";
 		CharacterReleaseTotal(KDSpeakerNPC);
 		KDWardrobeCallback = () => {
+			UpdateModels(KDSpeakerNPC);
+			KDShowCharacterPalette = false; KDWardrobePreviewRestraints = "";
+			KDRefreshCharacter.set(KDSpeakerNPC, true);
+			KDDressWardrobeChar(KDSpeakerNPC, false);
+
 			let value2 = value;
 			//if (KDOriginalValue) {
 			value2.customOutfit = LZString.compressToBase64(AppearanceItemStringify(KDSpeakerNPC.Appearance));
 			value2.Palette = KDSpeakerNPC.Palette;
+			value2.metadata = KDSpeakerNPC.metadata;
 
 			KDRefreshCharacter.set(KDSpeakerNPC, true);
+			KinkyDungeonCheckClothesLoss = true;
+			KinkyDungeonDressPlayer(KDSpeakerNPC, false, false, KDGameData.NPCRestraints ? KDGameData.NPCRestraints[value.id + ''] : undefined);
+		
 			//}
 		};
 		if (value.customOutfit) {
 			let outfit = value.customOutfit;
 			KDWardrobeRevertCallback = () => {
+				KDShowCharacterPalette = false; KDWardrobePreviewRestraints = "";
 				if (outfit)
 					CharacterAppearanceRestore(KDSpeakerNPC, DecompressB64(outfit),false, true);
 				CharacterRefresh(KDSpeakerNPC);
@@ -514,10 +524,12 @@ function KDDrawSelectedCollectionMember(value: KDCollectionEntry, x: number, y: 
 				KinkyDungeonDressPlayer(KDSpeakerNPC, true);
 			};
 			KDWardrobeResetCallback = () => {
+				KDShowCharacterPalette = false; KDWardrobePreviewRestraints = "";
 				delete value.customOutfit;
 			};
 		} else {
 			KDWardrobeRevertCallback = () => {
+				KDShowCharacterPalette = false; KDWardrobePreviewRestraints = "";
 				delete value.customOutfit;
 				KDRefreshCharacter.set(KDSpeakerNPC, true);
 				KinkyDungeonDressPlayer(KDSpeakerNPC, true);
@@ -537,6 +549,8 @@ function KDDrawSelectedCollectionMember(value: KDCollectionEntry, x: number, y: 
 		let current = LZString.compressToBase64(AppearanceItemStringify(KinkyDungeonPlayer.Appearance));
 		if (orig != current) KDOriginalValue = orig;
 		ForceRefreshModelsAsync(KDSpeakerNPC);
+		KDShowCharacterPalette = false; KDWardrobePreviewRestraints = "";
+		KDDressWardrobeChar(KDSpeakerNPC, true);
 		return true;
 	}, true, x - 90, y + 90, 80, 80, "", KDBaseWhite,
 		KinkyDungeonRootDirectory + "UI/Dress.png", undefined, undefined,
@@ -668,7 +682,7 @@ function KDDrawSelectedCollectionMember(value: KDCollectionEntry, x: number, y: 
 
 
 	if (!KDNPCChar.get(value.id)) {
-		KDSpeakerNPC = CharacterLoadNPC(value.id, value.name, value.Palette);
+		KDSpeakerNPC = CharacterLoadNPC(value.id, value.name, value.Palette, value.metadata?.customColors);
 		KDNPCChar.set(value.id, KDSpeakerNPC);
 		KDNPCChar_ID.set(KDSpeakerNPC, value.id);
 		let oldstyle = KDNPCStyle.get(KDSpeakerNPC);
@@ -725,7 +739,8 @@ function KDDrawSelectedCollectionMember(value: KDCollectionEntry, x: number, y: 
 			}
 			NPCTags.set(KDSpeakerNPC, KinkyDungeonUpdateRestraints(KDSpeakerNPC, value.id, 0));
 		}
-		KinkyDungeonDressPlayer(KDSpeakerNPC, false, false, KDGameData.NPCRestraints ? KDGameData.NPCRestraints[value.id + ''] : undefined);
+		KinkyDungeonDressPlayer(KDSpeakerNPC, false, false, 
+			KDGameData.NPCRestraints ? KDGameData.NPCRestraints[value.id + ''] : undefined);
 		DrawCharacter(KDSpeakerNPC,
 			x + 20 + (KDToggleBigView ? 0 : 100),
 			y + 60,

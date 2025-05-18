@@ -165,7 +165,7 @@ let KinkyDungeonKeySprint = ['ShiftLeft'];
 let KinkyDungeonKeyWeapon = ['R',];
 let KinkyDungeonKeyUpcast = ['ControlLeft', 'AltLeft'];
 let KinkyDungeonKeyMenu = ['V', 'I', 'U', 'M', 'L', '*', '-', '_', "Home", "PageUp"]; // QuikInv, Inventory, Reputation, Magic, Log, Quest, Collection, Pause, Journey
-let KinkyDungeonKeyToggle = ['O', 'P', 'B', 'Backspace', '=', "ShiftRight", 'T', '?', '/', "'"]; // Log, Passing, Door, Auto Struggle, Auto Pathfind, Inspect, Wait till interrupted, Make Noise, Crouch
+let KinkyDungeonKeyToggle = ['O', 'P', 'B', 'Backspace', '=', "ShiftRight", 'T', '?', '/', "'", 'N', 'K']; // Log, Passing, Door, Auto Struggle, Auto Pathfind, Inspect, Wait till interrupted, Make Noise, Crouch, Buffs
 let KinkyDungeonKeySpellPage = ['`'];
 let KinkyDungeonKeySwitchWeapon = ['F', 'G', 'H', 'J']; // Swap, Offhand, OffhandPrevious
 let KinkyDungeonKeySwitchLoadout = ['[', ']', '\\'];
@@ -234,6 +234,7 @@ let KDToggles = {
 	ChastityOption2: false,
 	ChastityBraOption: false,
 	SimpleColorPicker: true,
+	PaletteColorPicker: false,
 	TransparentUI: false,
 	Center: false,
 	TurnCounter: false,
@@ -260,6 +261,7 @@ let KDToggles = {
 	//AutoCrouchOnTrip: true,
 	FlipStatusBars: false,
 	ForcePalette: false,
+	RestraintPalette: true,
 	AutoLoadMods: false,
 	FlipPlayer: true,
 	FlipPlayerAuto: false,
@@ -304,9 +306,12 @@ let KDToggles = {
 	InvLimit: true,
 	Headpats: false,
 	ExtraBuffRow: true,
+	StruggleContext: false,
 };
 
+
 let KDToggleCategories = {
+	StruggleContext: "UI",
 	Headpats: "Clothes",
 	ExtraBuffRow: "UI",
 	ShowExtraStruggle: "UI",
@@ -368,6 +373,7 @@ let KDToggleCategories = {
 	FlipStatusBars: "UI",
 	ShowRestraintOnHover: "UI",
 	ForcePalette: "Clothes",
+	RestraintPalette: "Clothes",
 	//LazyWalk: "Controls",
 	//ShiftLatch: "Controls",
 	FlipPlayer: "Clothes",
@@ -381,6 +387,8 @@ let KDToggleCategories = {
 	//ApplyPaletteOutfit: "none",
 	ApplyPaletteTransform: "none",
 	NoOutfitPalette: "none",
+
+	PaletteColorPicker: "none",
 
 	IgnoreApplyCharPalette: "none",
 	AlwaysApplyCharPalette: "none",
@@ -422,6 +430,7 @@ let KDDefaultKB = {
 
 	Wait: KinkyDungeonKeyWait[0],
 	WaitInterrupt: KinkyDungeonKeyToggle[6],
+	ToggleBuff: KinkyDungeonKeyToggle[11],
 	Skip: KinkyDungeonKeySkip[0],
 	Enter: KinkyDungeonKeyEnter[0],
 
@@ -729,9 +738,16 @@ interface KDGameDataBase {
 		Escaped: boolean,
 	},
 
+	WarningTiles: Record<string, WarningTileRecord[]>,
+	RecruitedFaction?: string,
+	//customColors: Record<string, Record<string, LayerFilter>>,
+
 };
 
+
 let KDGameDataBase: KDGameDataBase = {
+	RecruitedFaction: "",
+	WarningTiles: {},
 	MasterworkIntro: false,
 	AutoRelease: {
 		NonNotable: false,
@@ -989,6 +1005,7 @@ let KDGameDataBase: KDGameDataBase = {
 	IdentifiedObj: {},
 	UseJourneyTarget: false,
 	PlayerWeaponLastEquipped: "",
+	//customColors: {},
 };
 
 // endregion
@@ -1178,7 +1195,11 @@ function KinkyDungeonLoad(): void {
 		if (CommonIsMobile || document.activeElement?.type == "text" || document.activeElement?.type == "textarea") {
 			// Trigger mouse clicked
 			//MouseClicked = true;
-			if (KDDrawGameContextMenu[KinkyDungeonDrawState]) {
+			if (KDDrawGameContextMenu[KDCurrentHoverButton?.contextMenu]) {
+				if (KDDrawGameContextMenu[KDCurrentHoverButton.contextMenu](false, MouseX, MouseY).length > 0) {
+					KDContextMenu = !KDContextMenu;
+				}
+			} else if (KDDrawGameContextMenu[KinkyDungeonDrawState]) {
 				if (KDDrawGameContextMenu[KinkyDungeonDrawState](false, MouseX, MouseY).length > 0) {
 					KDContextMenu = !KDContextMenu;
 				}
@@ -1194,7 +1215,11 @@ function KinkyDungeonLoad(): void {
 
 		} else {
 			event.preventDefault();
-			if (KinkyDungeonState == "Game") {
+			if (KDDrawGameContextMenu[KDCurrentHoverButton?.contextMenu]) {
+				if (KDDrawGameContextMenu[KDCurrentHoverButton.contextMenu](false, MouseX, MouseY).length > 0) {
+					KDContextMenu = !KDContextMenu;
+				}
+			} else if (KinkyDungeonState == "Game") {
 				if (KDDrawGameContextMenu[KinkyDungeonDrawState]) {
 					if (KDDrawGameContextMenu[KinkyDungeonDrawState](false, MouseX, MouseY).length > 0) {
 						KDContextMenu = !KDContextMenu;
@@ -1536,7 +1561,12 @@ let KDErrorText = "";
 let KDErrorTextTime = 0;
 let KDErrorTextTime_DELAY = 2500;
 
+let KDCurrentHoverButton: KDButtonParamData = null;
+
 function KinkyDungeonRun() {
+
+	KDButtonHovering = false;
+	KDCurrentHoverButton = null;
 
 	if (KDSaveQueue.length > 8) {
 		// uh...
@@ -2024,7 +2054,9 @@ function KinkyDungeonRun() {
 					CharacterAppearanceRestore(KinkyDungeonPlayer, appearance, false, true);
 					let parsed = JSON.parse(appearance);
 					if (parsed.metadata) {
-						KinkyDungeonPlayer.Palette = parsed.metadata.palette;
+						let metadata: KDOutfitMetadata = parsed.metadata;
+						KinkyDungeonPlayer.Palette = metadata.palette;
+						KinkyDungeonPlayer.metadata = metadata;
 					}
 
 					CharacterRefresh(KinkyDungeonPlayer);
@@ -2038,7 +2070,9 @@ function KinkyDungeonRun() {
 					CharacterAppearanceRestore(KinkyDungeonPlayer, appearance, false, true);
 					let parsed = JSON.parse(appearance);
 					if (parsed.metadata) {
-						KinkyDungeonPlayer.Palette = parsed.metadata.palette;
+						let metadata: KDOutfitMetadata = parsed.metadata;
+						KinkyDungeonPlayer.Palette = metadata.palette;
+						KinkyDungeonPlayer.metadata = metadata;
 					}
 					CharacterRefresh(KinkyDungeonPlayer);
 				}
@@ -2207,6 +2241,7 @@ function KinkyDungeonRun() {
 						let appearanceFromSave = JSON.stringify(decodeSave.saveStat.appearance);
 						CharacterAppearanceRestore(KinkyDungeonPlayer, appearanceFromSave, false, false);
 						KinkyDungeonPlayer.Palette = decodeSave.saveStat.Palette;
+						KinkyDungeonPlayer.metadata = decodeSave.saveStat.metadata;
 						CharacterRefresh(KinkyDungeonPlayer);
 						UpdateModels(KinkyDungeonPlayer);
 						//KDInitProtectedGroups(KinkyDungeonPlayer);
@@ -2219,6 +2254,8 @@ function KinkyDungeonRun() {
 				} catch (e) {
 					console.log("Invalid outfit loaded from save");
 					KinkyDungeonPlayer.Appearance = origAppearance;
+					/** breaks the link */
+					KDRefreshSelectedModel(KinkyDungeonPlayer);
 				}
 			}
 		}
@@ -2229,7 +2266,6 @@ function KinkyDungeonRun() {
 				return true;
 			}, true, 875, 650, 750, 64, TextGet("KinkyDungeonLoadFromFile") + ": " + KDSaveName, KDBaseWhite, ""
 		);
-
 		ElementPosition("saveInputField", 1250, 450, 1000, 230);
 	} else if (KinkyDungeonState == "LoadOutfit") {
 		DrawButtonVis(1275, 750, 350, 64, TextGet("KDWardrobeBackTo" + (StandalonePatched ? "Wardrobe" : "Menu")), KDBaseWhite, "");
@@ -2270,9 +2306,7 @@ function KinkyDungeonRun() {
 			if (orig != ElementValue("saveInputField")) KDOriginalValue = orig;
 			let decompressed = DecompressB64(ElementValue("saveInputField"));
 			if (decompressed) {
-				let origAppearance = Char.Appearance;
 				try {
-					console.log("Trying BC code...");
 					CharacterAppearanceRestore(Char, decompressed, true, false);
 					CharacterRefresh(Char);
 					KDOldValue = newValue;
@@ -2282,28 +2316,7 @@ function KinkyDungeonRun() {
 					if (Char.Appearance.length == 0)
 						throw new DOMException();
 				} catch (e) {
-					console.log("Trying BCX code...");
-					// If we fail, it might be a BCX code. try it!
-					Char.Appearance = origAppearance;
-					try {
-						let parsed = JSON.parse(decompressed);
-						if (parsed.length > 0) {
-							if (!StandalonePatched) {
-								for (let g of parsed) {
-									InventoryWear(Char, g.Name, g.Group, g.Color);
-								}
-								CharacterRefresh(Char);
-								ElementValue("saveInputField", LZString.compressToBase64(
-									AppearanceItemStringify(Char.Appearance)));
-							}
-							KDOldValue = newValue;
-							KDInitProtectedGroups(Char);
-						} else {
-							console.log("Invalid code. Maybe its corrupt?");
-						}
-					} catch (error) {
-						console.log("Invalid code.");
-					}
+					console.log("Invalid code.");
 				}
 			}
 		}
@@ -3074,9 +3087,14 @@ function KinkyDungeonRun() {
 						KDUpdateWaitTime(10)
 					}
 					if (KDGameData.SleepTurns == 0) {
+						let data = {
+							interrupt: false,
+							kneelTurns: 1,
+						};
+						KinkyDungeonSendEvent("sleepEnd", data);
 						KDChangeStamina("", "", "", 0);
 						KDChangeWill("", "", "", 0);
-						KDGameData.KneelTurns = 1;
+						KDGameData.KneelTurns = data.kneelTurns;
 					}
 				} else if (KDGameData.PlaySelfTurns > 0) {
 					if (CommonTime() > KinkyDungeonSleepTime) {
@@ -3426,13 +3444,13 @@ function KinkyDungeonRun() {
 				}
 
 
-				KDDrawPalettes(x, 250, w, scale, undefined, undefined);
+				KDDrawCustomPalettes(KDGetPalettes(KinkyDungeonPlayer), KinkyDungeonPlayer.ID + "_", x, 250, w, scale, undefined, undefined);
 
 				let options = KDClothesToggles;
 
 				let ii = 0;
-				let spacing = KDCustomOptionsSpacing[KDToggleTab] || 70;
-				let size = KDCustomOptionsSize[KDToggleTab] || 64;
+				let spacing = KDCustomOptionsSpacing["ClothesToggles"] || 70;
+				let size = KDCustomOptionsSize["ClothesToggles"] || 64;
 				for (let o of options) {
 					if (o.name) {
 						DrawCheckboxKDEx("toggle" + o.name, () => {
@@ -3443,11 +3461,11 @@ function KinkyDungeonRun() {
 								KDSaveToggles();
 							}
 							return true;
-						}, true, x, 600 + ii * spacing, size, size,
+						}, true, x + 85, 948 - (spacing * Object.keys(options).length) + ii * spacing, size, size,
 						TextGet("KDToggle" + o.name),
 						KDToggles[o.name], false, KDBaseWhite, undefined, {
-							maxWidth: 350,
-							fontSize: 24,
+							maxWidth: 265,
+							fontSize: 18,
 							scaleImage: true,
 						});
 					}
@@ -3694,22 +3712,22 @@ function KDCullTexList(list: Map<string, PIXITexture>): void {
 	}
 }
 
+interface KDButtonParamData {
+	Left:          number,
+	Top:           number,
+	Width:         number,
+	Height:        number,
+	enabled:       boolean,
+	func?:         (bdata?: any) => boolean | undefined,
+	priority:      number,
+	scrollfunc?:   (amount: number) => void,
+	hotkeyPress?:  string,
+	contextMenu?:  string
+}
 
-type ButtonCacheEntry = {
-	Left:          number;
-	Top:           number;
-	Width:         number;
-	Height:        number;
-	enabled:       boolean;
-	func?:         (bdata?: any) => boolean | undefined;
-	priority:      number;
-	scrollfunc?:   (amount: number) => void;
-	hotkeyPress?:  string;
-};
+let KDButtonsCache: Record<string, KDButtonParamData> = {};
 
-let KDButtonsCache: Record<string, ButtonCacheEntry> = {};
-
-let KDLastButtonsCache: Record<string, ButtonCacheEntry> = {};
+let KDLastButtonsCache: Record<string, KDButtonParamData> = {};
 
 
 /**
@@ -3745,7 +3763,7 @@ function KDRegisterKeyDefs (keyDefs: KDKeystrokeDef[], name?: string, commonFunc
  * @param button - Button from which to draw hotkey info.
  * @param [name] - Name of button, as registered in KDButtonsCache[].
  */
-function KDRegisterKeyDefsCompat (button: ButtonCacheEntry, name?: string): void
+function KDRegisterKeyDefsCompat (button: KDButtonParamData, name?: string): void
 {
 	if (!button.enabled  ||  !button.hotkeyPress  ||  !button.func) {
 		return;
@@ -3762,7 +3780,7 @@ function KDRegisterKeyDefsCompat (button: ButtonCacheEntry, name?: string): void
  * @param name - Button's registered name.
  * @param [options] - Optional info.
  */
-function KDRegisterButton (button: ButtonCacheEntry, name: string, options?: ButtonOptions): void
+function KDRegisterButton (button: KDButtonParamData, name: string, options?: ButtonOptions): void
 {
 	if (button.enabled) {
 		if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
@@ -3808,15 +3826,21 @@ function DrawButtonKD (
 	NoBorder?:	boolean
 ): void
 {
-	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder);
-	KDRegisterButton ({
+	let params = {
 		Left,
 		Top,
 		Width,
 		Height,
 		enabled,
 		priority: 0,
-	}, name);
+	};
+	let hover = ((MouseX >= Left) && (MouseX <= Left + Width) && (MouseY >= Top) && (MouseY <= Top + Height) && !CommonIsMobile && !Disabled);
+	if (hover) {
+		if (!KDCurrentHoverButton) KDCurrentHoverButton = params;
+		else Disabled = true;
+	}
+	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder);
+	KDRegisterButton (params, name);
 }
 
 
@@ -3861,8 +3885,7 @@ function DrawButtonKDEx (
 	options?:	ButtonOptions
 ): boolean
 {
-	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDRegisterButton ({
+	let params = {
 		Left,
 		Top,
 		Width,
@@ -3871,12 +3894,90 @@ function DrawButtonKDEx (
 		func,
 		priority: (options?.zIndex || 0),
 		hotkeyPress: options?.hotkeyPress,
-	}, name, options);
-	//if (options?.keyDefs  &&  Array.isArray (options.keyDefs)) {
-	//	KDRegisterKeyDefs (options.keyDefs, name, func);
-	//} else {
-	//	KDRegisterKeyDefsCompat (KDButtonsCache[name], name);
-	//}
+	};
+	let hover = ((MouseX >= Left) && (MouseX <= Left + Width) && (MouseY >= Top) && (MouseY <= Top + Height) && !CommonIsMobile && !Disabled);
+	if (hover) {
+		if (!KDCurrentHoverButton) KDCurrentHoverButton = params;
+		else Disabled = true;
+	}
+	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
+	KDRegisterButton (params, name, options);
+	return MouseIn(Left,Top,Width,Height);
+}
+
+
+
+/**
+ * Draws a button component
+ * @param name - Name of the button element
+ * @param func - Whether or not you can click on it
+ * @param enabled - Whether or not you can click on it
+ * @param Left - Position of the component from the left of the canvas
+ * @param Top - Position of the component from the top of the canvas
+ * @param Width - Width of the component
+ * @param Height - Height of the component
+ * @param Label - Text to display in the button
+ * @param Color - Color of the component
+ * @param [Image] - URL of the image to draw inside the button, if applicable
+ * @param [HoveringText] - Text of the tooltip, if applicable
+ * @param [Disabled] - Disables the hovering options if set to true
+ * @param [NoBorder] - Disables border
+ * @param [FillColor] - BG color
+ * @param [FontSize] - Font size
+ * @param [ShiftText] - Shift text to make room for the button
+ * @param [options] - Additional options
+ * @param [options.noTextBG] - Dont show text backgrounds
+ * @param [options.alpha] - Dont show text backgrounds
+ * @param [options.zIndex] - zIndex
+ * @param [options.scaleImage] - zIndex
+ * @param [options.centered] - centered
+ * @param [options.centerText] - centered
+ * @param [options.tint] - tint
+ * @param [options.hotkey] - hotkey
+ * @param [options.hotkeyPress] - hotkey
+ * @param [options.filters] - filters
+ * @returns - Whether or not the mouse is in the button
+ */
+function DrawButtonKDExContext (
+	name:		string,
+	contextMenu: string,
+	func:		(bdata: any) => any,
+	enabled:	boolean,
+	Left:		number,
+	Top:		number,
+	Width:		number,
+	Height:		number,
+	Label:		string,
+	Color:		string,
+	Image?:		string,
+	HoveringText?:	string,
+	Disabled?:	boolean,
+	NoBorder?:	boolean,
+	FillColor?:	string,
+	FontSize?:	number,
+	ShiftText?:	boolean,
+	options?:	any,
+): boolean
+{
+
+	let params = {
+		Left,
+		Top,
+		Width,
+		Height,
+		enabled,
+		func,
+		priority: (options?.zIndex || 0),
+		hotkeyPress: options?.hotkeyPress,
+		contextMenu: contextMenu
+	};
+	let hover = ((MouseX >= Left) && (MouseX <= Left + Width) && (MouseY >= Top) && (MouseY <= Top + Height) && !CommonIsMobile && !Disabled);
+	if (hover) {
+		if (!KDCurrentHoverButton) KDCurrentHoverButton = params;
+		else Disabled = true;
+	}
+	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
+	KDRegisterButton (params, name, options);
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -3925,8 +4026,7 @@ function DrawButtonKDExScroll (
 	options?:	ButtonOptions
 ): boolean
 {
-	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDRegisterButton ({
+	let params = {
 		Left,
 		Top,
 		Width,
@@ -3936,7 +4036,14 @@ function DrawButtonKDExScroll (
 		priority: (options?.zIndex || 0),
 		scrollfunc: scrollfunc,
 		hotkeyPress: options?.hotkeyPress,
-	}, name, options);
+	};
+	let hover = ((MouseX >= Left) && (MouseX <= Left + Width) && (MouseY >= Top) && (MouseY <= Top + Height) && !CommonIsMobile && !Disabled);
+	if (hover) {
+		if (!KDCurrentHoverButton) KDCurrentHoverButton = params;
+		else Disabled = true;
+	}
+	DrawButtonVis(Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
+	KDRegisterButton (params, name, options);
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -3983,8 +4090,7 @@ function DrawButtonKDExTo (
 	options?:	ButtonOptions
 ): boolean
 {
-	DrawButtonVisTo(Container, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
-	KDRegisterButton ({
+	let params = {
 		Left,
 		Top,
 		Width,
@@ -3993,7 +4099,14 @@ function DrawButtonKDExTo (
 		func,
 		priority: (options?.zIndex || 0),
 		hotkeyPress: options?.hotkeyPress,
-	}, name, options);
+	};
+	let hover = ((MouseX >= Left) && (MouseX <= Left + Width) && (MouseY >= Top) && (MouseY <= Top + Height) && !CommonIsMobile && !Disabled);
+	if (hover) {
+		if (!KDCurrentHoverButton) KDCurrentHoverButton = params;
+		else Disabled = true;
+	}
+	DrawButtonVisTo(Container, Left, Top, Width, Height, Label, Color, Image, HoveringText, Disabled, NoBorder, FillColor, FontSize, ShiftText, undefined, options?.zIndex, options);
+	KDRegisterButton (params, name, options);
 	return MouseIn(Left,Top,Width,Height);
 }
 
@@ -4271,7 +4384,7 @@ function KDProcessButtons() {
 function KDClickButton(name: string): boolean {
 	let button = KDButtonsCache[name] || KDLastButtonsCache[name];
 	if (button && button.enabled) {
-		return button.func();
+		return button.func(button);
 	}
 	return false;
 }
@@ -4755,6 +4868,24 @@ function KDDrawLoadMenu() {
 		}, true, CombarXX + 210, YYstart - 5, 150, 45, TextGet("KDCloudSaves"), KDBaseWhite, undefined, "")
 	}
 
+
+
+	DrawCheckboxKDEx(
+		"LoadoverrideOF", () => {
+			KDToggles.OverrideOutfit = !KDToggles.OverrideOutfit;
+			KDSaveToggles();
+
+			// Dress the KDPreviewModel
+			ModelPreviewLoaded = false;
+			KinkyDungeonDressModelPreview();
+			return true;
+		}, true, CombarXX + 20, YY + 165 + 375 + 55, 64, 64,
+		TextGet("KDToggleOverrideOutfitAbbr"), KDToggles.OverrideOutfit, false, KDTextWhite,
+	undefined, {
+
+	});
+
+
 	if (!KDLoadCloudGames) {
 		// Left button to switch to previous page
 		DrawButtonKDEx(`PreviousPage`, (_bdata) => {
@@ -4961,7 +5092,7 @@ function KDDrawLoadMenu() {
         YY += YYd;
     }
 	// Pastebox for code
-	ElementPosition("saveInputField", CombarXX + 215, YY + 165, 400, 300);
+	ElementPosition("saveInputField", CombarXX + 215, YY + 165 - 33, 400, 300 - 75);
 	let newValue = ElementValue("saveInputField");
 	// Load from Code button
 	DrawButtonKDEx("LoadFromCodeButton", () => {
@@ -5584,15 +5715,20 @@ function KinkyDungeonDressModelPreview() {
 	return new Promise((res, _rej) => {
 		KDPreviewModel = Object.assign({}, JSON.parse(JSON.stringify(KinkyDungeonPlayer)));
 		KDPreviewModel.ID++;
-		CharacterNaked(KDPreviewModel);
-		KDNaked = true;
-		if (loadedSaveforPreview.saveStat?.appearance) {
-			KDPreviewModel.Appearance = JSON.parse(JSON.stringify(loadedSaveforPreview.saveStat.appearance));
-			if (KDCurrentModels.get(KDPreviewModel))
-				KDCurrentModels.get(KDPreviewModel).Poses = loadedSaveforPreview.saveStat.poses;
+		if (!KDToggles.OverrideOutfit) {
+			CharacterNaked(KDPreviewModel);
+			KDNaked = true;
+			if (loadedSaveforPreview.saveStat?.appearance) {
+				KDPreviewModel.Appearance = JSON.parse(JSON.stringify(loadedSaveforPreview.saveStat.appearance));
+				/** breaks the link */
+				KDRefreshSelectedModel(KDPreviewModel);
+				if (KDCurrentModels.get(KDPreviewModel))
+					KDCurrentModels.get(KDPreviewModel).Poses = loadedSaveforPreview.saveStat.poses;
 
-			UpdateModels(KDPreviewModel);
+				UpdateModels(KDPreviewModel);
+			}
 		}
+
 		//CharacterAppearanceRestore(KDPreviewModel, DecompressB64(localStorage.getItem(`kinkydungeonappearance${KDCurrentOutfit}`)))
 		//setTimeout(() => {
 		DrawCharacter(KDPreviewModel, PIXIWidth, PIXIHeight, 0.1);
@@ -5879,7 +6015,9 @@ function KinkyDungeonStartNewGame(Load: boolean = false) {
 
 
 	KDModsAfterGameStart();
-	KinkyDungeonSendEvent("afterNewGame", {Load: Load});
+	if (!Load)
+		KinkyDungeonSendEvent("afterNewGame", {Load: Load});
+	else KinkyDungeonSendEvent("afterModsLoadedAndLoadGame", {Load: Load});
 }
 
 function KDUpdatePlugSettings(evalHardMode: boolean) {
@@ -5942,7 +6080,15 @@ function KinkyDungeonHandleClick(event: MouseEvent) {
 	allowMusic = true;
 	KDLastForceRefresh = CommonTime() - KDLastForceRefreshInterval - 10;
 	if (KDAwaitingModLoad) return true;
-	if (KDContextMenu && KDDrawGameContextMenu[KinkyDungeonDrawState]
+	if (KDContextMenu && KDCurrentHoverButton?.contextMenu
+	) {
+		if (!MouseIn(KDContextXX, KDContextYY, KDContextW, KDContextH)) {
+			KDContextMenu = false;
+			return true;
+		}
+		KDProcessButtons();
+		return true;
+	} else if (KDContextMenu && KDDrawGameContextMenu[KinkyDungeonDrawState]
 	) {
 		if (!MouseIn(KDContextXX, KDContextYY, KDContextW, KDContextH)) {
 			KDContextMenu = false;
@@ -6399,7 +6545,11 @@ window.addEventListener('touchend', function(event: TouchEvent) {
 	} else {
 		if (!HoldMoved && LastHoldTime > LongHoldThresh) {
 			if (KDMouseInPlayableArea()) {
-				if (KDDrawGameContextMenu[KinkyDungeonDrawState]) {
+				if (KDContextMenu && KDCurrentHoverButton?.contextMenu) {
+					if (KDDrawGameContextMenu[KDCurrentHoverButton.contextMenu](false, MouseX, MouseY).length > 0) {
+						KDContextMenu = !KDContextMenu;
+					}
+				} else if (KDDrawGameContextMenu[KinkyDungeonDrawState]) {
 					if (KDDrawGameContextMenu[KinkyDungeonDrawState](false, MouseX, MouseY).length > 0) {
 						KDContextMenu = !KDContextMenu;
 					}
@@ -6647,6 +6797,7 @@ function KinkyDungeonGenerateSaveData(): KinkyDungeonSave {
 		default: JSON.parse(JSON.stringify(KDGetDressList().Default)),
 		poses: JSON.parse(JSON.stringify(KDCurrentModels.get(KinkyDungeonPlayer).Poses)),
 		Palette: KinkyDungeonPlayer.Palette,
+		metadata: KinkyDungeonPlayer.metadata,
 
 		outfit: KDGameData.Outfit,
 		name: KDGameData.PlayerName,
@@ -6767,6 +6918,7 @@ function KinkyDungeonLoadGame(String: string = "") {
 					KDGetDressList().Default = saveData.saveStat.default;
 				}
 				KinkyDungeonPlayer.Palette = saveData.saveStat.Palette;
+				KinkyDungeonPlayer.metadata = saveData.saveStat.metadata;
 			}
 
 			KDPathfindingCacheFails = 0;
@@ -6848,9 +7000,12 @@ function KinkyDungeonLoadGame(String: string = "") {
 			if (!KDToggles.OverrideOutfit && saveData.saveStat) {
 				if (saveData.saveStat.poses || saveData.saveStat.appearance || saveData.saveStat.default) {
 					KinkyDungeonPlayer.Appearance = JSON.parse(JSON.stringify(saveData.saveStat.appearance));
+					/** breaks the link */
+					KDRefreshSelectedModel(KinkyDungeonPlayer);
 					KDGetDressList().Default = saveData.saveStat.default;
 					KDCurrentModels.get(KinkyDungeonPlayer).Poses = saveData.saveStat.poses;
 					KinkyDungeonPlayer.Palette = saveData.saveStat.Palette;
+					KinkyDungeonPlayer.metadata = saveData.saveStat.metadata;
 					UpdateModels(KinkyDungeonPlayer);
 				}
 			}
@@ -7441,18 +7596,13 @@ function KDRefreshSleep() {
 
 let KDCustomOptionsSize = {
 	UI: 50,
+	"ClothesToggles": 48,
 };
 let KDCustomOptionsSpacing = {
 	UI: 60,
+	"ClothesToggles": 52,
 };
 
-function KDNonContextActions(mobile: boolean, textArea: boolean): boolean {
-	if (!textArea && KinkyDungeonState == "Game" && KinkyDungeonDrawState == "Game" && MouseIn(0, 0, 500, PIXIHeight)) {
-		KinkyDungeonShowInventory = !KinkyDungeonShowInventory;
-		return true;
-	}
-	return false;
-}
 
 // Get the canvas offset with respect to the game window.
 // x and y are pixel offsets from the edge of the window to the edge of the game canvas.

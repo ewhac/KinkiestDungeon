@@ -980,10 +980,11 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 				}
 				let selection = KDGetByWeight(KinkyDungeonGetHexByListWeighted(data.hexlist || listname, KDRestraint(item).name, false, data.hexlevelmin || 0, data.hexlevelmax || 10));
 				let curse = KDGetByWeight(KinkyDungeonGetCurseByListWeighted([data.curselist || listname], KDRestraint(item).name, false, 0, 1000));
-				let oldRestraint = KDRestraint(data.item);
+				
 
 				// Load the current inventory variant
-				let newvariant: KDRestraintVariant = JSON.parse(JSON.stringify(KinkyDungeonRestraintVariants[item.inventoryVariant || item.name] || {}));
+				let newvariant: KDRestraintVariant = JSON.parse(JSON.stringify(
+					KinkyDungeonRestraintVariants[item.inventoryVariant || item.name] || {}));
 				/**  New restraint to transform to  */
 				let newRestraint: restraint = null;
 				if (data.newRestraintTags) {
@@ -1831,6 +1832,7 @@ let KDEventMapInventory: Record<string, Record<string, (e: KinkyDungeonEvent, it
 							&& !KDHelpless(en)
 							&& en.hp > 0
 							&& !en.Enemy?.tags.nobrain // only affects things that can behold it
+							&& !en.Enemy?.tags?.peaceful
 							&& KDHostile(en, player.player ? undefined : player);
 					}
 				);
@@ -3784,14 +3786,7 @@ const KDEventMapBuff: Record<string, Record<string, (e: KinkyDungeonEvent, buff:
 			if (data.Character == KDGetCharacter(entity)) {
 				if (buff.power >= 100) {
 					let color = { "gamma": 2.7666666666666666, "saturation": 1.6833333333333333, "contrast": 0.8, "brightness": 1.5, "red": 0.6333333333333334, "green": 1.1833333333333333, "blue": 2.033333333333333, "alpha": 1 };
-					let palette = "";
-					let outfit = KDOutfit({ name: KinkyDungeonCurrentDress });
-					if ((KDToggles.ForcePalette || outfit?.palette || KinkyDungeonPlayer.Palette)
-						&& (KDToggles.ApplyPaletteTransform
-							&& (outfit?.palette || KinkyDungeonPlayer.Palette || !KDDefaultPalette || KinkyDungeonFactionFilters[KDDefaultPalette]))) {
-						palette = (KDToggles.NoOutfitPalette ? undefined : outfit?.palette)
-							|| KinkyDungeonPlayer.Palette || KDDefaultPalette;
-					}
+					let palette = KDGetPlayerPalette(KinkyDungeonPlayer);
 					let efd: alwaysDressModel = {
 						Model: "Catsuit",
 						faction: palette || "AncientRobot",
@@ -7995,7 +7990,7 @@ let KDEventMapWeapon: Record<string, Record<string, (e: KinkyDungeonEvent, weapo
 		},
 		"MagicRope": (e, _weapon, data) => {
 			if (data.enemy && !data.miss && !data.disarm) {
-				if (data.enemy && (!e.chance || KDRandom() < e.chance) && data.enemy.hp > 0 && !KDHelpless(data.enemy)) {
+				if (data.enemy && (!e.chance || KDRandom() < e.chance) && data.enemy.hp >= 0.52) {
 					if (!KinkyDungeonHasMana(e.cost)) {
 						let restrained = KDPlayerEffectRestrain(undefined, 2, ["ropeMagicWeak"], "Player", true, false, false, false, false);
 						if (restrained.length > 0) {
@@ -12562,6 +12557,9 @@ let KDEventMapGeneric: Record<string, Record<string, (e: string, data: any) => v
 	},
 	"afterLoadGame": {
 		// Ran after loading a game
+	},
+	"afterModsLoadedAndLoadGame": {
+		// Ran after loading a game and after mods loaded
 	},
 	"afterModSettingsLoad": {
 		// Ran after loading KDModSettings from Local Storage

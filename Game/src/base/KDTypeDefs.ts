@@ -11,7 +11,10 @@ interface NamedAndTyped extends Named {
 interface KDOutfitMetadata {
 	name: string,
 	palette: string,
+	customColors: Record<string, Record<string, LayerFilter>>,
 }
+
+interface FactionFilterDef {color: string, override: boolean, desaturate?: boolean};
 
 /** Kinky Dungeon Typedefs*/
 interface item extends NamedAndTyped {
@@ -173,7 +176,7 @@ interface KDRestraintPropsBase {
 	 * color is the faction color type
 	 * override is whether the faction color overrides the filter. If true it will replace the filter in the model. If false it will apply it over the model's filter. Currently unused
 	*/
-	factionFilters?: Record<string, {color: string, override: boolean, desaturate?: boolean}>,
+	factionFilters?: Record<string, FactionFilterDef>,
 	/** This item is unaffected by shrines */
 	noShrine?:boolean,
 	/** This item is beneficial and player wont try to struggle from it */
@@ -1940,7 +1943,7 @@ interface entity {
 	silence?: number,
 	vulnerable?: number,
 	buffs?: Record<string, KDBuff>,
-	warningTiles?: any,
+	warningTiles?: warningTileEntry[],
 	visual_x?: number,
 	visual_y?: number,
 	Analyze?: boolean,
@@ -1966,6 +1969,7 @@ type KinkyDungeonDress = {
 	Color: string | string[];
 	Filters?: Record<string, LayerFilter>;
 	Properties?: Record<string, LayerPropertiesType>;
+	factionFilters?: Record<string, FactionFilterDef>;
 
 	Lost: boolean;
 	NoLose?: boolean;
@@ -2388,6 +2392,8 @@ interface spell {
 	trailLifetime?: number;
 	/** trailTime */
 	trailTime?: number;
+	/** Lingering bullets, but they dont immediately hit even if they spawn on you */
+	lingeringDelayed?: boolean,
 	/** Random number to increase lifetime by */
 	lifetimeHitBonus?: number;
 	/** Random number to increase trail lifetime by */
@@ -2524,6 +2530,17 @@ interface spell {
 
 interface KDQuest {
 	name: string;
+	/**
+	 * 
+	 * @param player player entity (future proof)
+	 * @param force force even if not meeting condition
+	 * @param intentional player triggered via option or button
+	 * @param success quest is successful
+	 * @returns 
+	 */
+	oncancel?: (player: entity, force: boolean, intentional: boolean, success: boolean) => boolean;
+	priority?: (player: entity) => number;
+	text?: (player: entity) => string[];
 	npc: string;
 	visible: boolean;
 	nocancel?: boolean,
@@ -2774,6 +2791,7 @@ interface KinkyDungeonSave {
 		default: KinkyDungeonDress,
 		poses: Record<string, boolean>,
 		Palette: string,
+		metadata: KDOutfitMetadata,
 
 
 		outfit: string,
@@ -4061,6 +4079,7 @@ interface KDCollectionEntry {
 
 	/** Optional NPC palette */
 	Palette?: string,
+	metadata: KDOutfitMetadata,
 
 	spawned?: boolean,
 

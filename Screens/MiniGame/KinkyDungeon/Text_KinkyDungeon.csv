@@ -31,7 +31,7 @@ RestartNeededRU,"Restart required!"
 
 KDVersion,"Version"
 KinkyDungeon,"Kinky Dungeon"
-KDVersionStr,"5.4.69"
+KDVersionStr,"5.4.75"
 KDLogo2,"By Ada18980"
 Intro,"You are an adventurer descending into an ancient underground city of magic."
 Intro2,"Beneath its depths lies the Mistress' Staff, an artifact of untold power."
@@ -46,6 +46,8 @@ KDToggleTabControls,Controls
 KDToggleTabKeybindings,Keybindings
 KDToggleTabMouseShortcuts,Mouse Shortcuts
 
+
+KDToggleStruggleContext,Replace struggle icons with menu
 KDToggleFastMovePassable,Auto-path through NPCs
 KDToggleFastMoveDoors,Auto-path through Doors
 
@@ -67,7 +69,7 @@ KDToggleDefaultApplyCharPalette,Use character palette for default outfit
 KDToggleExtraBuffRow,Allow two rows of buffs when collapsed
 KDToggleBackgrounds,Show Background Art
 KDToggleOptRender,Experimental Rendering (unstable)
-KDToggleHeadpats,Enable Heatpats
+KDToggleHeadpats,Enable Headpats
 KDToggleExtraTooltipHeight,Show (mostly) full tooltips
 KDToggleExtraTooltipCycle,Auto cycle through multipage tooltips
 KDToggleSoundOffWhenMin,Mute when Minimized
@@ -75,6 +77,7 @@ KDToggleBackgrounds,Show Background Art
 KDToggleRawDP,Show DP instead of %
 KDToggleOnlySelfQuickInv,Quick Inv only equips to self
 KDToggleOverrideOutfit,Override Outfit when Loading Save
+KDToggleOverrideOutfitAbbr,Override Outfit
 KDToggleSaveOutfit,Save Outfits within Save Files
 KDToggleShowNPCSprites,Show free characters on map
 KDToggleShowJailedNPCSprites,Detailed jailed NPCs (experimental)
@@ -138,6 +141,7 @@ KDToggleNippleToysOption,Show Nipple Toys Over Bras
 KDToggleNippleToysHide,Hide Nipple Clamps
 KDToggleNipplePiercingsHide,Hide Nipple Piercings
 KDToggleForcePalette,Use default palette when no outfit is worn
+KDToggleRestraintPalette,Apply worn restraint palettes to player
 KDToggleFlipPlayer,Flip Player Display
 KDToggleGreyscaleBlindness,Grayscale when Blind
 KDToggleFastFloaters,Faster Floater Fade
@@ -1077,6 +1081,7 @@ KinkyDungeonKeyMap,Expand Minimap
 KinkyDungeonKeyZoomOut,Zoom Out
 KinkyDungeonKeyZoomIn,Zoom In
 KinkyDungeonKeyWaitInterrupt,Wait till Interrupted
+KinkyDungeonKeyToggleBuff,Expand Buffs/Status
 KinkyDungeonKeyMakeNoise,Make Noise
 KinkyDungeonKeyCrouch,Crouch
 KinkyDungeonKeyPlaySelf,Play with Self
@@ -4625,6 +4630,9 @@ RestraintHeavyLatexCatsuitDesc2,"Blue latex is silky smooth, very stretchy, and 
 RestraintLatexMittens,Latex Mittens
 RestraintLatexMittensDesc,"A pair of mittens keep your hands out of trouble. They adhere to latex restraints making struggling more difficult."
 RestraintLatexMittensDesc2,"It has too much grip to struggle out of, but is made of a fragile material."
+RestraintWolfMittsStrong,Protection Sport Mittens
+RestraintWolfMittsStrongDesc,"A pair of tough latex mittens that prevent wolfgirls from scratching their trainers. They are already gagged, so no bite protection is needed."
+RestraintWolfMittsStrongDesc2,"They adhere to latex restraints making struggling more difficult. The rubber is extremely thick and won't budge except under incredible strength. A specialized applicator is used to get them on and off."
 
 RestraintLatexCube,Latex Cube
 RestraintLatexCubeDesc,A gelatinous cube that engulfed you at some point in the past.
@@ -7158,6 +7166,7 @@ KinkyDungeonNurseSyringe,"You feel a prick as a small syringe hits you, and you 
 KinkyDungeonNurseBola,"The thrown cuffs snap shut around your ankles and slow you down!!!"
 KinkyDungeonSpellRibbonBurst,Ribbon Burst
 KinkyDungeonSpellSpores,Spores
+KinkyDungeonSpellPocketSpores,Pocket Spores
 KinkyDungeonSpellSporesSick,Noxious Spores
 KinkyDungeonSpellSporesHappy,Enticing Spores
 KinkyDungeonSpores,"You inhale some spores, and feel a bit sleepy..."
@@ -7784,7 +7793,9 @@ KinkyDungeonPerkAcceptConfirm,"(Accept the contract)"
 KinkyDungeonPerkReject,"I'll think about it."
 
 KinkyDungeonFreeze,You are frozen!
+KinkyDungeonFreezeProj,You are frozen by a projectile!
 KinkyDungeonChill,You are chilled!
+KinkyDungeonChillProj,You are hit by a chilling projectile!
 KinkyDungeonShadowBind,"Shadowy tendrils wrap around your feet, rooting you in place!!!"
 
 KinkyDungeonFirstSpawn,You get the feeling that someone is searching for you...
@@ -14021,6 +14032,7 @@ KDColorSlideralpha,Transparency
 KDResetLayer,Reset Layer!
 KDResetLayerProps,Reset Properties!
 KDExportAllLayers,Export All Layers
+KDResetAllLayers,Reset All Layers
 KDExportAllProps,Export All Props
 KDCopyLayer,Copy
 KDPasteLayer,Paste
@@ -26977,6 +26989,49 @@ m_HighSecBalletHeelsRestraint_l_HardwareLeft,HardwareLeft
 m_HighSecBalletHeelsRestraint_l_HardwareRight,HardwareRight
 
 
+m_KjusEyes5,KjusEyes5
+m_KjusEyes5_l_Eyes,Eyes
+m_KjusEyes5_l_Eyes2,Eyes2
+m_KjusEyes5_l_Whites,Whites
+m_KjusEyes5_l_Whites2,Whites2
+m_CatsuitRestraint,CatsuitRestraint
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoUpper,TorsoUpper
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_CatsuitRestraint_l_TorsoLower,TorsoLower
+m_WolfCuffsAnklesRestraint,WolfCuffsAnklesRestraint
+m_WolfCuffsAnklesRestraint_l_Cuff,Cuff
+m_WolfCuffsAnklesRestraint_l_Band,Band
+m_WolfCuffsAnklesRestraint_l_Cuff,Cuff
+m_WolfCuffsAnklesRestraint_l_Band,Band
+m_WolfCuffsAnklesRightRestraint,WolfCuffsAnklesRightRestraint
+m_WolfCuffsAnklesRightRestraint_l_Cuff,Cuff
+m_WolfCuffsAnklesRightRestraint_l_Band,Band
+m_WolfCuffsAnklesLeftRestraint,WolfCuffsAnklesLeftRestraint
+m_WolfCuffsAnklesLeftRestraint_l_Cuff,Cuff
+m_WolfCuffsAnklesLeftRestraint_l_Band,Band
+m_NeoThighLink_l_ThighLinkHardware,ThighLinkHardware
+m_NeoAnkleLink_l_AnkleLinkHardware,AnkleLinkHardware
+m_FashionNeoThighLink_l_ThighLinkHardware,ThighLinkHardware
+m_FashionNeoAnkleLink_l_AnkleLinkHardware,AnkleLinkHardware
+m_CyberPetsuit_l_Unit,Unit
+m_CyberPetsuit_l_Unit,Unit
 
 
 KDHideItems,Hide Items
@@ -28191,7 +28246,7 @@ KDWeaponTag_illum,Illumination
 KDWeaponTagD_illum,"Illumination: This weapon is a light source."
 
 KinkyDungeonSpellOffhand,"Dual Wield"
-KinkyDungeonSpellDescriptionOffhand,"Designate an Offhand weapon to gain passive effects such as a light source, armor, or extra crit damage.|(Must equip Dual Wield spell to equip an offhand weapon)"
+KinkyDungeonSpellDescriptionOffhand,"Designate an Offhand weapon to gain passive effects such as a light source, armor, or extra crit damage.|Rogues cannot wield heavy or massive weapons in the offhand unless they are multiclass.|Wizards can only wield magic weapons in the offhand unless they are multiclass, and receive +1 slow level if they wield a 2-handed, heavy, or massive magical weapon in the offhand."
 
 KDInventoryActionOffhand,"Equip Offhand"
 KDInventoryActionRemoveOffhand,"Remove Offhand"
@@ -28721,6 +28776,9 @@ KDDiffTab_Challenge,Challenge Settings
 
 KinkyDungeonChallenge,Challenge Settings:
 
+KDColorPickerPalette,Palette
+KDPaletteColorPickerInfo,Pick a palette in Extra Options
+KDPaletteColorPickerInfo2,Open Extra Options to preview
 KDColorPickerSimple,Simple
 KDColorPickerAdvanced,Advanced
 KDColorPickerProperties,Expert Tools
@@ -30763,6 +30821,8 @@ KDPropField_Protected,Protected
 KDPropField_DisplaceAmount,Displace Amount
 KDPropField_EraseAmount,Erase Amount
 KDPropField_NoLoss,NoLoss
+KDPropField_HideRestraintsTags,HideRestraintsTags
+
 KDPropField_HideRestraintTags,HideRestraintTags
 
 KinkyDungeonLoadFromFile,Load from File
@@ -31142,6 +31202,11 @@ KDBackupOutfits,Backup
 KDLoadOutfits,Restore
 KDSetPalette,Extra Options
 KDVisualOpt_HideArmorWardrobe,Preview without Armor
+KDVisualOpt_PreviewRestraints_Latex,Preview Latex
+KDVisualOpt_PreviewRestraints_Metal,Preview Metal
+KDVisualOpt_PreviewRestraints_Leather,Preview Leather
+KDVisualOpt_PreviewRestraints_Rope,Preview Rope
+KDVisualOpt_PreviewRestraints_Catsuit,Preview Catsuit
 
 KinkyDungeonStatMC_Mage,"Wizard"
 
@@ -31294,6 +31359,7 @@ KDStamDmgBonus,AMNTx damage when SP is over 50%
 
 KinkyDungeonSpellManyOrbs,"Barrage of Barrier Orb"
 KinkyDungeonSpellZombieOrb,"Barrier Orb"
+KinkyDungeonSpellZombieOrbMini,"Haunted Orb"
 KinkyDungeonSpellFuukaOrbMulti,"Barrage of Sealing Talisman"
 KinkyDungeonSpellFuukaOrb,"Sealing Talisman"
 KinkyDungeonSpellEnemyCM_self,"Self Unlock"
@@ -31683,6 +31749,9 @@ KDGenMap,Generating Map...
 
 KinkyDungeonSpellHexWrappingDamage,Mystic wrappings constrict around your body!
 KinkyDungeonSpellOneBarMissile,One Bar Missile
+
+KDTut_RestraintContext,Right click on a restraint's name to open a context menu.
+KDTut_RestraintContext2,There is also an option in HUD settings to replace the small buttons with a context menu.
 
 KDTut_Tooltip,You can click Inspect then click the enemy to cycle thru pages.
 KDTut_Tooltip2,NPC tooltips like the ${EnemyName} are too long to show on one page.
@@ -32169,3 +32238,32 @@ KDLatexKittyCurseEffectFull,"You transfer the remainder of your ${Item}'s curse 
 KDLatexKittyCurseEffectFull2,"The curse will deal 25% damage as residual curse transfers."
 
 KinkyDungeonBuffLatexKittyCurseTick,This is the total amount of Latex Kitty Curse you possess.
+
+KDPaletteLayer_None,None
+KDPaletteLayer_Highlight,Highlights
+KDPaletteLayer_Catsuit,Catsuit
+KDPaletteLayer_DarkNeutral,Dark
+KDPaletteLayer_LightNeutral,Light
+
+KDWardrobeOverridePaletteLayer,Override Brightness
+KDWardrobeDesaturatePaletteLayer,Desaturate
+
+
+KDModButtonNone,None
+
+KinkyDungeonSpellCastWeaponAttack,You swing with your weapon at a distance!
+
+KDQuestFactionMembership,Faction: ${Faction} [${Rep}]
+
+KDQuest_RecruitMaidforce,You are a member of the Maidforce.
+KDQuest_RecruitBountyhunter,You are a member of the Bounty Hunters Guild.
+KDQuest_RecruitDragon,You are a member of the Dragonheart Order.
+KDQuest_RecruitAncientRobot,<CITIZEN ID=NaN>
+KDQuest_RecruitDressmaker,You are a model for DressUp Co.
+KDQuest_RecruitNevermere,You are an associate of Nevermere Trainers Inc.
+KDQuest_RecruitElf,Your existence is acknowledged by the Cult of the Wild.
+KDQuest_RecruitBast,You are receiving the blessing of Bast.
+KDQuest_RecruitAlchemist,You are a member of the Alchemist's Guild.
+KDQuest_RecruitApprentice,You are a student of the School of Magic.
+KDQuest_RecruitElemental,You are a subject of the Elemental Planes.
+KDQuest_RecruitBandit,You are a wanted outlaw.

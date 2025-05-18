@@ -490,6 +490,7 @@ function KinkyDungeonInitialize(Level: number, Load?: any) {
 	KinkyDungeonDrawState = "Game";
 	KDResetAlternateInventoryRender();
 	KDRefreshCharacter.set(KinkyDungeonPlayer, true);
+	KinkyDungeonCheckClothesLoss = true;
 	KinkyDungeonDressPlayer();
 
 	KinkyDungeonMapIndex = {};
@@ -2365,7 +2366,8 @@ function KinkyDungeonGameKeyDown() {
 				case KinkyDungeonKeyMenu[2]: KinkyDungeonDrawState = "Reputation"; break;
 				case KinkyDungeonKeyMenu[3]: KinkyDungeonDrawState = "MagicSpells"; break;
 				case KinkyDungeonKeyMenu[4]: KinkyDungeonDrawState = "Logbook"; break;
-				case KinkyDungeonKeyMenu[5]: KinkyDungeonDrawState = "Quest"; break;
+				case KinkyDungeonKeyMenu[5]: KinkyDungeonDrawState = "Quest";
+					KDSortQuests(KDPlayer()); break;
 				case KinkyDungeonKeyMenu[6]: KinkyDungeonDrawState = "Collection"; break;
 				case KinkyDungeonKeyMenu[7]: KinkyDungeonDrawState = "Facilities"; break;
 				case KinkyDungeonKeyMenu[9]: {
@@ -3312,6 +3314,8 @@ function KinkyDungeonAdvanceTime(delta: number, NoUpdate?: boolean, NoMsgTick?: 
 	KDUpdateFog = true;
 	KDLastTick = performance.now();
 
+	KDGameData.WarningTiles = {};
+
 	if (delta > 0 && CommonTime() > lastFloaterRefresh + 1000) {
 		KDEntitiesFloaterRegisty = new Map();
 		lastFloaterRefresh = CommonTime();
@@ -3756,6 +3760,8 @@ function KDAddAppearance (
 		C.Appearance.push(NA);
 		return NA;
 	}
+	
+		
 	return null;
 }
 
@@ -3778,7 +3784,8 @@ function KDAddModel (
 	NewColor:    string | string[],
 	filters:     Record<string, LayerFilter>,
 	item?:       item,
-	Properties?: Record<string, LayerPropertiesType>
+	Properties?: Record<string, LayerPropertiesType>,
+	factionFilters?: Record<string, FactionFilterDef>,
 ): Item
 {
 
@@ -3799,9 +3806,11 @@ function KDAddModel (
 			Property: undefined,
 			Filters: filters,
 			Properties: Properties,
+			factionFilters: factionFilters,
 		};
 		NA.Model.Filters = NA.Filters || NA.Model.Filters;
 		NA.Model.Properties = NA.Properties || NA.Model.Properties;
+		NA.Model.factionFilters = NA.factionFilters || NA.Model.factionFilters;
 		for (let i = 0; i < C.Appearance.length; i++) {
 			if (C.Appearance[i]?.Model?.Name == NA.Model.Name) {
 				C.Appearance[i] = NA;
@@ -4156,8 +4165,9 @@ function KDIsInBounds(x: number, y: number, pad: number = 1): boolean {
 
 /**
  * @param sprintdata
+ * @param accountForSlow - doubles effective cost if slowlevel > 1
  */
-function KDSprintCost(sprintdata?: any, sprintCost?: number): number {
+function KDSprintCost(sprintdata?: any, sprintCost?: number, accountForSlow: boolean = false): number {
 	if (sprintCost != undefined) return sprintCost;
 	let data = {
 		sprintdata: sprintdata,
@@ -4166,7 +4176,10 @@ function KDSprintCost(sprintdata?: any, sprintCost?: number): number {
 		boost: 0,
 		sprintCostOverride: sprintCost,
 	};
-	data.cost = (-KDSprintCostBase - KDSprintCostSlowLevel[Math.min(KDSprintCostSlowLevel.length, Math.round(KinkyDungeonSlowLevel))]);
+	data.cost = (-KDSprintCostBase - KDSprintCostSlowLevel[Math.min(KDSprintCostSlowLevel.length, 
+		Math.round(KinkyDungeonSlowLevel))] + (
+			(accountForSlow && KinkyDungeonSlowLevel > 1) ? -KDSprintAdjustSlowed : 0
+		));
 	if (KDGameData.MovePoints < 0) data.cost -= KDSlowedSprintCost;
 
 

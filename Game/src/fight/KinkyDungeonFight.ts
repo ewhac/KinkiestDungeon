@@ -2023,6 +2023,14 @@ function KinkyDungeonUpdateBullets(delta: number, Allied?: boolean): void {
 										});
 									if (!b.warnings.includes(xx + "," + yy)) {
 										b.warnings.push(xx + "," + yy);
+										KDAddWarning({
+											source: b.source,
+											type: 1,
+											sx: b.x,
+											sy: b.y,
+											x: xx,
+											y: yy,
+										});
 									}
 								}
 							}
@@ -2087,7 +2095,13 @@ function KinkyDungeonUpdateBulletVisuals(delta: number) {
 		}
 }
 
-let KinkyDungeonExtraWarningTiles = [];
+interface extraWarningTileEntry {
+	duration: number,
+	delay: number,
+	warning: warningTileEntry,
+}
+
+let KinkyDungeonExtraWarningTiles: extraWarningTileEntry[] = [];
 
 function KinkyDungeonCreateWarningTile(x: number, y: number, color: string = KDBaseWhite,
 		duration: number = 1, delay: number = 0, x_orig?: number, y_orig?: number) {
@@ -2095,6 +2109,8 @@ function KinkyDungeonCreateWarningTile(x: number, y: number, color: string = KDB
 		duration: duration,
 		delay: delay,
 		warning: {
+			visual_x: x,
+			visual_y: y,
 			color: color,
 			scale: 1,
 			x: x,
@@ -2107,6 +2123,15 @@ function KinkyDungeonCreateWarningTile(x: number, y: number, color: string = KDB
 
 function KinkyDungeonParseExtraWarningTiles(delta: number) {
 	for (let i = 0; i < KinkyDungeonExtraWarningTiles.length; i++) {
+		
+		KDAddWarning({
+			source: 0,
+			type: 2,
+			sx: KinkyDungeonExtraWarningTiles[i].warning.x,
+			sy: KinkyDungeonExtraWarningTiles[i].warning.y,
+			x: KinkyDungeonExtraWarningTiles[i].warning.x,
+			y: KinkyDungeonExtraWarningTiles[i].warning.y,
+		});
 		if (KinkyDungeonExtraWarningTiles[i].delay > 0) {
 			KinkyDungeonExtraWarningTiles[i].delay -= delta;
 		}
@@ -2130,7 +2155,7 @@ function KinkyDungeonUpdateBulletsCollisions(delta: number, Catchup?: boolean) {
 			// This is a bit of a brute force way of forcing the bullet to only check for collisions when time has passed, i.e. when delta = 1
 			// However the collision check still happens if the bullet was born in between turns, e.g the player uses Leather Package
 
-			if (b.collisionUpdate == undefined || delta > 0) {
+			if ((b.born && b.collisionUpdate == undefined) || delta > 0) {
 				if (!KinkyDungeonBulletsCheckCollision(b, b.time >= 0, undefined, undefined, !(b.bullet.faction == "Player" || (!b.vx && !b.vy) || b.bullet.aoe || (KDistEuclidean(b.vx, b.vy) < 0.9)), delta)) { // (b.bullet.faction == "Player" || (!b.vx && !b.vy) || b.bullet.aoe || (KDistEuclidean(b.vx, b.vy) < 0.9)) &&
 					if (!(b.bullet.spell && (b.bullet.spell.piercing || (b.bullet.spell.pierceEnemies && KinkyDungeonTransparentObjects.includes(KinkyDungeonMapGet(b.x, b.y)))))) {
 						KDMapData.Bullets.splice(E, 1);
@@ -2437,6 +2462,7 @@ function KinkyDungeonBulletHit(b: KDBullet, born: number, outOfTime?: boolean, o
 					let newB: KDBullet = {
 						delay: dd,
 						born: born,
+						secondary: !b.bullet.spell.lingeringDelayed,
 						time: b.bullet.spell?.lifetime + LifetimeBonus,
 						x: b.x + X, y: b.y + Y,
 						vx: 0, vy: 0,
@@ -2985,7 +3011,6 @@ function KinkyDungeonBulletsCheckCollision(bullet: KDBullet, AoE: boolean, force
 		if ((AoE || (bullet.vx != 0 || bullet.vy != 0))) { // Moving bullets always have a chance to hit, while AoE only has a chance to hit when AoE is explicitly being checked
 			if (bullet.bullet.aoe ? KDBulletAoECanHitEntity(bullet, KinkyDungeonPlayerEntity) : KDBulletCanHitEntity(bullet, KinkyDungeonPlayerEntity, inWarningOnly)) {
 				if (!bullet.bullet.spell || bullet.born < 1 || (bullet.vx == 0 && bullet.vy == 0) || bullet.bullet.spell.friendlyfire || (bullet.bullet.spell.enemySpell && bullet.bullet.faction != "Player")) { // Projectiles just born cant hurt you, unless they're enemy projectiles
-					//if (!(!bullet.secondary && bullet.bullet.spell && bullet.bullet.spell.noDirectDamage))
 					KDBulletHitPlayer(bullet, KinkyDungeonPlayerEntity);
 					hitEnemy = true;
 				}
@@ -2994,10 +3019,8 @@ function KinkyDungeonBulletsCheckCollision(bullet: KDBullet, AoE: boolean, force
 			for (let enemy of KDMapData.Entities) {
 				let overrideCollide = !bullet.bullet.aoe ? false : (bullet.bullet.spell && bullet.bullet.alwaysCollideTags && bullet.bullet.alwaysCollideTags.some((tag: string) => {return enemy.Enemy.tags[tag];}));
 				if (bullet.bullet.aoe ? KDBulletAoECanHitEntity(bullet, enemy) : KDBulletCanHitEntity(bullet, enemy, inWarningOnly, overrideCollide)) {
-					//if (!(!bullet.secondary && bullet.bullet.spell && bullet.bullet.spell.noDirectDamage)) {
 					KDBulletHitEnemy(bullet, enemy, d, nomsg);
 					nomsg = true;
-					//}
 					hitEnemy = true;
 				}
 			}
@@ -3375,9 +3398,14 @@ function KinkyDungeonDrawFight(_canvasOffsetX: number, _canvasOffsetY: number, C
 function KinkyDungeonSendWeaponEvent(Event: string, data: any, forceWeapon?: item) {
 	if (!forceWeapon && !KDMapHasEvent(KDEventMapWeapon, Event)) return;
 	let weapon = forceWeapon ? KDWeapon(forceWeapon) : KinkyDungeonPlayerDamage;
-	let events = weapon?.events;
-	if (forceWeapon && KinkyDungeonWeaponVariants[forceWeapon.inventoryVariant || forceWeapon.name]?.events) {
-		events = KinkyDungeonWeaponVariants[forceWeapon.inventoryVariant || forceWeapon.name].events;
+	let events = (forceWeapon ||  KinkyDungeonInventoryGetWeapon(KinkyDungeonPlayerWeapon))?.events || weapon?.events;
+	let Vevents = events ? null : (KinkyDungeonWeaponVariants[forceWeapon?.inventoryVariant || forceWeapon?.name || KinkyDungeonPlayerWeapon]?.events);
+	if (Vevents) {
+		for (let e of Vevents) {
+			if (e.trigger == Event && !e.offhandonly && (!e.requireEnergy || ((!e.energyCost && KDGameData.AncientEnergyLevel > 0) || (e.energyCost && KDGameData.AncientEnergyLevel > e.energyCost)))) {
+				KinkyDungeonHandleWeaponEvent(Event, e, weapon, data);
+			}
+		}
 	}
 	if (events) {
 		for (let e of events) {
@@ -3391,17 +3419,24 @@ function KinkyDungeonSendWeaponEvent(Event: string, data: any, forceWeapon?: ite
 	if (KDGameData.Offhand
 		&& KinkyDungeonInventoryGetWeapon(KDGameData.Offhand)) {
 		let weapon = KDWeapon(KinkyDungeonInventoryGetWeapon(KDGameData.Offhand));
-		if (KinkyDungeonInventoryGetWeapon(KDGameData.Offhand).events) {
-			for (let e of KinkyDungeonInventoryGetWeapon(KDGameData.Offhand).events) {
+			
+		let events = (KinkyDungeonInventoryGetWeapon(KDGameData.Offhand))?.events
+			|| KDWeapon(KinkyDungeonInventoryGetWeapon(KDGameData.Offhand))?.events;
+			
+		let Vevents = events ? null : (KinkyDungeonWeaponVariants[ KinkyDungeonInventoryGetWeapon(KDGameData.Offhand)?.inventoryVariant
+			|| KinkyDungeonInventoryGetWeapon(KDGameData.Offhand)?.name]?.events);
+		if (Vevents)
+			for (let e of Vevents) {
 				if (e.trigger == Event && e.offhand && (!e.requireEnergy || ((!e.energyCost && KDGameData.AncientEnergyLevel > 0) || (e.energyCost && KDGameData.AncientEnergyLevel > e.energyCost)))) {
 					KinkyDungeonHandleWeaponEvent(Event, e, KDWeapon(weapon), data);
 				}
 			}
-		} else for (let e of weapon.events) {
-			if (e.trigger == Event && e.offhand && (!e.requireEnergy || ((!e.energyCost && KDGameData.AncientEnergyLevel > 0) || (e.energyCost && KDGameData.AncientEnergyLevel > e.energyCost)))) {
-				KinkyDungeonHandleWeaponEvent(Event, e, KDWeapon(weapon), data);
+		if (events)
+			for (let e of events) {
+				if (e.trigger == Event && e.offhand && (!e.requireEnergy || ((!e.energyCost && KDGameData.AncientEnergyLevel > 0) || (e.energyCost && KDGameData.AncientEnergyLevel > e.energyCost)))) {
+					KinkyDungeonHandleWeaponEvent(Event, e, KDWeapon(weapon), data);
+				}
 			}
-		}
 	}
 }
 
@@ -3849,4 +3884,14 @@ function KDWeaponStamPenType(weapon: weapon): string {
 
 function KDEnemyShieldRegenStopTime(enemy: entity) {
 	return 3;
+}
+
+function KDAddWarning(tile: WarningTileRecord) {
+	if (!KDGameData.WarningTiles) KDGameData.WarningTiles = {};
+	if (!KDGameData.WarningTiles[tile.x + ',' + tile.y]) KDGameData.WarningTiles[tile.x + ',' + tile.y] = [];
+	KDGameData.WarningTiles[tile.x + ',' + tile.y].push(tile);
+}
+function KDGetWarnings(x: number, y: number) {
+	if (KDGameData.WarningTiles && KDGameData.WarningTiles[x + ',' + y]) return KDGameData.WarningTiles[x + ',' + y];
+	return [];
 }

@@ -1170,10 +1170,11 @@ const KinkyDungeonRestraints: restraint[] = [
 			UpperLock: {color: "DarkNeutral", override: true},
 			UpperCuff: {color: "DarkNeutral", override: true},
 		},
+		linkCategories: ["CyberMitt"], linkSizes: [0.7],
 		DefaultLock: "Cyber3",
 		factionColor: [[], [], [0]],
 		Asset: "LatexElbowGloves", Color: KDBaseRed, LinkableBy: [...KDGlovesLink], renderWhenLinked: ["Mittens"], Group: "ItemHands",
-		bindhands: 1.4, power: 10, weight: 0,
+		bindhands: 1.4, power: 11, weight: 0,
 		escapeChance: {"Struggle": -0.4, "Cut": -0.2, "Remove": 0.04, "Pick": -0.25},
 		limitChance: {"Struggle": 0.3, "Cut": 0.2,},
 		struggleMaxSpeed: {Remove: 0.1},
@@ -1193,6 +1194,7 @@ const KinkyDungeonRestraints: restraint[] = [
 			Lock: {color: "DarkNeutral", override: true},
 			Cuff: {color: "DarkNeutral", override: true},
 		},
+		linkCategories: ["CyberMitt"], linkSizes: [0.35],
 		DefaultLock: "Cyber2",
 		factionColor: [[], [], [0]],
 		Asset: "LatexElbowGloves", Color: KDBaseRed, LinkableBy: [...KDGlovesLink], renderWhenLinked: ["Mittens"], Group: "ItemHands",
@@ -1768,7 +1770,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		Asset: "KittyGag", gag: 0.5, Color: ["#4EA1FF", "#4EA1FF", "#4EA1FF"], Group: "ItemMouth",
 		AssetGroup: "ItemMouth3", power: 6, weight: 6,
 		escapeChance: {"Struggle": -0.1, "Cut": 0.04, "Remove": 0.1, Pick: 0.0},
-		Model: "ShinyLatexMuzzle", //Model: "GagLatexMute",
+		Model: "ShinyLatexMuzzleRestraint", //Model: "GagLatexMute",
 		sfxGroup: "Rubber",
 		Filters: {
 			Gag: {"gamma":1,"saturation":1,"contrast":1.4166666666666665,"brightness":1,"red":1,"green":1,"blue":1,"alpha":1},
@@ -1801,7 +1803,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		factionColor: [[0]], Asset: "SeamlessCatsuit", AssetGroup: "Suit", Color: ["#3873C3"],
 		alwaysAccessible: true,
 		sfxGroup: "Rubber",
-		Model: "Catsuit",
+		Model: "CatsuitRestraint",
 		renderExcept: ["Catsuits"],
 		alwaysRender: true,
 		Filters: {
@@ -1830,7 +1832,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		alwaysAccessible: true,
 		renderExcept: ["Catsuits"],
 		alwaysRender: true,
-		Model: "Catsuit",
+		Model: "CatsuitRestraint",
 		Filters: {
 			TorsoLower: {"gamma":2.7666666666666666,"saturation":1.6833333333333333,"contrast":0.8,"brightness":1.5,"red":0.6333333333333334,"green":1.1833333333333333,"blue":2.033333333333333,"alpha":1},
 			TorsoUpper: {"gamma":2.7666666666666666,"saturation":1.6833333333333333,"contrast":0.8,"brightness":1.5,"red":0.6333333333333334,"green":1.1833333333333333,"blue":2.033333333333333,"alpha":1},
@@ -2112,10 +2114,32 @@ const KinkyDungeonRestraints: restraint[] = [
 			Band: {color: "Highlight", override: true},
 			Lock: {color: "LightNeutral", override: true},
 		},
+		linkCategories: ["WolfMitt"], linkSizes: [0.6],
 		Asset: "LatexElbowGloves", Color: KDBaseRed, LinkableBy: [...KDGlovesLink], renderWhenLinked: ["Mittens"], Group: "ItemHands",
-		bindhands: 1.0, power: 10, weight: 0,
+		bindhands: 1.0, power: 8, weight: 0,
 		escapeChance: {"Struggle": -0.1, "Cut": -0.1, "Remove": -0.1, "Pick": 1.0},
 		maxwill: 0.4, enemyTags: {"wolfRestraints" : 6, "wolfGear":6}, playerTags: {"ItemHandsFull":-2}, minLevel: 0, allFloors: true, shrine: ["LongMittens", "Mittens", "Latex"]},
+	{inventory: true, unlimited: true, name: "WolfMittsStrong",
+		Model: "LatexDollMittsLong",
+		sfxGroup: "Rubber",
+		factionFilters: {
+			Mitten: {color: "DarkNeutral", override: true},
+			Band: {color: "Highlight", override: true},
+			Lock: {color: "LightNeutral", override: true},
+			Straps: {color: "DarkNeutral", override: true},
+			Cap: {color: "LightNeutral", override: false},
+			Glow: {color: "Highlight", override: false},
+			Display: {color: "Highlight", override: false},
+			Cuff: {color: "DarkNeutral", override: true},
+		},
+		linkCategories: ["WolfMitt", "CyberMitt"], linkSizes: [0.6, 0.6],
+		LinkableBy: [...KDGlovesLink], renderWhenLinked: ["Mittens"], Group: "ItemHands",
+		bindhands: 1.0, power: 10, weight: 0,
+		escapeChance: {"Struggle": -0.25, "Cut": -0.10, "Remove": -0.2, "Pick": 0.25},
+		limitChance: {"Struggle": 0.1, "Cut": 0.1, "Remove": 0.12},
+		maxwill: 0.05, enemyTags: {"wolfRestraints" : 25, "wolfGear":20}, playerTags: {"ItemHandsFull":-2}, minLevel: 8, allFloors: true, shrine: ["LongMittens", "Mittens", "Latex"]},
+
+	
 
 	{inventory: true, name: "WolfBallGag", debris: "Belts", LinkableBy: [...KDBallGagLink], renderWhenLinked: [...KDBallGagLink],
 		Model: "SegmentedLargeBallGagHarnessSecure",
@@ -3240,6 +3264,10 @@ const KinkyDungeonRestraints: restraint[] = [
 			"More_Armbinders": 3.5,
 			"Less_Armbinders": 0.1,
 		},
+		factionFilters: {
+			Binder: {color: "DarkNeutral", override: true},
+			Straps: {color: "Highlight", override: true},
+		},
 		sfxGroup: "Leather",
 		limitChance: {"Struggle": 0.15, "Cut": 0.1, "Unlock": 0.2},
 		maxwill: 0.25, escapeChance: {"Struggle": 0.11, "Cut": 0.4, "Remove": 0.3, "Pick": 0.5}, enemyTags: {"trap":100, "leatherRestraintsHeavy":6, "armbinderSpell": 100}, playerTags: {}, minLevel: 4, allFloors: true, shrine: ["Leather", "Armbinders", "Block_ItemHands"]},
@@ -3267,6 +3295,10 @@ const KinkyDungeonRestraints: restraint[] = [
 			"ItemArmsEmpty": 0.05,
 			"More_Boxbinders": 3.5,
 			"Less_Boxbinders": 0.1,
+		},
+		factionFilters: {
+			Binder: {color: "DarkNeutral", override: true},
+			Straps: {color: "Highlight", override: true},
 		},
 		LinkableBy: [...KDBoxbinderLink], Group: "ItemArms", Color: ["Default", "Default"],
 		bindarms: true, bindhands: 1.0, power: 6, weight: 2,
@@ -3404,6 +3436,10 @@ const KinkyDungeonRestraints: restraint[] = [
 	{inventory: true, trappable: true, name: "TrapBoots", debris: "Belts", Asset: "BalletHeels", Color: "Default", Group: "ItemBoots", heelpower: 1, power: 3, weight: 2,
 		remove: ["Shoes"],
 		sfxGroup: "Leather",
+		factionFilters: {
+			Sole: {color: "LightNeutral", override: true},
+			Shoe: {color: "DarkNeutral", override: true},
+		},
 		Model: "BalletHeelsRestraint",
 		maxwill: 0.9, escapeChance: {"Struggle": 0.15, "Cut": 0.45, "Remove": 0.4, "Pick": 0.4}, enemyTags: {"trap":100, "leatherHeels": 8}, playerTags: {},
 		minLevel: 0, allFloors: true, shrine: ["BalletHeels", "Heels", "Leather", "Boots", "Heels"]},
@@ -3412,6 +3448,11 @@ const KinkyDungeonRestraints: restraint[] = [
 		DefaultLock: "HiSec",
 		sfxGroup: "Leather",
 		remove: ["Shoes"],
+		
+		factionFilters: {
+			Sole: {color: "Highlight", override: false},
+			Shoe: {color: "DarkNeutral", override: true},
+		},
 		Model: "BalletHeelsRestraint",
 		escapeChance: {"Struggle": -0.5, "Cut": 0.1, "Remove": 10, "Pick": 0.0}, enemyTags: {}, playerTags: {}, minLevel: 0, allFloors: true, shrine: ["BalletHeels", "Heels", "Boots"]},
 
@@ -3947,12 +3988,18 @@ const KinkyDungeonRestraints: restraint[] = [
 	{inventory: true, trappable: true, name: "PanelGag", debris: "Belts", LinkableBy: [...KDFlatGagLink], renderWhenLinked: [...KDFlatGagLink], Asset: "DeepthroatGag", gag: 0.7,
 		Model: "PanelGag",
 		sfxGroup: "Leather",
+		factionFilters: {
+			Panel: {color: "DarkNeutral", override: true},
+		},
 		Color: "#888888", Group: "ItemMouth", power: 4, weight: 5,
 		escapeChance: {"Struggle": 0.1, "Cut": 0.3, "Remove": 0.4, "Pick": 0.3},
 		maxwill: 0.6, enemyTags: {"leatherRestraints":8, "leatherGags": 10}, playerTags: {}, minLevel: 0, maxLevel: 7, allFloors: true, shrine: ["FlatGags", "Leather", "Gags"]},
 	{inventory: true, trappable: true, name: "HarnessPanelGag", debris: "Belts", LinkableBy: [...KDFlatGagLink], renderWhenLinked: [...KDFlatGagLink], Asset: "HarnessPanelGag", gag: 0.7,
 		Model: "PanelGagHarness",
 		sfxGroup: "Leather",
+		factionFilters: {
+			Panel: {color: "DarkNeutral", override: true},
+		},
 		events: [
 			{trigger: "beforeStruggleCalc", type: "struggleDebuff", msg: "KDHarnessGagRemoveBlindfold", inheritLinked: true,StruggleType: "Remove", power: 0.35, requiredTag: "Blindfolds"},
 			{trigger: "beforeStruggleCalc", type: "struggleDebuff", msg: "KDHarnessGagStruggleBlindfold", inheritLinked: true,StruggleType: "Struggle", power: 0.25, requiredTag: "Blindfolds"},
@@ -3988,6 +4035,10 @@ const KinkyDungeonRestraints: restraint[] = [
 			{trigger: "beforeStruggleCalc", type: "struggleDebuff", msg: "KDHarnessGagRemoveBlindfold", inheritLinked: true,StruggleType: "Remove", power: 0.35, requiredTag: "Blindfolds"},
 			{trigger: "beforeStruggleCalc", type: "struggleDebuff", msg: "KDHarnessGagStruggleBlindfold", inheritLinked: true,StruggleType: "Struggle", power: 0.25, requiredTag: "Blindfolds"},
 		],
+		factionFilters: {
+			Panel: {color: "DarkNeutral", override: true},
+			Plug: {color: "LightNeutral", override: true},
+		},
 		Color: ["#888888", "#444444", "#aaaaaa"], Group: "ItemMouth", strictness: 0.4, power: 7, weight: 1,
 		escapeChance: {"Struggle": -0.2, "Cut": 0.2, "Remove": 0.12, "Pick": 0.07},
 		ignoreMinLevelTags: ["miniboss", "boss", "stageboss"],
@@ -3995,6 +4046,10 @@ const KinkyDungeonRestraints: restraint[] = [
 	{inventory: true, name: "PanelPlugGag", Asset: "DildoPlugGag", debris: "Belts", LinkableBy: [...KDPlugGagLink], renderWhenLinked: [...KDPlugGagLink], gag: 0.9,
 		Model: "PlugMuzzleGag",
 		sfxGroup: "Leather",
+		factionFilters: {
+			Panel: {color: "DarkNeutral", override: true},
+			Plug: {color: "LightNeutral", override: true},
+		},
 		Color: ["#888888", "#444444", "#aaaaaa"], Group: "ItemMouth", power: 6, weight: 1,
 		escapeChance: {"Struggle": -0.05, "Cut": 0.2, "Remove": 0.15, "Pick": 0.1},
 		maxwill: 0.2, enemyTags: {"leatherRestraintsHeavy" : 10, "leatherGags": 5}, playerTags: {}, minLevel: 5, maxLevel: 10, allFloors: true, shrine: ["PlugGags", "Leather", "Gags"]},
@@ -5041,6 +5096,11 @@ const KinkyDungeonRestraints: restraint[] = [
 			Sole: {"gamma":1,"saturation":1,"contrast":1,"brightness":1.7166666666666666,"red":1,"green":1,"blue":1,"alpha":1},
 			Shoe: {"gamma":1,"saturation":0.08333333333333333,"contrast":1,"brightness":0.55,"red":2.816666666666667,"green":1,"blue":1,"alpha":1},
 		},
+		
+		factionFilters: {
+			Sole: {color: "LightNeutral", override: true},
+			Shoe: {color: "DarkNeutral", override: true},
+		},
 		escapeChance: {"Struggle": 0.025, "Cut": -0.05, "Remove": 0.1, "Pick": 0.25},
 		enemyTags: {"dragonRestraints":6}, playerTags: {"ItemFeetFull":-2}, minLevel: 2, allFloors: true, shrine: ["Heels", "Leather", "Boots"]},
 	{inventory: true, name: "DragonBallGag", debris: "Belts", LinkableBy: [...KDBallGagLink], renderWhenLinked: [...KDBallGagLink], gag: 0.65, Asset: "FuturisticHarnessBallGag",
@@ -5067,7 +5127,7 @@ const KinkyDungeonRestraints: restraint[] = [
 		maxwill: 0.6, enemyTags: {"dragonRestraints":6, forceAntiMagic: -100}, playerTags: {"ItemFeetFull":-2}, minLevel: 7, allFloors: true, shrine: ["BallGags", "Leather", "Latex" , "Gags"]},
 	{inventory: true, name: "DragonMuzzleGag", debris: "Belts", LinkableBy: [...KDMuzzleGagLink], renderWhenLinked: [...KDMuzzleGagLink], gag: 0.3, Asset: "StitchedMuzzleGag", Color: "#9B1818", Group: "ItemMouth", AssetGroup: "ItemMouth3", power: 7,
 		weight: 6,
-		Model: "ShinyLatexMuzzle",
+		Model: "ShinyLatexMuzzleRestraint",
 		Filters: {
 			Gag: {"gamma":1,"saturation":1,"contrast":1.4166666666666665,"brightness":1,"red":1,"green":1,"blue":1,"alpha":1},
 			Rim: {"gamma":0.6166666666666667,"saturation":1.0166666666666666,"contrast":0.3333333333333333,"brightness":1.7999999999999998,"red":0.8666666666666667,"green":0.23333333333333334,"blue":0.43333333333333335,"alpha":1},
@@ -5164,6 +5224,9 @@ const KinkyDungeonRestraints: restraint[] = [
 		Filters: {
 			Sole: {"gamma":1.25,"saturation":1,"contrast":1.5333333333333332,"brightness":1,"red":1,"green":1,"blue":2.8666666666666667,"alpha":1},
 			Shoe: {"gamma":1.6,"saturation":0.3833333333333333,"contrast":1.6833333333333333,"brightness":0.43333333333333335,"red":1,"green":1,"blue":1.1166666666666667,"alpha":1},
+		},
+		factionFilters: {
+			Sole: {color: "LightNeutral", override: false},
 		},
 
 		Color: ["#222222", "#4e2a70", "White", "Default", "#b927a8", "#222222", KDBaseBlack],
@@ -7661,6 +7724,9 @@ KDAddRopeVariants(
 		magic: true,
 		Color: "#bb3cd7",
 		minLevel: 2,
+		factionFilters: {
+			Rope: {color: "Catsuit", override: false}
+		}
 	},
 	[
 		{trigger: "drawSGTooltip", type: "StruggleManaBonus", inheritLinked: true, power: 0.2, mult: 0.1, threshold: 10},
@@ -7689,6 +7755,9 @@ KDAddRopeVariants(
 	{
 		magic: true,
 		Color: "#ffff44",
+		factionFilters: {
+			Rope: {color: "Highlight", override: false}
+		}
 	},
 	[{trigger: "struggle", type: "celestialRopePunish"}],
 	{
@@ -7715,6 +7784,9 @@ KDAddRopeVariants(
 		magic: true,
 		Color: "#4fa4b8",
 		minLevel: 5,
+		factionFilters: {
+			Rope: {color: "Highlight", override: false}
+		}
 	},
 	[
 		{trigger: "drawSGTooltip", type: "StruggleManaBonus", inheritLinked: true, power: 0.3, mult: 0.1, threshold: 10},
@@ -7742,6 +7814,9 @@ KDAddRopeVariants(
 	4,
 	{
 		Color: "White",
+		factionFilters: {
+			Rope: {color: "LightNeutral", override: false}
+		}
 	},
 	[],
 	{

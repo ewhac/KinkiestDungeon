@@ -80,6 +80,7 @@ interface Item {
 	Color?: ItemColor;
 	Filters?: Record<string, LayerFilter>;
 	Properties?: Record<string, LayerPropertiesType>;
+	factionFilters?: Record<string, FactionFilterDef>;
 	Difficulty?: number;
 	Property?: any;
 }
@@ -92,6 +93,7 @@ interface Character {
 	Appearance: Item[];
 	Pose: string[];
 	Palette: string;
+	metadata: KDOutfitMetadata,
 	HeightRatio?: number;
 	HeightModifier: number;
 	MemberNumber?: number;

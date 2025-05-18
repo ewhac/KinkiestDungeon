@@ -227,11 +227,14 @@ kdgameboard.addChild(kditemsboard);
 // @ts-ignore
 let kdui = new PIXI.Graphics();
 let kdcanvas = new PIXI.Container();
+let kdpalettecontainer = new PIXI.Container();
 kdcanvas.sortableChildren = true;
+kdpalettecontainer.sortableChildren = true;
 kdcanvas.addChild(kdstatusboard);
 kdcanvas.addChild(kdenemystatusboard);
 kdcanvas.addChild(kdUItext);
 kdcanvas.addChild(kdminimap);
+kdcanvas.addChild(kdpalettecontainer);
 
 kdcanvas.addChild(kdBGMask);
 
@@ -1014,8 +1017,7 @@ function KinkyDungeonDrawGame() {
 
 	// Breath the sound outlines
 	if (StandalonePatched)
-		kdoutlinefilter.alpha = 0.5 + 0.1 * Math.sin(2 * Math.PI * (CommonTime() % 2000 / 2000) );
-	KDButtonHovering = false;
+		kdoutlinefilter.alpha = 0.5 + 0.1 * Math.sin(2 * Math.PI * (CommonTime() % 2000 / 2000) );;
 
 
 	let tooltips = [];
@@ -1125,7 +1127,9 @@ function KinkyDungeonDrawGame() {
 
 	KinkyDungeonCapStats();
 
-
+	if (KDContextMenu && KDCurrentHoverButton?.contextMenu) {
+		KDDrawGameContextMenu[KDCurrentHoverButton.contextMenu](true, MouseX, MouseY);
+	} else
 	if (KDContextMenu && KDDrawGameContextMenu[KinkyDungeonDrawState]) {
 		KDDrawGameContextMenu[KinkyDungeonDrawState](true, MouseX, MouseY);
 	}
@@ -1494,7 +1498,7 @@ function KinkyDungeonDrawGame() {
 						let allowFog = KDAllowFog();
 						if (KinkyDungeonVisionGet(KinkyDungeonTargetX, KinkyDungeonTargetY) > 0 || (allowFog && KinkyDungeonFogGet(KinkyDungeonTargetX, KinkyDungeonTargetY) > 0)
 							|| KDistChebyshev(KinkyDungeonTargetX - KinkyDungeonPlayerEntity.x, KinkyDungeonTargetY - KinkyDungeonPlayerEntity.y) < 1.5) {
-							KDDraw(kdstatusboard, kdpixisprites, "ui_movereticule", KinkyDungeonRootDirectory + "Target" + KDGetTargetRetType(KinkyDungeonTargetX, KinkyDungeonTargetY) + ".png",
+							KDDraw(kdstatusboard, kdpixisprites, "ui_movereticule" + KinkyDungeonTargetX + "," + KinkyDungeonTargetY, KinkyDungeonRootDirectory + "Target" + KDGetTargetRetType(KinkyDungeonTargetX, KinkyDungeonTargetY) + ".png",
 								(KinkyDungeonTargetX - CamX)*KinkyDungeonGridSizeDisplay, (KinkyDungeonTargetY - CamY)*KinkyDungeonGridSizeDisplay, KinkyDungeonGridSizeDisplay, KinkyDungeonGridSizeDisplay, undefined, {
 									zIndex: 100,
 								});
@@ -1571,7 +1575,7 @@ function KinkyDungeonDrawGame() {
 								DrawTextKD("x" + dist, (xx - CamX + 0.5)*KinkyDungeonGridSizeDisplay, (yy - CamY + 0.5)*KinkyDungeonGridSizeDisplay, "#ffaa44");
 							}
 						}
-						KDDraw(kdstatusboard, kdpixisprites, "ui_movereticule", KinkyDungeonRootDirectory + "Target" + KDGetTargetRetType(xx, yy) + ".png",
+						KDDraw(kdstatusboard, kdpixisprites, "ui_movereticule" + KinkyDungeonTargetX + "," + KinkyDungeonTargetY, KinkyDungeonRootDirectory + "Target" + KDGetTargetRetType(xx, yy) + ".png",
 							(xx - CamX)*KinkyDungeonGridSizeDisplay, (yy - CamY)*KinkyDungeonGridSizeDisplay, KinkyDungeonGridSizeDisplay, KinkyDungeonGridSizeDisplay, undefined, {
 								zIndex: 100,
 							});
@@ -2126,7 +2130,7 @@ function KinkyDungeonDrawGame() {
                         return true;
                     }, true, 500, 900, 145, 48, "Rest DP", KDBaseWhite, "")
                     DrawButtonKDEx("+maxDP", (_bdata) => {
-                        KDGameData.StatMaxBonus.DP += 10;
+                        KDGameData.StatMaxBonus.AP += 10;
                         return true;
                     }, true, 655, 900, 145, 48, "+Max DP", "#ffaaaa", "")
 
@@ -3020,7 +3024,7 @@ function DrawTextFitKDTo (
 	if (!Text) return 0;
 	let alignment = Align ? Align : "center";
 
-	return DrawTextVisKD(Container || kdcanvas, kdpixisprites, "text->" + Text + (!unique ? "," + X + "," + Y : "_unique"), {
+	return DrawTextVisKD(Container || kdcanvas, kdpixisprites, "tx|" + Text + (!unique ? "," + X + "," + Y : "_unique"), {
 		Text: Text,
 		X: X,
 		Y: Y,
@@ -3074,7 +3078,7 @@ function DrawTextFitKDTo2 (
 	if (!Text) return 0;
 	let alignment = Align ? Align : "center";
 
-	return DrawTextVisKD(Container || kdcanvas, Map, "text->" + Text + (!unique ? "," + X + "," + Y : "_unique"), {
+	return DrawTextVisKD(Container || kdcanvas, Map, "tx|" + Text + (!unique ? "," + X + "," + Y : "_unique"), {
 		Text: Text,
 		X: X,
 		Y: Y,
@@ -3117,7 +3121,7 @@ function DrawTextKD (
 	if (!Text) return;
 	let alignment = Align ? Align : "center";
 
-	return DrawTextVisKD(kdcanvas, kdpixisprites, "text->" + Text + "," + X + "," + Y, {
+	return DrawTextVisKD(kdcanvas, kdpixisprites, "tx|" + Text + "," + X + "," + Y, {
 		Text: Text,
 		X: X,
 		Y: Y,
@@ -3526,9 +3530,9 @@ type ButtonOptions = {
 	/// hotkey press that triggers this button
 	hotkeyPress?: string;
 	/// Hotkey definitions for this button
-	keyDefs?:     KDKeystrokeDef[],
+	keyDefs?:     KDKeystrokeDef[];
 	/// filters
-	filters?:     any[];
+	filters?:     PIXIFilter;
 	font?:        string;
 	fontSize?:    number;
 	maxWidth?:    number;
@@ -5359,17 +5363,8 @@ function KDGetTargetRetType(x: number, y: number): string {
 
 let KDPIXIPaletteFilters: Map<string, PIXIFilter[]> = new Map();
 
-/**
- * @param x
- * @param y
- * @param w
- * @param [scale]
- * @param [selected]
- * @param [callback]
- * @parap [text]
- * @param [deffault]
- */
-function KDDrawPalettes(x: number, y: number, w: number, scale: number = 72, selected: string, callback?: (s: string) => void, text: string = "KDSelectPalette", deffault?: string) {
+function KDDrawCustomPalettes(palettes: Record<string, Record<string, LayerFilter>>, paletteID: string,
+	x: number, y: number, w: number, scale: number = 72, selected: string, callback?: (s: string) => void, text: string = "KDSelectPalette", deffault?: string) {
 	if (selected == undefined) selected = (deffault != undefined ? deffault : KDDefaultPalette);
 	let XX = x;
 	let YY = y;
@@ -5377,49 +5372,51 @@ function KDDrawPalettes(x: number, y: number, w: number, scale: number = 72, sel
 	let column = 0;
 	let spacing = 80;
 	let zero: [string, Record<string, LayerFilter>] = ["", {Highlight: {"gamma":1,"saturation":1,"contrast":1,"brightness":1,"red":1,"green":1,"blue":1,"alpha":1}}];
-	DrawTextFitKD(TextGet(text), x + scale*(0.5 + w)/2, y - 36, scale*w, KDBaseWhite, KDTextGray0, 20);
+	DrawTextFitKDTo(kdpalettecontainer, TextGet(text), x + scale*(0.25), y - 28, scale*w, KDBaseWhite,
+	KDTextGray0, 20, "left");
 
-	for (let value of [zero, ...Object.entries(KinkyDungeonFactionFilters)]) {
-		if (!KDPIXIPaletteFilters.get(value[0]))
-			KDPIXIPaletteFilters.set(value[0],
+	for (let value of [zero, ...Object.entries(palettes)]) {
+		if (!KDPIXIPaletteFilters.get(paletteID + value[0]))
+			KDPIXIPaletteFilters.set(paletteID + value[0],
 				[
 					new PIXI.filters.AdjustmentFilter(value[1].DarkNeutral),
 					new PIXI.filters.AdjustmentFilter(value[1].LightNeutral),
 					new PIXI.filters.AdjustmentFilter(value[1].Highlight),
 					new PIXI.filters.AdjustmentFilter(value[1].Catsuit),
 				]);
-		KDDraw(kdcanvas, kdpixisprites, "palette" + value[0],
+		KDDraw(kdpalettecontainer, kdpixisprites, "palette" + value[0],
 			KinkyDungeonRootDirectory + "UI/greyColor.png",
 			XX, YY, scale, scale, undefined, {
 				filters: [
-					KDPIXIPaletteFilters.get(value[0])[0],
+					KDPIXIPaletteFilters.get(paletteID + value[0])[0],
 				]
 			});
-		KDDraw(kdcanvas, kdpixisprites, "paletteL" + value[0],
+		KDDraw(kdpalettecontainer, kdpixisprites, "paletteL" + value[0],
 			KinkyDungeonRootDirectory + "UI/greyColorLight.png",
 			XX, YY, scale, scale, undefined, {
 				filters: [
-					KDPIXIPaletteFilters.get(value[0])[1],
+					KDPIXIPaletteFilters.get(paletteID + value[0])[1],
 				],
 				zIndex: 2,
 			});
-		KDDraw(kdcanvas, kdpixisprites, "paletteH" + value[0],
+		KDDraw(kdpalettecontainer, kdpixisprites, "paletteH" + value[0],
 			KinkyDungeonRootDirectory + "UI/greyColorHighlight.png",
 			XX, YY, scale, scale, undefined, {
 				filters: [
-					KDPIXIPaletteFilters.get(value[0])[2],
+					KDPIXIPaletteFilters.get(paletteID + value[0])[2],
 				],
 				zIndex: 3,
 			});
-		KDDraw(kdcanvas, kdpixisprites, "paletteC" + value[0],
+		KDDraw(kdpalettecontainer, kdpixisprites, "paletteC" + value[0],
 			KinkyDungeonRootDirectory + "UI/greyColorCatsuit.png",
 			XX, YY, scale, scale, undefined, {
 				filters: [
-					KDPIXIPaletteFilters.get(value[0])[3],
+					KDPIXIPaletteFilters.get(paletteID + value[0])[3],
 				],
 				zIndex: 4,
 			});
-		DrawButtonKDEx("choosepalette" + value[0], (_b) => {
+
+		DrawButtonKDExTo(kdpalettecontainer, "choosepalette" + value[0], (_b) => {
 			if (callback) callback(value[0]);
 			else {
 				KDDefaultPalette = value[0];
@@ -5437,7 +5434,9 @@ function KDDrawPalettes(x: number, y: number, w: number, scale: number = 72, sel
 			zIndex: -10,
 		}
 		);
-		DrawTextFitKD(TextGet("KDPalette" + value[0]), XX + scale/2, YY + scale - 12, scale, KDBaseWhite, KDTextGray0, 18);
+		DrawTextFitKDTo(kdpalettecontainer, HasText("KDPalette" + value[0])
+			? TextGet("KDPalette" + value[0])
+			: (value[0]), XX + scale/2, YY + scale - 12, scale, KDBaseWhite, KDTextGray0, 18);
 		column++;
 		if (column >= w) {
 			column = 0;
@@ -5448,6 +5447,21 @@ function KDDrawPalettes(x: number, y: number, w: number, scale: number = 72, sel
 			XX += spacing;
 		}
 	}
+}
+
+
+/**
+ * @param x
+ * @param y
+ * @param w
+ * @param [scale]
+ * @param [selected]
+ * @param [callback]
+ * @parap [text]
+ * @param [deffault]
+ */
+function KDDrawPalettes(x: number, y: number, w: number, scale: number = 72, selected: string, callback?: (s: string) => void, text: string = "KDSelectPalette", deffault?: string) {
+	KDDrawCustomPalettes(KinkyDungeonFactionFilters, "", x, y, w, scale, selected, callback, text, deffault);
 }
 
 function KDGetOutlineFilter(color: number, alpha: number, quality: number, thickness: number): PIXIFilter {

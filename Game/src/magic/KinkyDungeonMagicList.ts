@@ -1023,7 +1023,7 @@ let KinkyDungeonSpellList: Record<string, spell[]> = { // List of spells you can
 				name: "Ice",
 				duration: 20,
 			},
-			projectileTargeting:true, onhit:"", time: 4,  power: 3.5, delay: 0, range: 50, damage: "frost", speed: 3, playerEffect: {name: "Chill", damage: "ice", power: 3, time: 3},
+			projectileTargeting:true, onhit:"", time: 4,  power: 3.5, delay: 0, range: 50, damage: "frost", speed: 3, playerEffect: {name: "ChillProj", damage: "ice", power: 3, time: 3},
 			events: [{type: "ElementalOnSlowOrBindOrDrench", trigger: "bulletHitEnemy", damage: "ice", time: 4, power: 0},]},
 		{name: "Snowball", color: "#92e8c0", tags: ["ice", "bolt", "offense"], prerequisite: "ApprenticeIce", sfx: "Freeze", hitsfx: "LesserFreeze", school: "Elements", manacost: 5, components: ["Arms"], level:1, type:"bolt",
 			noise: 5,
@@ -2755,9 +2755,16 @@ let KinkyDungeonSpellListEnemies: spell[] = [
 		level:1, type:"bolt", projectileTargeting:true, onhit:"",  power: 3, delay: 0, range: 50, damage: "chain", speed: 2, playerEffect: {name: "NurseBola"}}, // Throws a chain which stuns the target for 1 turn
 	{enemySpell: true, name: "NurseSyringe", color: "#ff00ff", minRange: 1.5, sfx: "Miss", manacost: 2, castRange: 6, components: ["Arms"], level:1, speed: 1,
 		type:"bolt", projectileTargeting:true, onhit:"", power: 4, delay: 0, range: 50, damage: "pain", playerEffect: {name: "NurseSyringe", power: 4, type: "poison", time: 8},},
-	{enemySpell: true, name: "RibbonBurst", color: "#ff00ff", sfx: "MagicSlash", manacost: 5, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 5, delay: 2, power: 4, range: 6, size: 3, aoe: 1.5, lifetime: 1, damage: "chain", playerEffect: {name: "TrapBindings",  text: "KinkyDungeonTrapBindingsRibbons", tags: ["magicRibbons"], power: 3, damage: "chain", count: 2, noGuard: true}},
-	{enemySpell: true, name: "Spores", bulletSpin: 0.1, color: "#6733aa", sfx: "MagicSlash", manacost: 4, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 5, delay: 2, power: 3, range: 6, size: 3, aoe: 1.5, lifetime: 1, damage: "poisongas", playerEffect: {name: "Spores", power: 2, damage: "poisongas"}},
-	{enemySpell: true, name: "DragonFlowerSpores", bulletSpin: 0.1, hideWarnings: true, selfcast: true, color: "#6733aa", sfx: "MagicSlash", manacost: 4, components: ["Verbal"], level:1, type:"inert",
+	{enemySpell: true, name: "RibbonBurst", color: "#ff00ff", sfx: "MagicSlash", manacost: 5, minRange: 0,
+		components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 5, delay: 2, power: 4, range: 6, size: 3, aoe: 1.5, lifetime: 1, damage: "chain", playerEffect: {name: "TrapBindings",  text: "KinkyDungeonTrapBindingsRibbons", tags: ["magicRibbons"], power: 3, damage: "chain", count: 2, noGuard: true}},
+	{enemySpell: true, name: "Spores", bulletSpin: 0.1, color: "#6733aa", sfx: "MagicSlash",
+		manacost: 4, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 5, delay: 2, power: 3, range: 6, size: 3, aoe: 1.5, lifetime: 1,
+		damage: "poisongas", playerEffect: {name: "Spores", power: 2.5, damage: "poisongas"}},
+	{enemySpell: true, name: "PocketSpores", bulletSpin: 0.1, color: "#6733aa", sfx: "MagicSlash", minRange: 0,
+		manacost: 1, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 5, delay: 1, power: 2.0, range: 1.5, size: 1, aoe: 0.5, lifetime: 1,
+		damage: "poisongas", playerEffect: {name: "Spores", power: 2, damage: "poisongas"}},
+	{enemySpell: true, name: "DragonFlowerSpores", bulletSpin: 0.1, hideWarnings: true, selfcast: true,
+		color: "#6733aa", sfx: "MagicSlash", manacost: 4, components: ["Verbal"], level:1, type:"inert",
 		onhit:"aoe", time: 5, delay: 2, power: 1.5, range: 2.5, size: 3, aoe: 1.5, lifetime: 1, damage: "poisongas", playerEffect: {
 			name: "DragonFlowerSpores",
 			power: 1.5, amount: 0.75, damage: "poisongas"
@@ -3036,7 +3043,7 @@ let KinkyDungeonSpellListEnemies: spell[] = [
 			name: "Ice",
 			duration: 10,
 		},
-		playerEffect: {name: "Chill", damage: "ice", power: 1, time: 3},
+		playerEffect: {name: "ChillProj", damage: "ice", power: 1, time: 3},
 		events: [{type: "ElementalOnSlowOrBindOrDrench", trigger: "bulletHitEnemy", damage: "ice", time: 4, power: 0},],
 
 	},
@@ -3342,12 +3349,14 @@ let KinkyDungeonSpellListEnemies: spell[] = [
 	{enemySpell: true, name: "ShadowScythe", color: KDBaseBlue, sfx: "MagicSlash", manacost: 4, components: ["Verbal"], level:1, type:"inert", noTerrainHit: true, onhit:"aoe", time: 5, delay: 1, power: 3.5, range: 2, size: 3, aoe: 1.5, lifetime: 1, damage: "cold", playerEffect: {name: "ShadowBind", time: 4}},
 	{enemySpell: true, name: "WitchSlime",  bindType: "Slime", color: "#ff00ff", minRange: 0, landsfx: "MagicSlash", manacost: 7, components: ["Legs"], level:1, type:"inert", onhit:"lingering",
 		time: 2, delay: 1, range: 4, power: 2, size: 3, aoe: 1, lifetime: 1, lifetimeHitBonus: 9, damage: "glue", playerEffect: {name: "SlimeTrap", time: 3},
+		lingeringDelayed: true,
 		bindTags: ["slimeRestraintsRandom"], effectTileDurationModLinger: 8, effectTileLinger: {
 			name: "Slime",
 			duration: 10,
 		},}, // Creates a huge pool of slime, slowing enemies that try to enter. If you step in it, you have a chance of getting trapped!
 	{enemySpell: true, name: "RubberSlime",  bindType: "Slime", color: "#ff00ff", minRange: 0, landsfx: "MagicSlash", manacost: 7, components: ["Legs"], level:1, type:"inert", onhit:"lingering",
 		time: 2, delay: 1, range: 4, power: 2, size: 3, aoe: 1, lifetime: 1, lifetimeHitBonus: 9, damage: "glue", playerEffect: {name: "EncaseBolt", count: 1, time: 4, power: 5, damage: "glue"},
+		lingeringDelayed: true,
 		effectTileDurationModLinger: 8, effectTileLinger: {
 			name: "Slime",
 			duration: 10,
@@ -3361,6 +3370,8 @@ let KinkyDungeonSpellListEnemies: spell[] = [
 	}, // Throws a ball of slime which oozes more slime
 	{enemySpell: true, name: "SlimePuddle", bindType: "Slime", color: "#ff00ff", sfx: "FireSpell", manacost: 3, components: ["Arms"], level:1, type:"bolt", projectileTargeting:true, onhit:"lingering",
 		time: 2, power: 2, lifetime: 5, lifetimeHitBonus: 5, aoe: 1.5, delay: 0, range: 50, damage: "glue", speed: 1, playerEffect: {name: "SlimeTrap", time: 3},
+		
+		lingeringDelayed: true,
 		bindTags: ["slimeRestraintsRandom"], effectTileDurationModLinger: 8, effectTileLinger: {
 			name: "Slime",
 			duration: 10,
@@ -3428,7 +3439,7 @@ let KinkyDungeonSpellListEnemies: spell[] = [
 			name: "Ice",
 			duration: 20,
 		},
-		projectileTargeting:true, onhit:"", time: 4,  power: 3.5, delay: 0, range: 50, damage: "frost", speed: 2, playerEffect: {name: "Chill", damage: "ice", power: 3, time: 3},
+		projectileTargeting:true, onhit:"", time: 4,  power: 3.5, delay: 0, range: 50, damage: "frost", speed: 2, playerEffect: {name: "ChillProj", damage: "ice", power: 3, time: 3},
 		events: [{type: "ElementalOnSlowOrBindOrDrench", trigger: "bulletHitEnemy", damage: "ice", time: 4, power: 0},]},
 
 	{enemySpell: true, name: "WitchBoulder", sfx: "Bones", hitsfx: "HeavySwing", school: "Elements", manacost: 3, components: ["Arms"], level:1, type:"bolt", projectileTargeting:true, onhit:"", block: 8, time: 4,  power: 4, delay: 0, range: 50, damage: "crush", speed: 2, playerEffect: {name: "WitchBoulder", time: 2}},
@@ -4232,7 +4243,8 @@ let KDPlayerCastConditions: Record<string, (player: entity, x: number, y: number
 
 let KDCustomCost: Record<string, (data: any) => void> = {
 	"SprintPlusAttack": (data) => {
-		data.cost = Math.round(10 * -(KDAttackCost().attackCost + KDSprintCost())) + "SP";
+		data.cost = Math.round(10 * -(KDAttackCost().attackCost + KDSprintCost(undefined, 
+			undefined, true))) + "SP";
 		data.color = KDBaseMint;
 	},
 	"LimitSurge": (data) => {

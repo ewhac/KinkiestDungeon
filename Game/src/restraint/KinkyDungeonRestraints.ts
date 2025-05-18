@@ -1107,7 +1107,13 @@ function KinkyDungeonGetAffinity(Message: boolean, affinity: string, group?: str
 	} else if (affinity == "Sticky") {
 		return KinkyDungeonHasGhostHelp() || KinkyDungeonHasAllyHelp();
 	} else if (affinity == "Sharp") {
-		if (((KinkyDungeonHasGhostHelp() || KinkyDungeonHasAllyHelp()) && KinkyDungeonAllWeapon().some((inv) => {return KDWeapon(inv).light && KDWeapon(inv).cutBonus != undefined;})) || KinkyDungeonWeaponCanCut(false)) return true;
+		let hasHelp = KinkyDungeonHasGhostHelp() || KinkyDungeonHasAllyHelp();
+		if (((KinkyDungeonHasGhostHelp() || KinkyDungeonHasAllyHelp())
+			&& KinkyDungeonAllWeapon().some(
+		(inv) => {
+			return (hasHelp || KDWeapon(inv).light)
+				&& KDWeapon(inv).cutBonus != undefined;}))
+				|| KinkyDungeonWeaponCanCut(false)) return true;
 		if (KinkyDungeonAllWeapon().some((inv) => {return KDWeapon(inv).light && KDWeapon(inv).cutBonus != undefined;}) && (!KinkyDungeonIsArmsBound(
 			true, false, group, undefined, !Message
 		) || KinkyDungeonStatsChoice.has("Psychic") || KinkyDungeonWallCrackAndKnife(false))) return true;
@@ -3309,6 +3315,7 @@ type eligibleRestraintOptions = {
 	QuitOnFirst?:		 boolean;
 	/** Reduce target willpower by this much */
 	willBonus?: 		 number;
+	suppressTightPerk?: boolean;
 }
 
 /**
@@ -3420,7 +3427,7 @@ function KDGetRestraintsEligible (
 {
 	let RestraintsList: eligibleRestraintItem[] = [];
 	let effLevel = Level;
-	if (KinkyDungeonStatsChoice.has("TightRestraints")) {
+	if (!options?.suppressTightPerk && KinkyDungeonStatsChoice.has("TightRestraints")) {
 		effLevel *= KDTightRestraintsMult;
 		effLevel += KDTightRestraintsMod;
 	}
@@ -3767,7 +3774,7 @@ function KDGetRestraintWithVariants (
 	}
 }
 
-function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: number, customRestraints?: item[], extraTags?: string[]) {
+function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: number, customRestraints?: item[], extraTags?: string[]): Map<string, boolean> {
 	if (!C && !id) C = KinkyDungeonPlayer;
 	if (C == KinkyDungeonPlayer && !customRestraints) {
 		let playerTags = new Map();
@@ -3794,10 +3801,11 @@ function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: numbe
 			let inv = inv2.item;
 			playerTags.set("Item_"+inv.name, true);
 
-			if ((!inv.faction || KDToggles.ForcePalette || outfit?.palette || KinkyDungeonPlayer.Palette)
-				&& (KDToggles.ApplyPaletteRestraint && (outfit?.palette || KinkyDungeonPlayer.Palette || !KDDefaultPalette || KinkyDungeonFactionFilters[KDDefaultPalette]))) {
+			if ((!inv.faction || KDToggles.ForcePalette || outfit?.palette || (KinkyDungeonPlayer.metadata?.palette || KinkyDungeonPlayer.Palette))
+				&& (KDToggles.ApplyPaletteRestraint && (outfit?.palette || (KinkyDungeonPlayer.metadata?.palette || KinkyDungeonPlayer.Palette) || !KDDefaultPalette
+				|| GetPalette(C, KDDefaultPalette)))) {
 				inv.faction = (KDToggles.NoOutfitPalette ? undefined : outfit?.palette)
-					|| KinkyDungeonPlayer.Palette || KDDefaultPalette;
+					|| (KinkyDungeonPlayer.metadata?.palette || KinkyDungeonPlayer.Palette) || KDDefaultPalette;
 			}
 
 			if (KDRestraint(inv).Link)
@@ -3934,8 +3942,17 @@ function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: numbe
 		return playerTags;
 	} else if (KDGameData.NPCRestraints && KDGameData.NPCRestraints[id + ""]) {
 
-		let playerTags = new Map();
-		for (let inv of Object.values(KDGameData.NPCRestraints[id + ""])) {
+		return KDGetNPCRestraintTags(KDGameData.NPCRestraints[id + ""], extraTags, id);
+	}
+
+	return new Map();
+
+}
+
+function KDGetNPCRestraintTags(restraintList: Record<string, NPCRestraint>, extraTags?: string[], id = -1, addTags = true, events: boolean = true): Map<string, boolean> {
+	let playerTags: Map<string, boolean> = new Map();
+	if (restraintList)
+		for (let inv of Object.values(restraintList)) {
 			let group = KDRestraint(inv)?.Group;
 			if (group) {
 				if (KDGroupBlocked(group)) playerTags.set(group + "Blocked", true);
@@ -3945,13 +3962,14 @@ function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: numbe
 					playerTags.set(inv.inventoryVariant + "Worn", true);
 			}
 		}
-		for (let sg of KinkyDungeonStruggleGroupsBase) {
-			let group = sg;
-			if (!Object.values(KDGameData.NPCRestraints[id + ""]).some((rest) => {
-				return KDRestraint(rest)?.Group == group;
-			})) playerTags.set(group + "Empty", true);
-		}
-		for (let inv of Object.values(KDGameData.NPCRestraints[id + ""])) {
+	for (let sg of KinkyDungeonStruggleGroupsBase) {
+		let group = sg;
+		if (!restraintList || !Object.values(restraintList).some((rest) => {
+			return KDRestraint(rest)?.Group == group;
+		})) playerTags.set(group + "Empty", true);
+	}
+	if (restraintList)
+		for (let inv of Object.values(restraintList)) {
 			if (!KDRestraint(inv)) continue;
 			playerTags.set("Item_"+inv.name, true);
 
@@ -3985,20 +4003,17 @@ function KinkyDungeonUpdateRestraints(C?: Character, id?: number, _delta?: numbe
 
 		}
 
-		let tags = extraTags || [];
+	let tags = extraTags || [];
+	if (addTags)
 		KinkyDungeonAddTags(tags, MiniGameKinkyDungeonLevel);
-		for (let t of tags) {
-			playerTags.set(t, true);
-		}
-
-		KinkyDungeonSendEvent("updateNPCTags", {tags: playerTags, npc:id});
-		return playerTags;
+	for (let t of tags) {
+		playerTags.set(t, true);
 	}
 
-	return new Map();
-
+	if (events)
+		KinkyDungeonSendEvent("updateNPCTags", {tags: playerTags, npc:id});
+	return playerTags;
 }
-
 
 function KDGetCursePower(item: item): number {
 	if (!item || !KDGetCurse(item)) return 0;
@@ -6663,7 +6678,7 @@ function KDDynamicLinkListSurface(item: item): item[] {
 			!inaccess
 			&& (!KDRestraint(inv).renderExcept
 				|| !KDRestraint(inv).renderExcept.some((tag) => {
-					return !TagsSoFar[tag];
+					return TagsSoFar[tag];
 				}))
 			&& (
 				KDRestraint(host).UnderlinkedAlwaysRender

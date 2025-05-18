@@ -534,6 +534,9 @@ function KDGetNearestExitTo(roomTo: string, mapX: number, mapY: number, x: numbe
 }
 
 function KinkyDungeonInDanger() {
+	if (KDGetWarnings(KDPlayer().x, KDPlayer().y).length > 0) {
+		return true;
+	}
 	for (let b of KDMapData.Bullets) {
 		let bdist = 1.5;
 		if (b.vx && b.vy) bdist = 2*Math.sqrt(b.vx*b.vx + b.vy*b.vy);
@@ -599,13 +602,44 @@ function KinkyDungeonDrawEnemies(_canvasOffsetX: number, _canvasOffsetY: number,
 		KinkyDungeonFastStruggleSuppress = false;
 		reenabled2 = true;
 	}
+
+	if (KDGetWarnings(KDPlayer().x, KDPlayer().y)?.length > 0) {
+		if ((!wasInDanger && KDGameData.FocusControlToggle?.AutoPathSuppressBeforeCombat)
+			|| (KDGameData.FocusControlToggle?.AutoPathStepDuringCombat && !KinkyDungeonFlags.get("startPath"))) {
+		
+			if (!KinkyDungeonAutoWait)
+				if (KinkyDungeonFastMove && !KinkyDungeonFastMoveSuppress && !reenabled)
+					KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+			if (KinkyDungeonFlags.get("startPath") && KinkyDungeonFastMovePath.length > 0) {
+				KinkyDungeonFastMovePath = [KinkyDungeonFastMovePath[0]];
+			} else {
+				KinkyDungeonFastMovePath = [];
+			}
+		} else
+		// Cancel fast move even if there is a current path
+		if (KinkyDungeonFastMovePath?.length > 0 &&
+			(
+				KDGameData.FocusControlToggle?.AutoPathSuppressDuringCombat
+
+			)
+		) {
+			if (KinkyDungeonFlags.get("startPath") && KinkyDungeonFastMovePath.length > 0) {
+				KinkyDungeonFastMovePath = [KinkyDungeonFastMovePath[0]];
+			} else {
+				KinkyDungeonFastMovePath = [];
+			}
+		}
+	}
+
 	for (let b of KDMapData.Bullets) {
 		let bdist = 1.5;
 		if (b.vx && b.vy) bdist = 2*Math.sqrt(b.vx*b.vx + b.vy*b.vy);
 		if (KinkyDungeonVisionGet(Math.round(b.x), Math.round(b.y)) > 0 && Math.max(Math.abs(b.x - KinkyDungeonPlayerEntity.x), Math.abs(b.y - KinkyDungeonPlayerEntity.y)) < bdist) {
 			if (KinkyDungeonFastStruggle) {
-				if (KinkyDungeonFastStruggle && !KinkyDungeonFastStruggleSuppress && !reenabled2)
-					KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+				
+				if (!KinkyDungeonAutoWait)
+					if (KinkyDungeonFastStruggle && !KinkyDungeonFastStruggleSuppress && !reenabled2)
+						KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
 				KinkyDungeonFastStruggle = false;
 				KinkyDungeonFastStruggleGroup = "";
 				KinkyDungeonFastStruggleType = "";
@@ -636,6 +670,7 @@ function KinkyDungeonDrawEnemies(_canvasOffsetX: number, _canvasOffsetY: number,
 			}
 
 			KDInDanger = true;
+			break;
 		}
 	}
 	let nearby = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, KDGameData.MaxVisionDist + 1, undefined, true);
@@ -657,8 +692,10 @@ function KinkyDungeonDrawEnemies(_canvasOffsetX: number, _canvasOffsetY: number,
 						&& (!KDAmbushAI(enemy) || enemy.ambushtrigger)) {
 						if ((!wasInDanger && KDGameData.FocusControlToggle?.AutoPathSuppressBeforeCombat)
 							|| (KDGameData.FocusControlToggle?.AutoPathStepDuringCombat && !KinkyDungeonFlags.get("startPath"))) {
-							if (KinkyDungeonFastMove && !KinkyDungeonFastMoveSuppress && !reenabled)
-								KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+						
+							if (!KinkyDungeonAutoWait)
+								if (KinkyDungeonFastMove && !KinkyDungeonFastMoveSuppress && !reenabled)
+									KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
 							if (KDGameData.FocusControlToggle?.AutoPathStepDuringCombat && KinkyDungeonFlags.get("startPath") && KinkyDungeonFastMovePath.length > 0) {
 								KinkyDungeonFastMovePath = [KinkyDungeonFastMovePath[0]];
 							} else {
@@ -682,8 +719,9 @@ function KinkyDungeonDrawEnemies(_canvasOffsetX: number, _canvasOffsetY: number,
 					if ((KDHostile(enemy) || enemy.rage) && KinkyDungeonVisionGet(enemy.x, enemy.y) > 0 && KinkyDungeonFastStruggle &&
 						!enemy.Enemy.tags.harmless &&
 						(!KDAmbushAI(enemy) || enemy.ambushtrigger)) {
-						if (KinkyDungeonFastStruggle && !KinkyDungeonFastStruggleSuppress && !reenabled2)
-							KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+						if (!KinkyDungeonAutoWait)
+							if (KinkyDungeonFastStruggle && !KinkyDungeonFastStruggleSuppress && !reenabled2)
+								KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
 						KinkyDungeonFastStruggle = false;
 						KinkyDungeonFastStruggleGroup = "";
 						KinkyDungeonFastStruggleType = "";
@@ -816,12 +854,14 @@ function KinkyDungeonDrawEnemies(_canvasOffsetX: number, _canvasOffsetY: number,
 
 		}
 	}
-	if (reenabled && KinkyDungeonFastMove) {
-		KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
-	} else if (reenabled2 && KinkyDungeonFastStruggle) {
-		KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+	
+	if (!KinkyDungeonAutoWait)
+		if (reenabled && KinkyDungeonFastMove) {
+			KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+		} else if (reenabled2 && KinkyDungeonFastStruggle) {
+			KinkyDungeonPlaySound(KinkyDungeonRootDirectory + "Audio/Click.ogg");
+		}
 	}
-}
 
 function KDDrawEnemySprite(board: PIXIContainer, enemy: entity, tx: number, ty: number, CamX: number, CamY: number, StaticView?: boolean, zIndex: number = 0, id: string = ""): string {
 	let buffSprite = "";
@@ -1298,6 +1338,16 @@ function KinkyDungeonDrawEnemiesStatus(canvasOffsetX: number, canvasOffsetY: num
 }
 
 let KDLastEnemyWarningDelta = 0;
+
+interface WarningTileRecord {
+	/** 0 = enemy, 1 = bullet, 2 = custom */
+	type: number,
+	source: number,
+	sx: number,
+	sy: number,
+	x: number,
+	y: number,
+}
 
 function KinkyDungeonDrawEnemiesWarning(_canvasOffsetX: number, _canvasOffsetY: number, CamX: number, CamY: number) {
 
@@ -4620,6 +4670,19 @@ function KinkyDungeonUpdateEnemies(maindelta: number, Allied: boolean) {
 			let enemy = KDMapData.Entities[i];
 			// Make it so you can backstab enemies while your allies fight them
 			KDCheckVulnerableBackstab(enemy);
+			if (enemy.warningTiles) {
+				for (let w of enemy.warningTiles) {
+					
+					KDAddWarning({
+						source: enemy.id,
+						type: 0,
+						sx: enemy.x,
+						sy: enemy.y,
+						x: enemy.x + w.x,
+						y: enemy.y + w.y,
+					});
+				}
+			}
 			// Alert enemies if youve aggroed one
 			if (!KDAllied(enemy) && !(enemy.ceasefire > 0)) {
 				if (!(enemy.hostile > 0)
@@ -7107,7 +7170,12 @@ function KinkyDungeonEnemyLoop(enemy: entity, player: any, delta: number, vision
 						if (spell.castCondition && (!KDCastConditions[spell.castCondition] && !KDCastConditions[spell.castCondition](enemy, enemy, spell))) spell = null;
 					} else spell = null;
 				} else if (spell?.castCondition && (KDCastConditions[spell.castCondition] && !KDCastConditions[spell.castCondition](enemy, player, spell))) spell = null;
-				let minSpellRange = (spell && spell.minRange != undefined) ? spell.minRange : ((spell && (spell.selfcast || (enemy.Enemy.selfCast && enemy.Enemy.selfCast[spell.name]) || spell.buff || (spell.range && KDGetSpellRange(spell) < 1.6))) ? 0 : 1.5);
+				let minSpellRange = (spell && spell.minRange != undefined) ? spell.minRange : 
+					((spell
+						&& (spell.selfcast
+							|| (enemy.Enemy.selfCast && enemy.Enemy.selfCast[spell.name])
+							|| spell.buff
+							|| (spell.range && KDGetSpellRange(spell) < 1.6))) ? 0 : 1.5);
 				if (spell && spell.heal && spelltarget.hp >= spelltarget.Enemy.maxhp) spell = null;
 				if (spell && !(!minSpellRange || (AIData.playerDist > minSpellRange))) spell = null;
 				if (spell && !(!spell.minRange || (AIData.playerDist > spell.minRange))) spell = null;
@@ -7620,11 +7688,14 @@ function KinkyDungeonEnemyTryAttack (
 }
 
 type warningTileEntry = {
+	color?: string,
 	x:         number;
 	y:         number;
 	visual_x:  number;
 	visual_y:  number;
 	scale:     number;
+	x_orig?: number,
+	y_orig?: number,
 }
 
 function KinkyDungeonGetWarningTilesAdj(enemy: entity): warningTileEntry[] {
@@ -10531,6 +10602,19 @@ function KDGetEnemyTypeRep(enemy: enemy, faction: string): number {
 	return amount;
 }
 
+function GetOutfitMetadata(value: KDCollectionEntry | KDPersistentNPC | Character): KDOutfitMetadata {
+	if (value) {
+		return value.metadata || {
+			customColors: {},
+			palette: value.Palette,
+			//@ts-ignore
+			name: value.name || value.Name,
+		};
+	}
+
+	return null;
+}
+
 /**
  * @param enemy
  * @param force
@@ -10550,7 +10634,7 @@ function KDQuickGenNPC(enemy: entity, force: boolean) {
 		if (!enemyType.style) return; // Dont make one for enemies without styles
 		let NPC = null;
 		if (!KDNPCChar.get(id)) {
-			NPC = CharacterLoadNPC(id, KDEnemyName(enemy), value?.Palette);
+			NPC = LoadNPC(id, KDEnemyName(enemy),GetOutfitMetadata(value));
 			KDNPCChar.set(id, NPC);
 			KDNPCChar_ID.set(NPC, id);
 			value = value || KDGetPersistentNPC(enemy.id);
